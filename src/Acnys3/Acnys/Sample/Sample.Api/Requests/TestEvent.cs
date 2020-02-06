@@ -1,8 +1,7 @@
 ﻿using System;
-using Acnys.Core;
 using Acnys.Core.Eventing;
 
-namespace Sample.Api.Facade
+namespace Sample.Api.Requests
 {
     public class TestEvent : Event
     {

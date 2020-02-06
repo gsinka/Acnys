@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Acnys.Core.Eventing;
 using Acnys.Core.Request.Application;
-using Sample.Api.Facade;
+using Sample.Api.Requests;
 using Serilog;
 
 namespace Sample.Application.Handlers

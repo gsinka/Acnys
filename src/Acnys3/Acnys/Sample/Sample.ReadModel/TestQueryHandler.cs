@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Request.ReadModel;
-using Sample.Api.Facade;
+using Sample.Api.Requests;
 using Serilog;
 
 namespace Sample.ReadModel
@@ -20,7 +20,7 @@ namespace Sample.ReadModel
             return Task.Run(() =>
             {
                 _log.Verbose("Query handled");
-                return query.Data;
+                return query.Data + " handled";
             }, cancellationToken);
 
         }

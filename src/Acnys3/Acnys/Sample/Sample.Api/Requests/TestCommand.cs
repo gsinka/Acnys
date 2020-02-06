@@ -1,7 +1,8 @@
 ﻿using System;
 using Acnys.Core.Request;
+using FluentValidation;
 
-namespace Sample.Api.Facade
+namespace Sample.Api.Requests
 {
     public class TestCommand : Command
     {
@@ -12,4 +13,13 @@ namespace Sample.Api.Facade
             Data = data;
         }
     }
+
+    public class TestCommandValidator : AbstractValidator<TestCommand>
+    {
+        public TestCommandValidator()
+        {
+            RuleFor(x => x.Data).NotEmpty().WithMessage("Data cannot be empty");
+        }
+    }
+
 }
