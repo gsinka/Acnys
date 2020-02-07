@@ -19,7 +19,6 @@ namespace Acnys.Core.Hosting.Request
 
             Builder.RegisterType<CommandDispatcher>().As<IDispatchCommand>().SingleInstance();
             Builder.RegisterType<QueryDispatcher>().As<IDispatchQuery>().SingleInstance();
-            Builder.RegisterType<EventDispatcher>().As<IDispatchEvent>().SingleInstance();
         }
 
         public RequestBuilder RegisterHandlersFromAssemblyOf<T>()
@@ -30,10 +29,6 @@ namespace Acnys.Core.Hosting.Request
 
             Builder.RegisterAssemblyTypes(typeof(T).Assembly)
                 .AsClosedTypesOf(typeof(IHandleQuery<,>))
-                .AsImplementedInterfaces();
-
-            Builder.RegisterAssemblyTypes(typeof(T).Assembly)
-                .AsClosedTypesOf(typeof(IHandleEvent<>))
                 .AsImplementedInterfaces();
 
             return this;

@@ -1,5 +1,6 @@
 using System.Reflection;
 using Acnys.Core.Hosting;
+using Acnys.Core.Hosting.Events;
 using Acnys.Core.Hosting.Request;
 using Acnys.Core.Hosting.Serilog;
 using Microsoft.AspNetCore.Builder;
@@ -40,6 +41,12 @@ namespace Acnys.Web
                     .ValidateRequests()
                 )
 
+                .AddEvents((context, builder) => builder
+                    .RegisterHandlersFromAssemblyOf<TestEventHandler>()
+                    
+                
+                )
+
                 .AddHttpRequestHandler()
 
                 .ConfigureWebHostDefaults(builder => builder
@@ -64,7 +71,6 @@ namespace Acnys.Web
                         services.AddAuthorization();
 
                     })
-
                 )
 
                 .Build().Run();
