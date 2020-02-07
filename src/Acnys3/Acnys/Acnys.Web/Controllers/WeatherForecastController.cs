@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Request.Application;
 using Acnys.Core.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Sample.Api.Requests;
@@ -12,6 +13,7 @@ using Sample.Api.Requests;
 namespace Acnys.Web.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {

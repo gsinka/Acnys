@@ -6,8 +6,11 @@ using Acnys.Core.Hosting.HealthCheck;
 using Acnys.Core.Hosting.Metrics;
 using Acnys.Core.Hosting.Request;
 using Acnys.Core.Hosting.Serilog;
+using Acnys.Core.Hosting.SingleSignOn;
+using Acnys.Core.SingleSignOn.Constants;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
@@ -51,28 +54,7 @@ namespace Acnys.Web
                 )
 
                 .AddHttpRequestHandler()
-
-                .ConfigureWebHostDefaults(builder => builder
-                    .Configure((context, app) =>
-                        {
-                            if (context.HostingEnvironment.IsDevelopment())
-                            {
-                                app.UseDeveloperExceptionPage();
-                            }
-                            
-                            app.AddLiveness();
-                            app.AddReadiness();
-
-                            app.UseHttpMetrics();
-
-                            app.UseStatusCodePages();
-                            app.UseRouting();
-                            app.UseHttpRequestHandler();
-                            app.UseAuthorization();
-                            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
-
-                        })
-
+                
                     .ConfigureServices((context, services) =>
                     {
                         services.AddHealthChecks()
@@ -80,9 +62,35 @@ namespace Acnys.Web
 
                         services.AddHttpMetrics();
 
-                        services.AddControllers().AddApplicationPart(Assembly.GetEntryAssembly()).AddControllersAsServices();
-                        services.AddAuthorization();
+                        services
+                            .AddControllers()
+                            .AddApplicationPart(Assembly.GetEntryAssembly()).AddControllersAsServices();
 
+
+                        services.AddAuthorization(options => options.AddPolicy("admin", builder => builder.RequireClaim("user-roles", new List<string>() { "admin"})));
+                        services.AddSingleSignOn(configuration => context.Configuration.Bind(Defaults.CONFIGURATION_SECTION, configuration));
+                    })
+
+                .ConfigureWebHostDefaults(builder => builder
+                    .Configure((context, app) =>
+                    {
+                        if (context.HostingEnvironment.IsDevelopment())
+                        {
+                            app.UseDeveloperExceptionPage();
+                        }
+
+                        app.AddLiveness();
+                        app.AddReadiness();
+                        app.UseHttpMetrics();
+                        app.UseStatusCodePages();
+                        app.UseRouting();
+                        //app.UseHttpRequestHandler();
+                        app.UseAuthorization();
+                        app.UseEndpoints(endpoints =>
+                        {
+                            endpoints.MapHttpRequestHandler();
+                            endpoints.MapControllers();
+                        });
                     })
                 )
 
