@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
-namespace Acnys.Core.Hosting.HealtCheck
+namespace Acnys.Core.Hosting.HealthCheck
 {
     public static class HealthCheckExtensions
     {
