@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Reflection;
+using Acnys.Core.AspNetCore.HealthCheck;
 using Acnys.Core.Hosting;
 using Acnys.Core.Hosting.Events;
 using Acnys.Core.Hosting.Request;
@@ -6,6 +8,7 @@ using Acnys.Core.Hosting.Serilog;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Sample.Api.Requests;
 using Sample.Application.Handlers;
@@ -43,8 +46,6 @@ namespace Acnys.Web
 
                 .AddEvents((context, builder) => builder
                     .RegisterHandlersFromAssemblyOf<TestEventHandler>()
-                    
-                
                 )
 
                 .AddHttpRequestHandler()
@@ -56,6 +57,9 @@ namespace Acnys.Web
                             {
                                 app.UseDeveloperExceptionPage();
                             }
+                            
+                            app.AddLiveness();
+                            app.AddReadiness();
 
                             app.UseStatusCodePages();
                             app.UseRouting();
@@ -67,6 +71,9 @@ namespace Acnys.Web
 
                     .ConfigureServices((context, services) =>
                     {
+                        services.AddHealthChecks()
+                            .AddCheck("Self", () => HealthCheckResult.Healthy(), new List<string> {"Liveness"});
+
                         services.AddControllers().AddApplicationPart(Assembly.GetEntryAssembly()).AddControllersAsServices();
                         services.AddAuthorization();
 
