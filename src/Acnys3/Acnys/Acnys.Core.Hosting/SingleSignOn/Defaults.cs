@@ -1,4 +1,4 @@
-﻿namespace Acnys.Core.SingleSignOn.Constants
+﻿namespace Acnys.Core.Hosting.SingleSignOn
 {
     public static class Defaults
     {

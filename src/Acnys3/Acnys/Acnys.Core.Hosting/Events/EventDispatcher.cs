@@ -7,7 +7,7 @@ using Acnys.Core.Request.Application;
 using Autofac;
 using Serilog;
 
-namespace Acnys.Core.Hosting.Request
+namespace Acnys.Core.Hosting.Events
 {
     public class EventDispatcher : IDispatchEvent
     {

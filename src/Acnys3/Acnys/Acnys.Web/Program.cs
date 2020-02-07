@@ -8,7 +8,6 @@ using Acnys.Core.Hosting.OpenApiDocument;
 using Acnys.Core.Hosting.Request;
 using Acnys.Core.Hosting.Serilog;
 using Acnys.Core.Hosting.SingleSignOn;
-using Acnys.Core.SingleSignOn.Constants;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;

@@ -1,5 +1,4 @@
 ﻿using System;
-using Acnys.Core.SingleSignOn.Configurations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 

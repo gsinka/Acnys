@@ -1,6 +1,4 @@
-﻿using Acnys.Core.SingleSignOn.Constants;
-
-namespace Acnys.Core.SingleSignOn.Configurations
+﻿namespace Acnys.Core.Hosting.SingleSignOn
 {
     public class JwtBearerConfiguration
     {
