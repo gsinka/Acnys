@@ -21,7 +21,5 @@ namespace Acnys.Core.Hosting.Request
             path ??= "";
             app.MapControllerRoute("generic", $"{((path ?? "").EndsWith("/") ? path : path + "/")}{{controller=GenericRequestHandler}}/{{action=post}}");
         }
-
-
     }
 }

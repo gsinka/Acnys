@@ -4,6 +4,7 @@ using Acnys.Core.Hosting;
 using Acnys.Core.Hosting.Events;
 using Acnys.Core.Hosting.HealthCheck;
 using Acnys.Core.Hosting.Metrics;
+using Acnys.Core.Hosting.OpenApiDocument;
 using Acnys.Core.Hosting.Request;
 using Acnys.Core.Hosting.Serilog;
 using Acnys.Core.Hosting.SingleSignOn;
@@ -31,7 +32,7 @@ namespace Acnys.Web
             Host.CreateDefaultBuilder(args)
 
                 .AddAutofac()
-                
+
                 .AddSerilog((context, config) => config
                     .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss+fff}{EventType:x8} {Level:u3}][{App}] {Message:lj} <-- [{SourceContext}]{NewLine}{Exception}", theme: AnsiConsoleTheme.Code)
                     .Enrich.FromLogContext()
@@ -41,7 +42,7 @@ namespace Acnys.Web
                 )
 
                 .AddComputerClock()
-                
+
                 .AddRequests((context, builder) => builder
                     .RegisterHandlersFromAssemblyOf<TestCommandHandler>()
                     .RegisterHandlersFromAssemblyOf<TestQueryHandler>()
@@ -54,21 +55,22 @@ namespace Acnys.Web
                 )
 
                 .AddHttpRequestHandler()
-                
+
                     .ConfigureServices((context, services) =>
                     {
                         services.AddHealthChecks()
-                            .AddCheck("Self", () => HealthCheckResult.Healthy(), new List<string> {"Liveness"});
+                            .AddCheck("Self", () => HealthCheckResult.Healthy(), new List<string> { "Liveness" });
 
                         services.AddHttpMetrics();
 
                         services
                             .AddControllers()
                             .AddApplicationPart(Assembly.GetEntryAssembly()).AddControllersAsServices();
-
-
-                        services.AddAuthorization(options => options.AddPolicy("admin", builder => builder.RequireClaim("user-roles", new List<string>() { "admin"})));
+                        
+                        services.AddAuthorization(options => options.AddPolicy("admin", builder => builder.RequireClaim("user-roles", new List<string>() { "admin" })));
                         services.AddSingleSignOn(configuration => context.Configuration.Bind(Defaults.CONFIGURATION_SECTION, configuration));
+
+                        services.AddOpenApiDocumentation();
                     })
 
                 .ConfigureWebHostDefaults(builder => builder
@@ -83,8 +85,10 @@ namespace Acnys.Web
                         app.AddReadiness();
                         app.UseHttpMetrics();
                         app.UseStatusCodePages();
+
+                        app.AddOpenApiDocumentation();
+                            
                         app.UseRouting();
-                        //app.UseHttpRequestHandler();
                         app.UseAuthorization();
                         app.UseEndpoints(endpoints =>
                         {
