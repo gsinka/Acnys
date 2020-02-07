@@ -5,7 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Acnys.Core.Abstractions\Acnys.Core.Abstractions.csproj" />
+    <Folder Include="Eventing\" />
+    <Folder Include="Aggregates\" />
+    <Folder Include="Request\Application\" />
+    <Folder Include="Request\ReadModel\" />
   </ItemGroup>
 
 </Project>
