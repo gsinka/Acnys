@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="3.0.4" />
     <PackageReference Include="Autofac" Version="5.0.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="NSwag.AspNetCore" Version="13.2.2" />

@@ -5,12 +5,10 @@ using Acnys.Core.Hosting.Events;
 using Acnys.Core.Hosting.HealthCheck;
 using Acnys.Core.Hosting.Metrics;
 using Acnys.Core.Hosting.OpenApiDocument;
-using Acnys.Core.Hosting.RabbitMQ;
 using Acnys.Core.Hosting.RabbitMQ.Lovisa;
 using Acnys.Core.Hosting.Request;
 using Acnys.Core.Hosting.Serilog;
 using Acnys.Core.Hosting.SingleSignOn;
-using Acnys.Core.Request.Application;
 using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -19,7 +17,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Prometheus;
-using RabbitMQ.Client;
 using Sample.Api.Requests;
 using Sample.Application.Handlers;
 using Sample.ReadModel;
@@ -43,6 +40,7 @@ namespace Acnys.Web
                 .AddSerilog((context, config) => config
                     .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss+fff}{EventType:x8} {Level:u3}][{App}] {Message:lj} <-- [{SourceContext}]{NewLine}{Exception}", theme: AnsiConsoleTheme.Code)
                     .Enrich.FromLogContext()
+                    .Enrich.WithProperty("App", "SPL")
                     .MinimumLevel.Information()
                     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                     .MinimumLevel.Override("System", LogEventLevel.Warning)
@@ -63,6 +61,9 @@ namespace Acnys.Web
 
                 .AddHttpRequestHandler()
 
+                .AddRabbitEventBus("RabbitEventSettings")
+                .AddRabbitEventBusHealthCheck()
+
                 .ConfigureServices((context, services) =>
                 {
                     services.AddHealthChecks()
@@ -82,34 +83,11 @@ namespace Acnys.Web
                     
                     context.Configuration.Bind("OpenApi", documentSettings);
                     context.Configuration.Bind("OpenApi:Security", securityScheme);
-
                     services.AddOpenApiDocumentation(documentSettings, securityScheme);
-
-                    //services.AddHostedService<RabbitEventService>();
-                    services.Configure<RabbitEventSettings>(context.Configuration.GetSection("RabbitEventSettings"));
                 })
 
                 .ConfigureContainer<ContainerBuilder>((context, builder) =>
                 {
-                    builder.RegisterType<RabbitEventService>().AsImplementedInterfaces().SingleInstance();
-                    
-
-                    //builder.AddRabbitConnection(factory => factory
-                    //    .UseUri(context.Configuration["RabbitMQ:Uri"])
-                    //    .EnableAutoRecovery()
-                    //    );
-
-                    //builder.RegisterType<BasicPropertiesMapper>().As<IMapEvent>().SingleInstance();
-
-                    //builder.Register(componentContext => new RabbitConsumerFactory()
-                    //    .UseConnection(componentContext.Resolve<IConnection>)
-                    //    .CreateQueue()
-                    //    .DispatchMessage(componentContext.Resolve<IMapEvent>(), componentContext.Resolve<IDispatchEvent>())
-                    //    .CreateConsumer("test", false)
-                    //    )
-                    //    .AsSelf()
-                    //    .SingleInstance()
-                    //    .AutoActivate();
                 })
 
                 .ConfigureWebHostDefaults(builder => builder
@@ -131,7 +109,7 @@ namespace Acnys.Web
                         app.UseAuthorization();
                         app.UseEndpoints(endpoints =>
                         {
-                            endpoints.MapHttpRequestHandler();
+                            endpoints.MapHttpRequestHandler("/api");
                             endpoints.MapControllers();
                         });
                     })
