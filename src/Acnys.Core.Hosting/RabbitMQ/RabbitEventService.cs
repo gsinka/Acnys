@@ -18,12 +18,12 @@ namespace Acnys.Core.Hosting.RabbitMQ.Lovisa
     {
         private readonly ILogger _log;
         private readonly IDispatchEvent _eventDispatcher;
-        private readonly IMapEvent _eventMapper;
         private readonly IOptions<RabbitEventSettings> _settings;
         private readonly ConnectionFactory _connectionFactory;
         private readonly IConnection _connection;
         private readonly IModel _channel;
         private readonly IList<EventingBasicConsumer> _consumers = new List<EventingBasicConsumer>();
+        private readonly BasicPropertiesMapper _eventMapper;
 
         public RabbitEventService(ILogger log, IDispatchEvent eventDispatcher, IOptions<RabbitEventSettings> settings)
         {
@@ -134,17 +134,17 @@ namespace Acnys.Core.Hosting.RabbitMQ.Lovisa
 
         private void RabbitMQ_ConnectionShutdown(object sender, ShutdownEventArgs e) { }
 
-        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = new CancellationToken())
+        public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = new CancellationToken())
         {
             _log.Verbose("Checking Rabbit Event Service health status");
 
-            return !_connection.IsOpen
+            return Task.FromResult(!_connection.IsOpen
                 ? HealthCheckResult.Unhealthy("Connection to RabbitMQ is lost")
                 : !_consumers.Any(consumer => consumer.IsRunning)
                   ? HealthCheckResult.Unhealthy("No consumers are running")
                   :_consumers.Any(consumer => !consumer.IsRunning)
                     ? HealthCheckResult.Degraded("One or more consumers are not running")
-                    : HealthCheckResult.Healthy("Rabbit Event Service is working properly");
+                    : HealthCheckResult.Healthy("Rabbit Event Service is working properly"));
 
         }
     }
