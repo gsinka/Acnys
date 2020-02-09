@@ -12,10 +12,10 @@ namespace Sample.Application.Handlers
         private readonly ILogger _log;
         private readonly ISendCommand _commandSender;
 
-        public TestEventHandler(ILogger log, ISendCommand commandSender)
+        public TestEventHandler(ILogger log/*, ISendCommand commandSender*/)
         {
             _log = log;
-            _commandSender = commandSender;
+            //_commandSender = commandSender;
         }
 
         public async Task Handle(TestEvent evnt, CancellationToken cancellationToken = default)

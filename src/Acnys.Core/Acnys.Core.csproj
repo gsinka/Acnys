@@ -7,7 +7,6 @@
   <ItemGroup>
     <Folder Include="Eventing\" />
     <Folder Include="Aggregates\" />
-    <Folder Include="Request\Application\" />
     <Folder Include="Request\ReadModel\" />
   </ItemGroup>
 

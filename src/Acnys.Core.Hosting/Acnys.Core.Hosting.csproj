@@ -6,6 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="RabbitMQ\Pooled\**" />
+    <EmbeddedResource Remove="RabbitMQ\Pooled\**" />
+    <None Remove="RabbitMQ\Pooled\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
@@ -19,7 +25,7 @@
     <PackageReference Include="prometheus-net.AspNetCore" Version="3.4.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.0.0" />
-
+    <PackageReference Include="RabbitMQ.Client" Version="5.1.2" />
 
   </ItemGroup>
 

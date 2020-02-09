@@ -10,21 +10,21 @@ namespace Acnys.Core.Hosting.OpenApiDocument
 {
     public static class OpenApiDocumentExtensions
     {
-        public static void AddOpenApiDocumentation(this IServiceCollection services)
+        public static void AddOpenApiDocumentation(this IServiceCollection services, OpenApiDocumentSettings settings, OpenApiSecurityScheme securityScheme)
         {
             services.AddOpenApiDocument(options =>
             {
-                options.DocumentName = "SampleApp";
-                options.Title = "Sample Application";
-                options.Version = "1.0.0";
+                options.DocumentName = settings.DocumentName;
+                options.Title = settings.DocumentTitle;
+                options.Version = settings.Version;
 
-                options.DocumentProcessors.Add(new SecurityDefinitionAppender("name", new NSwag.OpenApiSecurityScheme
+                options.DocumentProcessors.Add(new SecurityDefinitionAppender(securityScheme.Name, new NSwag.OpenApiSecurityScheme
                 {
-                    Name = "name",
-                    Scheme = "http",
-                    Type = NSwag.OpenApiSecuritySchemeType.OAuth2,
-                    Flow = NSwag.OpenApiOAuth2Flow.Implicit,
-                    AuthorizationUrl = $"{""}/protocol/openid-connect/auth",
+                    Name = securityScheme.Name,
+                    Scheme = securityScheme.Scheme,
+                    Type = securityScheme.Type,
+                    Flow = securityScheme.Flow,
+                    AuthorizationUrl = $"{securityScheme.Authority}/protocol/openid-connect/auth",
                     Scopes = new Dictionary<string, string>
                     {
                         { "openid", "Open ID" },
@@ -34,20 +34,20 @@ namespace Acnys.Core.Hosting.OpenApiDocument
             });
         }
 
-        public static void AddOpenApiDocumentation(this IApplicationBuilder app)
+        public static void AddOpenApiDocumentation(this IApplicationBuilder app, OpenApiDocumentSettings documentSettings, OpenApiSecurityScheme securityScheme)
         {
             app.UseOpenApi(settings =>
             {
-                settings.DocumentName = "Document name";
+                settings.DocumentName = settings.DocumentName;
             });
 
             app.UseSwaggerUi3(settings =>
             {
-                settings.Path = "/swagger";
+                settings.Path = documentSettings.Path;
                 settings.OAuth2Client = new OAuth2ClientSettings
                 {
-                    AppName = "AppName",
-                    ClientId = "ClientId"
+                    AppName = securityScheme.AppName,
+                    ClientId = securityScheme.ClientId
                 };
                 settings.OAuth2Client.AdditionalQueryStringParameters.Add("nonce", "123456");
             });
