@@ -10,7 +10,7 @@ namespace Sample.Application.Handlers
     public class TestEventHandler : IHandleEvent<TestEvent>
     {
         private readonly ILogger _log;
-        private readonly ISendCommand _commandSender;
+        //private readonly ISendCommand _commandSender;
 
         public TestEventHandler(ILogger log/*, ISendCommand commandSender*/)
         {
@@ -18,10 +18,12 @@ namespace Sample.Application.Handlers
             //_commandSender = commandSender;
         }
 
-        public async Task Handle(TestEvent evnt, CancellationToken cancellationToken = default)
+        public Task Handle(TestEvent evnt, CancellationToken cancellationToken = default)
         {
             _log.Information("Event {eventType} handled", evnt.GetType());
             //await _commandSender.Send(new TestCommand(evnt.Data, causationId: evnt.EventId, evnt.CorrelationId), cancellationToken);
+
+            return Task.CompletedTask;
         }
     }
 }
