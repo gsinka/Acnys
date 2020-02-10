@@ -1,0 +1,33 @@
+name: Continous Delivery
+
+on:
+  push:    
+    tags:
+      - '*'
+      
+jobs:
+  
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    
+    - uses: actions/checkout@v2
+    - run: |
+        git fetch --prune --unshallow
+    
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.0.100
+    
+    - name: Build
+      run: dotnet build ./src/Acnys.Core.sln --configuration Release
+    
+    - name: Test
+      run: dotnet test ./src/Acnys.Core.sln
+    
+    - name: Pack
+      run: dotnet pack ./src/Acnys.Core.sln --configuration Release --output ./packages
+
+    - name: Publish      
+      run: dotnet nuget push ./packages/**/*.nupkg --no-symbols true --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
