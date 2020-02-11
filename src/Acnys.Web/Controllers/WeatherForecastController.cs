@@ -37,7 +37,7 @@ namespace Acnys.Web.Controllers
         [HttpGet]
         public async Task<IEnumerable<WeatherForecast>> Get(CancellationToken cancellationToken)
         {
-            await _commandSender.Send(new TestCommand("test data", Guid.Empty, Guid.NewGuid()), cancellationToken);
+            await _commandSender.Send(new TestCommand("", Guid.Empty, Guid.NewGuid()), cancellationToken);
 
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast

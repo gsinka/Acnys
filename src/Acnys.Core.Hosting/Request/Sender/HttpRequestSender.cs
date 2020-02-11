@@ -43,9 +43,10 @@ namespace Acnys.Core.Hosting.Request.Sender
                 cancellationToken);
 
             if (!result.IsSuccessStatusCode)
+            {
                 _log.Error("Sending command to HTTP endpoint failed. Reason: {reason}, Response: {response}", result.ReasonPhrase, result.Content.ReadAsStringAsync());
-
-            result.EnsureSuccessStatusCode();
+                throw new InvalidOperationException(await result.Content.ReadAsStringAsync());
+            }
         }
 
         public async Task<T> Send<T>(IQuery<T> query, CancellationToken cancellationToken = default)
@@ -67,9 +68,10 @@ namespace Acnys.Core.Hosting.Request.Sender
                 cancellationToken);
 
             if (!result.IsSuccessStatusCode)
+            {
                 _log.Error("Sending query to HTTP endpoint failed. Reason: {reason}, Response: {response}", result.ReasonPhrase, result.Content.ReadAsStringAsync());
-
-            result.EnsureSuccessStatusCode();
+                throw new InvalidOperationException(await result.Content.ReadAsStringAsync());
+            }
 
             var responseContent = await result.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<T>(responseContent);

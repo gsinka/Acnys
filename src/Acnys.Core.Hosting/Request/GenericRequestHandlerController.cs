@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Acnys.Core.Request;
 using Acnys.Core.Request.Application;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
 
 namespace Acnys.Core.Hosting.Request
