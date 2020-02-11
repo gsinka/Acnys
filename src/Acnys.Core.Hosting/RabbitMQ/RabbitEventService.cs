@@ -12,7 +12,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Serilog;
 
-namespace Acnys.Core.Hosting.RabbitMQ.Lovisa
+namespace Acnys.Core.Hosting.RabbitMQ
 {
     public class RabbitEventService : BackgroundService, IPublishEvent, IHealthCheck
     {

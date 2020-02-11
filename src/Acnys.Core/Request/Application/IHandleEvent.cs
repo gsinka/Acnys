@@ -1,7 +1,8 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Acnys.Core.Eventing;
 
-namespace Acnys.Core.Eventing
+namespace Acnys.Core.Request.Application
 {
     /// <summary>
     /// Event handler interface

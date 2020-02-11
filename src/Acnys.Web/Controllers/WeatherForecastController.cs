@@ -25,19 +25,19 @@ namespace Acnys.Web.Controllers
 
         private readonly ILogger<WeatherForecastController> _logger;
         private readonly IClock _clock;
-        private readonly IDispatchCommand _commandDispatcher;
+        private readonly ISendCommand _commandSender;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger, IClock clock, IDispatchCommand commandDispatcher)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IClock clock, ISendCommand commandSender)
         {
             _logger = logger;
             _clock = clock;
-            _commandDispatcher = commandDispatcher;
+            _commandSender = commandSender;
         }
 
         [HttpGet]
         public async Task<IEnumerable<WeatherForecast>> Get(CancellationToken cancellationToken)
         {
-            await _commandDispatcher.Dispatch(new TestCommand("test data", Guid.Empty, Guid.NewGuid()), cancellationToken);
+            await _commandSender.Send(new TestCommand("test data", Guid.Empty, Guid.NewGuid()), cancellationToken);
 
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast

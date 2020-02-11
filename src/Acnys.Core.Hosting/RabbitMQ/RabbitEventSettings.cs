@@ -1,4 +1,4 @@
-﻿namespace Acnys.Core.Hosting.RabbitMQ.Lovisa
+﻿namespace Acnys.Core.Hosting.RabbitMQ
 {
     public class RabbitEventSettings
     {

@@ -8,10 +8,18 @@ namespace Acnys.Core.Hosting.Request
     {
         public static IHostBuilder AddRequests(this IHostBuilder hostBuilder, Action<HostBuilderContext, RequestBuilder> requestBuilder)
         {
+            
             return hostBuilder.ConfigureContainer<ContainerBuilder>((context, builder) =>
             {
-                requestBuilder(context, new RequestBuilder(context, builder));
+                var requestConfig = new RequestBuilder();
+                requestBuilder(context, requestConfig);
+                
+                requestConfig.Callbacks.ForEach(action => action(context, builder));
+                
+                //requestBuilder(context, new RequestBuilder(context, builder));
             });
+
+
         }
 
     }

@@ -1,9 +1,8 @@
 ﻿using Autofac;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 
-namespace Acnys.Core.Hosting.RabbitMQ.Lovisa
+namespace Acnys.Core.Hosting.RabbitMQ
 {
     public static class RabbitExtensions
     {
