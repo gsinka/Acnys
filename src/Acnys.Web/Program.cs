@@ -37,7 +37,7 @@ namespace Acnys.Web
             var documentSettings = new OpenApiDocumentSettings();
             var securityScheme = new OpenApiSecurityScheme();
 
-            Host.CreateDefaultBuilder(args)
+            var app = Host.CreateDefaultBuilder(args)
                 
                 .AddAutofac()
 
@@ -124,8 +124,11 @@ namespace Acnys.Web
                     })
                 )
 
-                .Build().Run();
+                .Build();
+                
+            Log.ForContext<Program>().Information("Running application");
 
+            app.Run();
         }
 
     }
