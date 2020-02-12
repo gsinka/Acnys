@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Acnys.Core.Hosting.Testing;
 using Acnys.Core.Request.Application;
 using Acnys.Core.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -26,18 +27,28 @@ namespace Acnys.Web.Controllers
         private readonly ILogger<WeatherForecastController> _logger;
         private readonly IClock _clock;
         private readonly ISendCommand _commandSender;
+        private readonly TestHelper<TestEvent> _testHelper;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger, IClock clock, ISendCommand commandSender)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IClock clock, ISendCommand commandSender, TestHelper<TestEvent> testHelper)
         {
             _logger = logger;
             _clock = clock;
             _commandSender = commandSender;
+            _testHelper = testHelper;
         }
 
         [HttpGet]
         public async Task<IEnumerable<WeatherForecast>> Get(CancellationToken cancellationToken)
         {
-            await _commandSender.Send(new TestCommand("", Guid.Empty, Guid.NewGuid()), cancellationToken);
+            await _commandSender.Send(new TestCommand("test", Guid.Empty, Guid.NewGuid()), cancellationToken);
+
+            var result = await _testHelper.WaitFor(e => e.Data == "test");
+
+            //var returnEvent = await _testHelper.SendCommandAndWaitForEvent<TestEvent, TestCommand>(
+            //    new TestCommand("test", Guid.Empty, Guid.NewGuid()), 
+            //    evnt => true, 
+            //    TimeSpan.FromSeconds(5), 
+            //    cancellationToken);
 
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast

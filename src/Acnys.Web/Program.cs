@@ -11,7 +11,9 @@ using Acnys.Core.Hosting.Request;
 using Acnys.Core.Hosting.Request.Sender;
 using Acnys.Core.Hosting.Serilog;
 using Acnys.Core.Hosting.SingleSignOn;
+using Acnys.Core.Hosting.Testing;
 using Acnys.Core.Request;
+using Acnys.Core.Request.Application;
 using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -96,8 +98,11 @@ namespace Acnys.Web
                 })
 
                 .ConfigureContainer<ContainerBuilder>((context, builder) =>
-                {
-                })
+                    {
+                        builder.RegisterGenericDecorator(typeof(EventAwaiter<>), typeof(IHandleEvent<>));
+                        builder.RegisterGeneric(typeof(TestHelper<>)).AsSelf().SingleInstance();
+                        //builder.RegisterType<TestHelper>().SingleInstance().AsSelf();
+                    })
 
                 .ConfigureWebHostDefaults(builder => builder
                     .Configure((context, app) =>
