@@ -27,7 +27,9 @@ jobs:
       run: dotnet test ./src/Acnys.sln
     
     - name: Pack
-      run: dotnet pack ./src/Acnys.sln --configuration Release --output ./packages
+      run: |
+        dotnet pack ./src/Acnys.Core/Acnys.Core.csproj --configuration Release --output ./packages
+        dotnet pack ./src/Acnys.Core.Hosting/Acnys.Core.Hosting.csproj --configuration Release --output ./packages
 
     - name: Publish      
       run: dotnet nuget push ./packages/**/*.nupkg --no-symbols true --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}

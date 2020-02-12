@@ -2,6 +2,7 @@
 using Autofac;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using Serilog.Core;
 
 namespace Acnys.Core.Hosting.Serilog
 {
@@ -10,7 +11,12 @@ namespace Acnys.Core.Hosting.Serilog
         public static IHostBuilder AddSerilog(this IHostBuilder hostBuilder, Action<HostBuilderContext, LoggerConfiguration> config, bool preserveStaticLogger = false, bool writeToProviders = false)
         {
             return hostBuilder
-                    .ConfigureContainer<ContainerBuilder>((context, builder) => builder.RegisterLogger())
+                    .ConfigureContainer<ContainerBuilder>((context, builder) =>
+                    {
+                        var logConfig = new LoggerConfiguration();
+                        config(context, logConfig);
+                        builder.RegisterLogger(logConfig.CreateLogger());
+                    })
                     .UseSerilog(config, preserveStaticLogger, writeToProviders)
                 ;
         }

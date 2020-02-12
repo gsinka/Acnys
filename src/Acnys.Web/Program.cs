@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Acnys.Core.Hosting;
@@ -5,10 +6,12 @@ using Acnys.Core.Hosting.Events;
 using Acnys.Core.Hosting.HealthCheck;
 using Acnys.Core.Hosting.Metrics;
 using Acnys.Core.Hosting.OpenApiDocument;
-using Acnys.Core.Hosting.RabbitMQ.Lovisa;
+using Acnys.Core.Hosting.RabbitMQ;
 using Acnys.Core.Hosting.Request;
+using Acnys.Core.Hosting.Request.Sender;
 using Acnys.Core.Hosting.Serilog;
 using Acnys.Core.Hosting.SingleSignOn;
+using Acnys.Core.Request;
 using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -22,6 +25,7 @@ using Sample.Application.Handlers;
 using Sample.ReadModel;
 using Serilog;
 using Serilog.Events;
+using Serilog.Formatting.Json;
 using Serilog.Sinks.SystemConsole.Themes;
 
 namespace Acnys.Web
@@ -33,15 +37,16 @@ namespace Acnys.Web
             var documentSettings = new OpenApiDocumentSettings();
             var securityScheme = new OpenApiSecurityScheme();
 
-            Host.CreateDefaultBuilder(args)
-
+            var app = Host.CreateDefaultBuilder(args)
+                
                 .AddAutofac()
 
                 .AddSerilog((context, config) => config
                     .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss+fff}{EventType:x8} {Level:u3}][{App}] {Message:lj} <-- [{SourceContext}]{NewLine}{Exception}", theme: AnsiConsoleTheme.Code)
+                    //.WriteTo.Console(new JsonFormatter())
                     .Enrich.FromLogContext()
                     .Enrich.WithProperty("App", "SPL")
-                    .MinimumLevel.Information()
+                    .MinimumLevel.Verbose()
                     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                     .MinimumLevel.Override("System", LogEventLevel.Warning)
                 )
@@ -53,6 +58,10 @@ namespace Acnys.Web
                     .RegisterHandlersFromAssemblyOf<TestQueryHandler>()
                     .RegisterValidatorsFromAssemblyOf<TestCommand>()
                     .ValidateRequests()
+                    
+                    .AddLoopbackSender("loopback")
+                    .AddHttpSender("local", builderContext => "http://localhost:5000/api")
+                    .RouteRequest((request) => DateTime.Now.Second % 2 == 0 ? "local" : "loopback")
                 )
 
                 .AddEvents((context, builder) => builder
@@ -63,7 +72,7 @@ namespace Acnys.Web
 
                 .AddRabbitEventBus("RabbitEventSettings")
                 .AddRabbitEventBusHealthCheck()
-
+                
                 .ConfigureServices((context, services) =>
                 {
                     services.AddHealthChecks()
@@ -115,8 +124,11 @@ namespace Acnys.Web
                     })
                 )
 
-                .Build().Run();
+                .Build();
+                
+            Log.ForContext<Program>().Information("Running application");
 
+            app.Run();
         }
 
     }

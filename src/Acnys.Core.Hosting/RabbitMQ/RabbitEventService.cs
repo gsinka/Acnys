@@ -12,7 +12,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Serilog;
 
-namespace Acnys.Core.Hosting.RabbitMQ.Lovisa
+namespace Acnys.Core.Hosting.RabbitMQ
 {
     public class RabbitEventService : BackgroundService, IPublishEvent, IHealthCheck
     {
@@ -41,14 +41,14 @@ namespace Acnys.Core.Hosting.RabbitMQ.Lovisa
         {
             stoppingToken.ThrowIfCancellationRequested();
 
-            _log.Debug("Declaring event exchange {exchangeName} (Topic)", _settings.Value.EventExchange);
-            _channel.ExchangeDeclare(_settings.Value.EventExchange, ExchangeType.Topic);
+            _log.Debug("Declaring event exchange {exchangeName} (Topic)", _settings.Value.Exchange.Name);
+            _channel.ExchangeDeclare(_settings.Value.Exchange.Name, _settings.Value.Exchange.Type ?? ExchangeType.Topic);
 
-            _log.Debug("Declaring event queue {queueName} (durable, non-exclusive, non-auto delete)", _settings.Value.EventExchange);
-            _channel.QueueDeclare(_settings.Value.EventQueue, true, false, false, null);
+            _log.Debug("Declaring event queue {queueName} (durable: {durable}, exclusive: {exclusive}, auto-delete: {autoDelete})", _settings.Value.Queue.Name, _settings.Value.Queue.Durable, _settings.Value.Queue.Exclusive, _settings.Value.Queue.AutoDelete);
+            _channel.QueueDeclare(_settings.Value.Queue.Name, _settings.Value.Queue.Durable, _settings.Value.Queue.Exclusive, _settings.Value.Queue.AutoDelete, _settings.Value.Queue.Arguments);
 
-            _log.Debug("Binding queue {queueName} with exchange {exchangeName} using routing key '{routingKey}'", _settings.Value.EventQueue, _settings.Value.EventExchange, _settings.Value.RoutingKey);
-            _channel.QueueBind(_settings.Value.EventQueue, _settings.Value.EventExchange, _settings.Value.RoutingKey);
+            _log.Debug("Binding queue {queueName} with exchange {exchangeName} using routing key '{routingKey}'", _settings.Value.Queue.Name, _settings.Value.Exchange.Name, _settings.Value.RoutingKey);
+            _channel.QueueBind(_settings.Value.Queue.Name, _settings.Value.Exchange.Name, _settings.Value.RoutingKey);
             _channel.BasicQos(0, 1, false);
 
             _log.Verbose("Creating consumers for {processorCount} processors", Environment.ProcessorCount);
@@ -74,7 +74,7 @@ namespace Acnys.Core.Hosting.RabbitMQ.Lovisa
                 consumer.Unregistered += OnConsumerUnregistered;
                 consumer.ConsumerCancelled += OnConsumerConsumerCancelled;
 
-                _channel.BasicConsume(_settings.Value.EventQueue, false, consumer);
+                _channel.BasicConsume(_settings.Value.Queue.Name, false, consumer);
                 _consumers.Add(consumer);
 
                 //_log.Verbose("Consumer created with tag '{consumerTag}'", consumer.ConsumerTag);
@@ -97,7 +97,7 @@ namespace Acnys.Core.Hosting.RabbitMQ.Lovisa
             var (props, body) = mapper.FromEvent(evnt, new Dictionary<string, object>());
 
             _log.Debug("Publishing message with routing key '{routingKey}'", _settings.Value.RoutingKey);
-            _channel.BasicPublish(_settings.Value.EventExchange, _settings.Value.RoutingKey, true, props, body);
+            _channel.BasicPublish(_settings.Value.Exchange.Name, _settings.Value.RoutingKey, true, props, body);
 
             return Task.CompletedTask;
         }
