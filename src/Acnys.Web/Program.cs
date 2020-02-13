@@ -8,10 +8,9 @@ using Acnys.Core.Hosting.Metrics;
 using Acnys.Core.Hosting.OpenApiDocument;
 using Acnys.Core.Hosting.RabbitMQ;
 using Acnys.Core.Hosting.Request;
-using Acnys.Core.Hosting.Request.Sender;
 using Acnys.Core.Hosting.Serilog;
 using Acnys.Core.Hosting.SingleSignOn;
-using Acnys.Core.Request;
+using Acnys.Core.Testing;
 using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -25,7 +24,6 @@ using Sample.Application.Handlers;
 using Sample.ReadModel;
 using Serilog;
 using Serilog.Events;
-using Serilog.Formatting.Json;
 using Serilog.Sinks.SystemConsole.Themes;
 
 namespace Acnys.Web
@@ -73,6 +71,8 @@ namespace Acnys.Web
                 .AddRabbitEventBus("RabbitEventSettings")
                 .AddRabbitEventBusHealthCheck()
                 
+                .AddEventAwaiter()
+
                 .ConfigureServices((context, services) =>
                 {
                     services.AddHealthChecks()
@@ -96,8 +96,8 @@ namespace Acnys.Web
                 })
 
                 .ConfigureContainer<ContainerBuilder>((context, builder) =>
-                {
-                })
+                    {
+                    })
 
                 .ConfigureWebHostDefaults(builder => builder
                     .Configure((context, app) =>

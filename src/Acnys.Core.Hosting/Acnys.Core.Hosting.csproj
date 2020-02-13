@@ -44,6 +44,7 @@
 
   <ItemGroup>
     <Folder Include="Metrics\" />
+    <Folder Include="Testing\" />
   </ItemGroup>
 
 </Project>
