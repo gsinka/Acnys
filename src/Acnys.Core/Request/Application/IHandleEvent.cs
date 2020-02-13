@@ -18,4 +18,9 @@ namespace Acnys.Core.Request.Application
         /// <returns></returns>
         Task Handle(T evnt, CancellationToken cancellationToken = default);
     }
+
+    public interface IHandleEvent
+    {
+        Task Handle(IEvent evnt, CancellationToken cancellationToken = default);
+    }
 }

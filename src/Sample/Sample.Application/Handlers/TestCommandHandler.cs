@@ -28,7 +28,8 @@ namespace Sample.Application.Handlers
 
             //// Publish uncommitted events
             //var uncommittedEvents = aggregate.GetUncommittedEvents();
-            
+
+            //await Task.Delay(2000, cancellationToken);
             await _eventPublisher.Publish(new TestEvent(command.Data, causationId:command.Id, correlationId: command.CorrelationId), cancellationToken);
 
             _log.Information("Command handled");
