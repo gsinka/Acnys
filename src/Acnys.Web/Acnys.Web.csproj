@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Acnys.Core.Hosting\Acnys.Core.Hosting.csproj" />
-    <ProjectReference Include="..\Acnys.Core.Testing\Acnys.Core.Testing.csproj" />
     <ProjectReference Include="..\Sample\Sample.Application\Sample.Application.csproj" />
     <ProjectReference Include="..\Sample\Sample.ReadModel\Sample.ReadModel.csproj" />
   </ItemGroup>

@@ -10,7 +10,6 @@ using Acnys.Core.Hosting.RabbitMQ;
 using Acnys.Core.Hosting.Request;
 using Acnys.Core.Hosting.Serilog;
 using Acnys.Core.Hosting.SingleSignOn;
-using Acnys.Core.Testing;
 using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -71,7 +70,7 @@ namespace Acnys.Web
                 .AddRabbitEventBus("RabbitEventSettings")
                 .AddRabbitEventBusHealthCheck()
                 
-                .AddEventAwaiter()
+                .AddRequestService()
 
                 .ConfigureServices((context, services) =>
                 {

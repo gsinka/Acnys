@@ -15,12 +15,7 @@ namespace Acnys.Core.Hosting.Request
                 requestBuilder(context, requestConfig);
                 
                 requestConfig.Callbacks.ForEach(action => action(context, builder));
-                
-                //requestBuilder(context, new RequestBuilder(context, builder));
             });
-
-
         }
-
     }
 }
