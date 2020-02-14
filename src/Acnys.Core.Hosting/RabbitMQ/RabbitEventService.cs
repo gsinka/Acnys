@@ -44,8 +44,20 @@ namespace Acnys.Core.Hosting.RabbitMQ
             _log.Debug("Declaring event exchange {exchangeName} (Topic)", _settings.Value.Exchange.Name);
             _channel.ExchangeDeclare(_settings.Value.Exchange.Name, _settings.Value.Exchange.Type ?? ExchangeType.Topic);
 
+            foreach (var (queue, routingKey) in _settings.Value.Exchange.Bindings)
+            {
+                _log.Debug("Binding queue {queueName} with exchange {exchangeName} using routing key '{routingKey}'", queue, _settings.Value.Exchange.Name, routingKey);
+                _channel.QueueBind(queue, _settings.Value.Exchange.Name, routingKey);
+            }
+
             _log.Debug("Declaring event queue {queueName} (durable: {durable}, exclusive: {exclusive}, auto-delete: {autoDelete})", _settings.Value.Queue.Name, _settings.Value.Queue.Durable, _settings.Value.Queue.Exclusive, _settings.Value.Queue.AutoDelete);
             _channel.QueueDeclare(_settings.Value.Queue.Name, _settings.Value.Queue.Durable, _settings.Value.Queue.Exclusive, _settings.Value.Queue.AutoDelete, _settings.Value.Queue.Arguments);
+
+            foreach (var (exchange, routingKey) in _settings.Value.Queue.Bindings)
+            {
+                _log.Debug("Binding queue {queueName} with exchange {exchangeName} using routing key '{routingKey}'", _settings.Value.Queue.Name, exchange, routingKey);
+                _channel.QueueBind(_settings.Value.Queue.Name, exchange, routingKey);
+            }
 
             _log.Debug("Binding queue {queueName} with exchange {exchangeName} using routing key '{routingKey}'", _settings.Value.Queue.Name, _settings.Value.Exchange.Name, _settings.Value.RoutingKey);
             _channel.QueueBind(_settings.Value.Queue.Name, _settings.Value.Exchange.Name, _settings.Value.RoutingKey);
