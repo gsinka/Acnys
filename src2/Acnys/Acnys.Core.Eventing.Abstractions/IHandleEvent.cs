@@ -17,11 +17,11 @@ namespace Acnys.Core.Eventing.Abstractions
         /// <param name="arguments">Event arguments</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns></returns>
-        Task Handle(T @event, IDictionary<string, object> arguments, CancellationToken cancellationToken = default);
+        Task Handle(T @event, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default);
     }
     
     public interface IHandleEvent
     {
-        Task Handle(IEvent @event, IDictionary<string, object> arguments, CancellationToken cancellationToken = default);
+        Task Handle(IEvent @event, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default);
     }
 }

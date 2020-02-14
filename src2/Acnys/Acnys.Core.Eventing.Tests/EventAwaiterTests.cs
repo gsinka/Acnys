@@ -14,7 +14,7 @@ namespace Acnys.Core.Eventing.Tests
 {
     public class EventAwaiterTests
     {
-        private IContainer _container;
+        private readonly IContainer _container;
 
         public EventAwaiterTests(ITestOutputHelper testOutputHelper)
         {
@@ -23,7 +23,6 @@ namespace Acnys.Core.Eventing.Tests
             var builder = new ContainerBuilder();
 
             builder.RegisterInstance(Log.Logger).As<ILogger>().SingleInstance();
-
             builder.RegisterLoopbackEventPublisher();
             builder.RegisterEventDispatcher();
             builder.RegisterEventAwaiterService();

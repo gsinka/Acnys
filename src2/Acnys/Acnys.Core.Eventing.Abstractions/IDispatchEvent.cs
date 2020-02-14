@@ -17,6 +17,6 @@ namespace Acnys.Core.Eventing.Abstractions
         /// <param name="arguments">Event arguments</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task Dispatch<T>(T @event, IDictionary<string, object> arguments, CancellationToken cancellationToken = default) where T : IEvent;
+        Task Dispatch<T>(T @event, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : IEvent;
     }
 }

@@ -49,7 +49,11 @@ namespace Acnys.Core.Eventing.Infrastructure
                     _log.Debug("Finished handling event {eventName} with handler {handlerName}", eventName, (string)handler.GetType().Name);
                 }
 
-                await _eventAwaiterService.ProcessEvent(@event, arguments, cancellationToken);
+                if (_eventAwaiterService != null)
+                {
+                    await _eventAwaiterService.ProcessEvent(@event, arguments, cancellationToken);
+                }
+                
             }
             catch (Exception exception)
             {
