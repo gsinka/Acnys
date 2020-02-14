@@ -1,9 +1,8 @@
 name: Continous Delivery
 
 on:
-  push:    
-    tags:
-      - '*'
+  release:    
+    types: [published, prereleased]
       
 jobs:
   
