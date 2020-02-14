@@ -18,6 +18,7 @@ namespace Acnys.Core.Hosting.RabbitMQ
     {
         public string Name { get; set; }
         public string Type { get; set; } = ExchangeType.Topic;
+        public IDictionary<string, string> Bindings { get; set; } = new Dictionary<string, string>();
     }
 
     public class RabbitEventQueueSettings
@@ -27,5 +28,6 @@ namespace Acnys.Core.Hosting.RabbitMQ
         public bool Durable { get; set; } = false;
         public bool Exclusive { get; set; } = false;
         public IDictionary<string, object> Arguments { get; set; }
+        public IDictionary<string, string> Bindings { get; set; } = new Dictionary<string, string>();
     }
 }
