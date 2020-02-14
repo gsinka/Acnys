@@ -24,9 +24,9 @@ namespace Acnys.Core.Request
         /// <param name="requestId">Command id</param>
         /// <param name="causationId">Causation id</param>
         /// <param name="correlationId">Correlation id</param>
-        protected Command(Guid requestId, Guid? causationId = null, Guid? correlationId = null)
+        protected Command(Guid? requestId, Guid? causationId = null, Guid? correlationId = null)
         {
-            RequestId = requestId;
+            RequestId = requestId ?? Guid.NewGuid();
             CausationId = causationId;
             CorrelationId = correlationId;
         }

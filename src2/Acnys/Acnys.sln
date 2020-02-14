@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Acnys.Core.Eventing.Infrast
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Acnys.Core.Eventing.Tests", "Acnys.Core.Eventing.Tests\Acnys.Core.Eventing.Tests.csproj", "{897C1FBB-4E10-47DB-BC2B-39BD50621BEF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Acnys.Core.Request.Tests", "Acnys.Core.Request.Tests\Acnys.Core.Request.Tests.csproj", "{96140E47-ECB9-4B12-AB0E-8E493692562C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{897C1FBB-4E10-47DB-BC2B-39BD50621BEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{897C1FBB-4E10-47DB-BC2B-39BD50621BEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{897C1FBB-4E10-47DB-BC2B-39BD50621BEF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96140E47-ECB9-4B12-AB0E-8E493692562C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96140E47-ECB9-4B12-AB0E-8E493692562C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96140E47-ECB9-4B12-AB0E-8E493692562C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96140E47-ECB9-4B12-AB0E-8E493692562C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -83,6 +89,7 @@ Global
 		{454B3CDD-4D61-49C4-90C9-B542DA6A1275} = {A36C9D6B-3D14-4573-AD99-E60A8645F2FE}
 		{91D61758-5C36-4324-B7D7-EE8627493E6A} = {93E2C0AC-08D3-4300-A1D8-699F82E3EFD2}
 		{897C1FBB-4E10-47DB-BC2B-39BD50621BEF} = {93E2C0AC-08D3-4300-A1D8-699F82E3EFD2}
+		{96140E47-ECB9-4B12-AB0E-8E493692562C} = {A36C9D6B-3D14-4573-AD99-E60A8645F2FE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A69C0856-DF72-460A-BEEB-2F5709E6DE5D}

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Eventing.Abstractions;
-using Acnys.Core.Eventing.Infrastructure;
 using Acnys.Core.Eventing.Infrastructure.Extensions;
 using Autofac;
 using Serilog;
