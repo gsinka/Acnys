@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Acnys.Core.Request.Abstractions
@@ -9,6 +10,6 @@ namespace Acnys.Core.Request.Abstractions
     /// <remarks>The command sender sends command to </remarks>
     public interface ISendCommand
     {
-        Task Send<T>(T command,  CancellationToken cancellationToken = default) where T : ICommand;
+        Task Send<T>(T command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : ICommand;
     }
 }

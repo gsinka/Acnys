@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Request.Abstractions;
 using Autofac.Features.Indexed;
 using Serilog;
 
-namespace Acnys.Core.Request.Infrastructure
+namespace Acnys.Core.Request.Infrastructure.Senders
 {
     public class RequestSender : ISendRequest
     {
@@ -20,7 +21,7 @@ namespace Acnys.Core.Request.Infrastructure
             _senderKeySelector = senderKeySelector;
         }
 
-        public async Task Send<T>(T command, CancellationToken cancellationToken = default) where T : ICommand
+        public async Task Send<T>(T command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : ICommand
         {
             var senderKey = _senderKeySelector(command);
             _log.Verbose("Sender key {senderKey} resolved for command {commandType}", senderKey, command.GetType().Name);
@@ -28,10 +29,10 @@ namespace Acnys.Core.Request.Infrastructure
             var sender = _requestSenderSelector[senderKey];
             _log.Verbose("Sender {senderType} resolved for command {commandType}", sender.GetType().Name, command.GetType().Name);
 
-            await sender.Send(command, cancellationToken);
+            await sender.Send(command, arguments, cancellationToken);
         }
 
-        public async Task<T> Send<T>(IQuery<T> query, CancellationToken cancellationToken = default)
+        public async Task<T> Send<T>(IQuery<T> query, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
             var senderKey = _senderKeySelector(query);
             _log.Verbose("Sender key {senderKey} resolved for query {queryType}", senderKey, query.GetType().Name);
@@ -39,7 +40,7 @@ namespace Acnys.Core.Request.Infrastructure
             var sender = _requestSenderSelector[senderKey];
             _log.Verbose("Sender {senderType} resolved for query {queryType}", sender.GetType().Name, query.GetType().Name);
 
-            return await sender.Send(query, cancellationToken);
+            return await sender.Send(query, arguments, cancellationToken);
         }
     }
 }

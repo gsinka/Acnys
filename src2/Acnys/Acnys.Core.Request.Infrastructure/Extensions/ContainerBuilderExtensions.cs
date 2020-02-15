@@ -1,4 +1,5 @@
 ﻿using Acnys.Core.Request.Abstractions;
+using Acnys.Core.Request.Infrastructure.Dispatchers;
 using Acnys.Core.Request.Infrastructure.Senders;
 using Autofac;
 

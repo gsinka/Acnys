@@ -33,7 +33,7 @@ namespace Acnys.Core.Request.Tests
         public async Task Test1()
         {
             var sender = _container.Resolve<ISendRequest>();
-            await sender.Send(new TestCommand(), CancellationToken.None);
+            await sender.Send(new TestCommand(), cancellationToken: CancellationToken.None);
         }
     }
 }

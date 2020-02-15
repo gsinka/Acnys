@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Request.Abstractions;
@@ -14,7 +15,7 @@ namespace Acnys.Core.Request.Tests
 
     public class TestCommandHandler : IHandleCommand<TestCommand>
     {
-        public Task Handle(TestCommand command, CancellationToken cancellationToken = default)
+        public Task Handle(TestCommand command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }

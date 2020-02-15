@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Request.Abstractions;
 using Autofac;
 using Serilog;
 
-namespace Acnys.Core.Request.Infrastructure
+namespace Acnys.Core.Request.Infrastructure.Dispatchers
 {
     /// <summary>
     /// Autofac based command dispatcher
@@ -28,7 +29,7 @@ namespace Acnys.Core.Request.Infrastructure
         /// <param name="command">Command to dispatch</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns></returns>
-        public Task Dispatch<T>(T command, CancellationToken cancellationToken = default) where T : ICommand
+        public Task Dispatch<T>(T command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : ICommand
         {
             return Task.Run(async() =>
             {
@@ -49,7 +50,7 @@ namespace Acnys.Core.Request.Infrastructure
                         var handler = (IHandleCommand<T>)scope.Resolve(handlerType);
                             
                         _log.Verbose("Handling {commandType} with {handler}", commandType.Name, handler.GetType().Name);
-                        await handler.Handle(command, cancellationToken);
+                        await handler.Handle(command, arguments, cancellationToken);
 
                         _log.Debug("Command dispatch completed successfully");
                     }

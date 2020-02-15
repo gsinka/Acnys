@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -7,7 +8,7 @@ using Acnys.Core.Request.Abstractions;
 using Newtonsoft.Json;
 using Serilog;
 
-namespace Acnys.Core.Request.Infrastructure
+namespace Acnys.Core.Request.Infrastructure.Senders
 {
     public class HttpRequestSender : ISendRequest
     {
@@ -22,7 +23,7 @@ namespace Acnys.Core.Request.Infrastructure
             _uri = new Uri(uri);
         }
 
-        public async Task Send<T>(T command, CancellationToken cancellationToken = default) where T : ICommand
+        public async Task Send<T>(T command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : ICommand
         {
             _log.Debug("Sending command to HTTP endpoint {uri}", _uri.ToString());
 
@@ -34,6 +35,12 @@ namespace Acnys.Core.Request.Infrastructure
             var queryJson = JsonConvert.SerializeObject(command);
 
             httpClient.DefaultRequestHeaders.Add("domain-type", command.GetType().AssemblyQualifiedName);
+
+            if (arguments != null)
+                foreach (var argument in arguments)
+                {
+                    httpClient.DefaultRequestHeaders.Add(argument.Key, argument.Value.ToString());
+                }
 
             var result = await httpClient.PostAsync(
                 _uri,
@@ -47,7 +54,7 @@ namespace Acnys.Core.Request.Infrastructure
             }
         }
 
-        public async Task<T> Send<T>(IQuery<T> query, CancellationToken cancellationToken = default)
+        public async Task<T> Send<T>(IQuery<T> query, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
             _log.Debug("Sending query to HTTP endpoint {uri}", _uri.ToString());
 
@@ -59,7 +66,13 @@ namespace Acnys.Core.Request.Infrastructure
             var queryJson = JsonConvert.SerializeObject(query);
             
             httpClient.DefaultRequestHeaders.Add("domain-type", query.GetType().AssemblyQualifiedName);
-            
+
+            if (arguments != null)
+                foreach (var argument in arguments)
+                {
+                    httpClient.DefaultRequestHeaders.Add(argument.Key, argument.Value.ToString());
+                }
+
             var result = await httpClient.PostAsync(
                 _uri, 
                 new StringContent(queryJson, Encoding.UTF8, "application/json"), 

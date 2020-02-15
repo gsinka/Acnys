@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Acnys.Core.Request.Abstractions
@@ -14,8 +15,9 @@ namespace Acnys.Core.Request.Abstractions
         /// </summary>
         /// <typeparam name="T">Command type</typeparam>
         /// <param name="command">Command</param>
+        /// <param name="arguments">Command arguments</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Returns the dispatcher task</returns>
-        Task Dispatch<T>(T command, CancellationToken cancellationToken = default) where T : ICommand;
+        Task Dispatch<T>(T command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : ICommand;
     }
 }

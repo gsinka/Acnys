@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Request.Abstractions;
 using Autofac;
 using Serilog;
 
-namespace Acnys.Core.Request.Infrastructure
+namespace Acnys.Core.Request.Infrastructure.Dispatchers
 {
     public class QueryDispatcher : IDispatchQuery
     {
@@ -25,7 +26,7 @@ namespace Acnys.Core.Request.Infrastructure
         /// <param name="query">Query object</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns></returns>
-        public async Task<TResult> Dispatch<TResult>(IQuery<TResult> query, CancellationToken cancellationToken)
+        public async Task<TResult> Dispatch<TResult>(IQuery<TResult> query, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
             var queryName = query.GetType().Name;
 
@@ -47,7 +48,7 @@ namespace Acnys.Core.Request.Infrastructure
                     Type handlerType = handler.GetType();
 
                     _log.Verbose("Handling {queryType} with {handlerType}", queryType.Name, handlerType.Name);
-                    TResult result = await handler.Handle((dynamic) query, cancellationToken);
+                    TResult result = await handler.Handle((dynamic) query, arguments, cancellationToken);
 
                     _log.Debug("Query dispatch completed successfully");
                     _log.Verbose("Query result object: {@queryResult}", result);

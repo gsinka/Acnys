@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Request.Abstractions;
 using Serilog;
@@ -18,18 +19,18 @@ namespace Acnys.Core.Request.Infrastructure.Senders
             _queryDispatcher = queryDispatcher;
         }
 
-        public async Task Send<T>(T command, CancellationToken cancellationToken = default) where T : ICommand
+        public async Task Send<T>(T command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : ICommand
         {
             _log.Debug("Sending command to loopback dispatcher");
 
-            await _commandDispatcher.Dispatch(command, cancellationToken);
+            await _commandDispatcher.Dispatch(command, arguments, cancellationToken);
         }
 
-        public async Task<T> Send<T>(IQuery<T> query, CancellationToken cancellationToken = default)
+        public async Task<T> Send<T>(IQuery<T> query, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
             _log.Debug("Sending query to loopback dispatcher");
 
-            return await _queryDispatcher.Dispatch(query, cancellationToken);
+            return await _queryDispatcher.Dispatch(query, arguments, cancellationToken);
         }
     }
 }
