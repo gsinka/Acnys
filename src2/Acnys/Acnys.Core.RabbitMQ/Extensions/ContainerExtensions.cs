@@ -1,6 +1,8 @@
 ﻿using System;
+using Acnys.Core.Eventing.Abstractions;
 using Autofac;
 using RabbitMQ.Client;
+using Serilog;
 
 namespace Acnys.Core.RabbitMQ.Extensions
 {
@@ -21,6 +23,23 @@ namespace Acnys.Core.RabbitMQ.Extensions
             {
                 builder.RegisterInstance(connection).Keyed<IConnection>(serviceKey);
             }
+
+            return builder;
+        }
+
+        public static ContainerBuilder AddEventListener(this ContainerBuilder builder, string queue)
+        {
+            builder.Register(context =>
+                    new EventListener(
+                        context.Resolve<ILogger>().ForContext<EventListener>(),
+                        context.Resolve<IConnection>(),
+                        context.Resolve<IDispatchEvent>(),
+                        queue,
+                        string.Empty,
+                        null,
+                        EventListener.Default
+                    )
+                ).AsSelf().SingleInstance().AutoActivate();
 
             return builder;
         }

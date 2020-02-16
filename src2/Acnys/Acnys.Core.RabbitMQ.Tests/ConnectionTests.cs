@@ -44,7 +44,7 @@ namespace Acnys.Core.RabbitMQ.Tests
             var keyedConnection = container.ResolveKeyed<IConnection>("key");
             Assert.True(keyedConnection.IsOpen);
 
-            var eventPublisher = new EventPublisher(connection, "test", EventPublisher.Default);
+            var eventPublisher = new EventPublisher(connection, "test", EventPublisher.DefaultContextBuilder);
             
             eventPublisher.Publish(
                 new TestEvent("test data", correlationId: Guid.NewGuid(), causationId: Guid.NewGuid()), 
@@ -63,7 +63,7 @@ namespace Acnys.Core.RabbitMQ.Tests
             var container = builder.Build();
 
             var connection = container.Resolve<IConnection>();
-            var eventPublisher = new EventPublisher(connection, "test", EventPublisher.Default);
+            var eventPublisher = new EventPublisher(connection, "test", EventPublisher.DefaultContextBuilder);
 
             eventPublisher.Publish(
                 new TestEvent("test data", correlationId: Guid.NewGuid(), causationId: Guid.NewGuid()),
@@ -83,34 +83,47 @@ namespace Acnys.Core.RabbitMQ.Tests
             builder.RegisterInstance(Log.Logger).As<ILogger>().SingleInstance();
 
             builder.RegisterEventDispatcher();
-            builder.RegisterEventHandlersFromAssemblyOf<TestEventHandler>();
+
+            builder.RegisterType<RabbitService>().SingleInstance().AsSelf();
             builder.AddRabbitConnection(CloudConnectionFactory);
+
+            var handler1 = new TestEventHandler(new ManualResetEvent(false));
+            builder.RegisterInstance(handler1).SingleInstance().AsImplementedInterfaces();
+            var handler2 = new TestEventHandler(new ManualResetEvent(false));
+            builder.RegisterInstance(handler2).SingleInstance().AsImplementedInterfaces();
 
             var container = builder.Build();
 
-            var connection = container.Resolve<IConnection>();
+            var rabbit = container.Resolve<RabbitService>();
 
-            var eventPublisher = new EventPublisher(connection, "test", EventPublisher.Default);
+            rabbit.CreateExchange("test", autoDelete:true);
+            rabbit.CreateQueue("test", autoDelete: true);
+            rabbit.CreateQueue("test2", autoDelete: true);
+            rabbit.Bind("test", "test");
+            rabbit.Bind("test2", "test");
+            rabbit.AddEventListener("test");
+            rabbit.AddEventListener("test2");
+            
+            var eventPublisher = new EventPublisher(rabbit.Connection, "test", EventPublisher.DefaultContextBuilder);
+
+            var testEvent = new TestEvent("test data", correlationId: Guid.NewGuid(), causationId: Guid.NewGuid());
 
             eventPublisher.Publish(
-                new TestEvent("test data", correlationId: Guid.NewGuid(), causationId: Guid.NewGuid()),
+                testEvent,
                 new Dictionary<string, object>()
                 {
                     { "key1", "value1" },
                     { "key2", "value2" },
                 });
 
-            var listener = new EventListener(
-                container.Resolve<ILogger>(),
-                connection,
-                container.Resolve<IDispatchEvent>(),
-                "test",
-                string.Empty,
-                new Dictionary<string, object>(),
-                EventListener.Default);
+            Assert.True(handler1.ManualResetEvent.WaitOne(1000) && handler2.ManualResetEvent.WaitOne(1000));
 
-            Thread.Sleep(1000);
-            Assert.True(true);
+            Assert.NotNull(handler1.Event);
+            Assert.NotNull(handler1.Args);
+
+            Assert.Equal(testEvent.EventId, handler1.Event.EventId);
+            Assert.Equal(testEvent.CorrelationId, handler1.Event.CorrelationId);
+            Assert.Equal(testEvent.CausationId, handler1.Event.CausationId);
         }
     }
 
@@ -126,8 +139,20 @@ namespace Acnys.Core.RabbitMQ.Tests
 
     public class TestEventHandler : IHandleEvent<TestEvent>
     {
+        public readonly ManualResetEvent ManualResetEvent;
+        public TestEvent Event { get; private set; } = null;
+        public IDictionary<string, object> Args { get; private set; } = null;
+
+        public TestEventHandler(ManualResetEvent manualResetEvent)
+        {
+            ManualResetEvent = manualResetEvent;
+        }
+
         public Task Handle(TestEvent @event, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
+            Event = @event;
+            Args = arguments;
+            ManualResetEvent.Set();
             return Task.CompletedTask;
         }
     }

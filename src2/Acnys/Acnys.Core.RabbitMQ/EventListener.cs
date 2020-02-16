@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using Acnys.Core.Eventing.Abstractions;
@@ -7,7 +9,6 @@ using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Serilog;
-using Type = System.Type;
 
 namespace Acnys.Core.RabbitMQ
 {
@@ -24,7 +25,7 @@ namespace Acnys.Core.RabbitMQ
             IDispatchEvent eventDispatcher,
             string queue,
             string consumerTag,
-            IDictionary<string, object> args,
+            IDictionary<string, object> consumerArgs,
             Func<ILogger, EventingBasicConsumer, BasicDeliverEventArgs, (IEvent evnt, IDictionary<string, object> args)> eventMapper)
         {
             _log = log;
@@ -36,7 +37,7 @@ namespace Acnys.Core.RabbitMQ
             _consumer = new EventingBasicConsumer(channel);
             _consumer.Received += OnReceived;
 
-            channel.BasicConsume(queue, false, consumerTag, args, _consumer);
+            channel.BasicConsume(queue, false, consumerTag, consumerArgs, _consumer);
         }
 
         private void OnReceived(object sender, BasicDeliverEventArgs e)
@@ -76,11 +77,11 @@ namespace Acnys.Core.RabbitMQ
 
             var eventArgs = new Dictionary<string, object>()
             {
-                { "DeliveryTag", args.DeliveryTag },
-                { "ConsumerTag", args.ConsumerTag },
-                { "Exchange", args.Exchange },
-                { "Redelivered", args.Redelivered },
-                { "RoutingKey", args.RoutingKey },
+                { nameof(args.DeliveryTag), args.DeliveryTag },
+                { nameof(args.ConsumerTag), args.ConsumerTag },
+                { nameof(args.Exchange), args.Exchange },
+                { nameof(args.Redelivered), args.Redelivered },
+                { nameof(args.RoutingKey), args.RoutingKey },
             };
 
             return (evnt, eventArgs);
