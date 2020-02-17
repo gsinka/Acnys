@@ -5,7 +5,7 @@ using Autofac;
 
 namespace Acnys.Core.Request.Infrastructure.Extensions
 {
-    public static class ContainerBuilderExtensions
+    public static class RequestExtensions
     {
         public static ContainerBuilder RegisterCommandHandlersFromAssemblyOf<T>(this ContainerBuilder builder)
         {
