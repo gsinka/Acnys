@@ -1,3 +1,4 @@
+using System.Reflection;
 using Acnys.Core.AspNet.RabbitMQ;
 using Acnys.Core.AspNet.Request;
 using Microsoft.AspNetCore.Builder;
@@ -20,7 +21,8 @@ namespace WebApplication1
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services
+                .AddControllers().AddApplicationPart(Assembly.GetEntryAssembly()).AddControllersAsServices();
 
             services.Configure<RabbitServiceConfiguration>(Configuration.GetSection("Rabbit"));
             //services.AddHostedService<RabbitHostedService>();

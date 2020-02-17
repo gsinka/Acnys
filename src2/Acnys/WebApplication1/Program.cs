@@ -33,8 +33,12 @@ namespace WebApplication1
                 .AddRequests()
                 .AddRequestValidation()
                 .RegisterRequestHandlersFromAssemblyOf<TestEventHandler>()
-                .AddHttpRequestHandler()
                 
+                .AddRequestSender(request => "http")
+                .AddHttpRequestSender("http://localhost:5000/api", "http")
+                
+                .AddHttpRequestHandler()
+            
                 .AddEventing()
                 .RegisterEventHandlersFromAssemblyOf<TestEventHandler>()
 

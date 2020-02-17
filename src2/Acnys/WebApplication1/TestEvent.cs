@@ -24,7 +24,6 @@ namespace WebApplication1
         public Task Handle(TestEvent @event, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
-
         }
     }
 

@@ -22,7 +22,7 @@ namespace Acnys.Core.Request.Infrastructure.Extensions
                 context.Resolve<ILogger>().ForContext<RequestSender>(),
                 context.Resolve<IIndex<object, ISendRequest>>(),
                 keySelector
-            ));
+            )).AsImplementedInterfaces().SingleInstance();
 
             return builder;
         }
@@ -73,7 +73,7 @@ namespace Acnys.Core.Request.Infrastructure.Extensions
                         new HttpRequestSender(context.Resolve<ILogger>().ForContext<HttpRequestSender>(),
                             context.ResolveKeyed<HttpClientHandler>(senderKey),
                             uri))
-                    .Keyed<ISendRequest>(senderKey);
+                    .Keyed<ISendRequest>(senderKey).SingleInstance();
             }
 
             return builder;

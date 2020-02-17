@@ -1,4 +1,6 @@
-﻿using Acnys.Core.Request.Infrastructure.Extensions;
+﻿using System;
+using Acnys.Core.Request.Abstractions;
+using Acnys.Core.Request.Infrastructure.Extensions;
 using Acnys.Core.Request.Infrastructure.Senders;
 using Autofac;
 using Microsoft.Extensions.Hosting;
@@ -15,6 +17,7 @@ namespace Acnys.Core.AspNet.Request
                 containerBuilder.RegisterQueryDispatcher();
             });
         }
+
         public static IHostBuilder RegisterRequestHandlersFromAssemblyOf<T>(this IHostBuilder builder)
         {
             return builder.ConfigureContainer<ContainerBuilder>((context, containerBuilder) =>
@@ -55,6 +58,14 @@ namespace Acnys.Core.AspNet.Request
                 {
                     containerBuilder.RegisterLoopbackRequestSender(senderKey);
                 });
+        }
+
+        public static IHostBuilder AddRequestSender(this IHostBuilder builder, Func<IRequest, object> keySelector)
+        {
+            return builder.ConfigureContainer<ContainerBuilder>((context, containerBuilder) =>
+            {
+                containerBuilder.RegisterRequestSender(keySelector);
+            });
         }
     }
 }
