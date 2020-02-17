@@ -1,4 +1,5 @@
-﻿using Acnys.Core.Request.Abstractions;
+﻿using System.Resources;
+using Acnys.Core.Request.Abstractions;
 using Acnys.Core.Request.Infrastructure.Dispatchers;
 using Acnys.Core.Request.Infrastructure.Senders;
 using Autofac;
@@ -24,12 +25,6 @@ namespace Acnys.Core.Request.Infrastructure.Extensions
 
             return builder;
         }
-        public static ContainerBuilder RegisterLoopbackRequestSender(this ContainerBuilder builder)
-        {
-            builder.RegisterType<LoopbackRequestSender>().AsImplementedInterfaces().SingleInstance();
-            return builder;
-        }
-
 
         public static ContainerBuilder RegisterCommandDispatcher(this ContainerBuilder builder)
         {
@@ -42,6 +37,5 @@ namespace Acnys.Core.Request.Infrastructure.Extensions
             builder.RegisterType<QueryDispatcher>().As<IDispatchQuery>().SingleInstance();
             return builder;
         }
-
     }
 }
