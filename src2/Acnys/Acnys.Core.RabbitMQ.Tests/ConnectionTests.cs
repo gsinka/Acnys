@@ -21,6 +21,7 @@ namespace Acnys.Core.RabbitMQ.Tests
         public ConnectionTests(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
+            Log.Logger = new LoggerConfiguration().WriteTo.TestOutput(testOutputHelper).MinimumLevel.Verbose().CreateLogger();
         }
 
         private readonly Action<ConnectionFactory> CloudConnectionFactory = (factory => {
@@ -33,6 +34,7 @@ namespace Acnys.Core.RabbitMQ.Tests
         {
             var builder = new ContainerBuilder();
 
+            builder.RegisterInstance(Log.Logger).As<ILogger>().SingleInstance();
             builder.AddRabbitConnection(CloudConnectionFactory);
             builder.AddRabbitConnection(CloudConnectionFactory, "key");
 
@@ -44,7 +46,7 @@ namespace Acnys.Core.RabbitMQ.Tests
             var keyedConnection = container.ResolveKeyed<IConnection>("key");
             Assert.True(keyedConnection.IsOpen);
 
-            var eventPublisher = new EventPublisher(connection, "test", EventPublisher.DefaultContextBuilder);
+            var eventPublisher = new EventPublisher(container.Resolve<ILogger>(), connection, "test", EventPublisher.DefaultContextBuilder);
             
             eventPublisher.Publish(
                 new TestEvent("test data", correlationId: Guid.NewGuid(), causationId: Guid.NewGuid()), 
@@ -63,7 +65,7 @@ namespace Acnys.Core.RabbitMQ.Tests
             var container = builder.Build();
 
             var connection = container.Resolve<IConnection>();
-            var eventPublisher = new EventPublisher(connection, "test", EventPublisher.DefaultContextBuilder);
+            var eventPublisher = new EventPublisher(container.Resolve<ILogger>(), connection, "test", EventPublisher.DefaultContextBuilder);
 
             eventPublisher.Publish(
                 new TestEvent("test data", correlationId: Guid.NewGuid(), causationId: Guid.NewGuid()),
@@ -104,7 +106,7 @@ namespace Acnys.Core.RabbitMQ.Tests
             rabbit.AddEventListener("test");
             rabbit.AddEventListener("test2");
             
-            var eventPublisher = new EventPublisher(rabbit.Connection, "test", EventPublisher.DefaultContextBuilder);
+            var eventPublisher = new EventPublisher(container.Resolve<ILogger>(), rabbit.Connection, "test", EventPublisher.DefaultContextBuilder);
 
             var testEvent = new TestEvent("test data", correlationId: Guid.NewGuid(), causationId: Guid.NewGuid());
 

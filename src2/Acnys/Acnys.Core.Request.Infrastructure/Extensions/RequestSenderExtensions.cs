@@ -33,7 +33,7 @@ namespace Acnys.Core.Request.Infrastructure.Extensions
         /// <param name="builder"></param>
         /// <param name="senderKey"></param>
         /// <returns></returns>
-        public static ContainerBuilder RegisterLoopbackRequestSender(this ContainerBuilder builder, object senderKey)
+        public static ContainerBuilder RegisterLoopbackRequestSender(this ContainerBuilder builder, object senderKey = null)
         {
             if (senderKey == null)
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using Acnys.Core.Eventing.Abstractions;
@@ -73,14 +74,13 @@ namespace Acnys.Core.RabbitMQ
             var eventJson = Encoding.UTF8.GetString(args.Body);
             var evnt = (IEvent)JsonConvert.DeserializeObject(eventJson, eventType);
 
-            var eventArgs = new Dictionary<string, object>()
-            {
-                { nameof(args.DeliveryTag), args.DeliveryTag },
-                { nameof(args.ConsumerTag), args.ConsumerTag },
-                { nameof(args.Exchange), args.Exchange },
-                { nameof(args.Redelivered), args.Redelivered },
-                { nameof(args.RoutingKey), args.RoutingKey },
-            };
+            var eventArgs = args.BasicProperties.Headers.ToDictionary(pair => pair.Key, pair => pair.Value);
+            
+            eventArgs.Add(nameof(args.DeliveryTag), args.DeliveryTag);
+            eventArgs.Add(nameof(args.ConsumerTag), args.ConsumerTag);
+            eventArgs.Add(nameof(args.Exchange), args.Exchange);
+            eventArgs.Add(nameof(args.Redelivered), args.Redelivered);
+            eventArgs.Add(nameof(args.RoutingKey), args.RoutingKey);
 
             return (evnt, eventArgs);
         }

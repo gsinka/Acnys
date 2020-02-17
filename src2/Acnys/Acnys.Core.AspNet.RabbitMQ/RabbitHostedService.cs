@@ -38,7 +38,7 @@ namespace Acnys.Core.AspNet.RabbitMQ
 
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             // Create publisher
             _publisher = new EventPublisher(_log.ForContext<EventPublisher>(), _connection, _serviceConfiguration.Publisher.Exchange, EventPublisher.DefaultContextBuilder);
@@ -54,6 +54,8 @@ namespace Acnys.Core.AspNet.RabbitMQ
                     listenerConfig.ConsumerArguments, 
                     EventListener.Default));
             }
+
+            return Task.CompletedTask;
         }
 
         public async Task Publish<T>(T @event, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : IEvent

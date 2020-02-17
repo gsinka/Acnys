@@ -1,4 +1,5 @@
 using Acnys.Core.AspNet.RabbitMQ;
+using Acnys.Core.AspNet.Request;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -40,6 +41,7 @@ namespace WebApplication1
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHttpRequestHandler("api");
             });
         }
     }

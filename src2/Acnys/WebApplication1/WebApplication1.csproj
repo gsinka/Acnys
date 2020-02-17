@@ -10,6 +10,7 @@
     <ProjectReference Include="..\Acnys.Core.AspNet.Request\Acnys.Core.AspNet.Request.csproj" />
     <ProjectReference Include="..\Acnys.Core.AspNet\Acnys.Core.AspNet.csproj" />
     <ProjectReference Include="..\Acnys.Core.Eventing\Acnys.Core.Eventing.csproj" />
+    <ProjectReference Include="..\Acnys.Core.Request\Acnys.Core.Request.csproj" />
   </ItemGroup>
 
 
