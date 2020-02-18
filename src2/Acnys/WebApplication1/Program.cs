@@ -24,7 +24,7 @@ namespace WebApplication1
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                
+
                 .AddAutofac()
                 .AddSerilog((context, config) => config
                     .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss+fff}{EventType:x8} {Level:u3}][{App}] {Message:lj} <-- [{SourceContext}]{NewLine}{Exception}", theme: AnsiConsoleTheme.Code)
@@ -36,36 +36,34 @@ namespace WebApplication1
 
                 .AddHealthChecks((context, builder) => builder.AddCheck("Self", () => HealthCheckResult.Healthy(), new List<string> { "Liveness" }))
                 .AddHttpMetrics()
-                
+
                 .AddOpenApiDocumentation(
-                    (context, app) => context.Configuration.Bind("Application", app), 
+                    (context, app) => context.Configuration.Bind("Application", app),
                     (context, sso) => context.Configuration.Bind("SingleSignOn", sso))
 
                 .AddRequests()
                 .AddRequestValidation()
                 .RegisterRequestHandlersFromAssemblyOf<TestEventHandler>()
-                
+
                 .AddRequestSender(request => "http")
                 .AddHttpRequestSender(context => "http://localhost:5000/api", "http")
-                
+
                 .AddHttpRequestHandler()
-            
+
                 .AddEventing()
                 .RegisterEventHandlersFromAssemblyOf<TestEventHandler>()
-
-
-
+            
                 .ConfigureContainer<ContainerBuilder>((context, builder) =>
-                    {
-                        builder.RegisterType<RabbitHostedService>().AsImplementedInterfaces().SingleInstance();
-                    })
-                
-                
+                {
+                    builder.RegisterType<Setup>().As<IStartable>().SingleInstance();
+                    builder.RegisterType<RabbitHostedService>().AsImplementedInterfaces().SingleInstance();
+                })
+
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
                 });
     }
 
-    
+
 }

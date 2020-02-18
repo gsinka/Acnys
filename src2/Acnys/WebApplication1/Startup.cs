@@ -26,6 +26,7 @@ namespace WebApplication1
                 .AddControllers().AddApplicationPart(Assembly.GetEntryAssembly()).AddControllersAsServices();
 
             services.Configure<RabbitServiceConfiguration>(Configuration.GetSection("Rabbit"));
+            
             //services.AddHostedService<RabbitHostedService>();
         }
 

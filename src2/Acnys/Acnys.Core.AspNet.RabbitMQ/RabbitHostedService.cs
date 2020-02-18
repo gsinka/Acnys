@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Eventing.Abstractions;
@@ -12,21 +11,15 @@ using Serilog;
 
 namespace Acnys.Core.AspNet.RabbitMQ
 {
-    public class RabbitHostedService : BackgroundService, IPublishEvent
+    public class RabbitHostedService : BackgroundService, IRabbitService
     {
-        private readonly ILogger _log;
         private readonly IConnection _connection;
-        private HttpClientHandler _clientHandler = new HttpClientHandler();
-        private readonly IDispatchEvent _eventDispatcher;
         private readonly RabbitServiceConfiguration _serviceConfiguration;
-        private EventPublisher _publisher;
-        private List<EventListener> _listeners = new List<EventListener>();
+        private readonly IRabbitService _internal;
 
 
         public RabbitHostedService(ILogger log, IDispatchEvent eventDispatcher, IOptions<RabbitServiceConfiguration> serviceConfiguration)
         {
-            _log = log;
-            _eventDispatcher = eventDispatcher;
             _serviceConfiguration = serviceConfiguration.Value;
 
             _connection = new ConnectionFactory()
@@ -36,23 +29,15 @@ namespace Acnys.Core.AspNet.RabbitMQ
 
             }.CreateConnection();
 
+            _internal = new RabbitService(log.ForContext<RabbitService>(), _connection, eventDispatcher, _serviceConfiguration.Publisher.Exchange);
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            // Create publisher
-            _publisher = new EventPublisher(_log.ForContext<EventPublisher>(), _connection, _serviceConfiguration.Publisher.Exchange, EventPublisher.DefaultContextBuilder);
-
             // Create listeners
             foreach (var listenerConfig in _serviceConfiguration.Listeners)
             {
-                _listeners.Add(new EventListener(
-                    _log.ForContext<EventListener>(), 
-                    _connection, _eventDispatcher, 
-                    listenerConfig.Queue, 
-                    listenerConfig.ConsumerTag, 
-                    listenerConfig.ConsumerArguments, 
-                    EventListener.Default));
+                _internal.AddEventListener(listenerConfig.Queue, listenerConfig.ConsumerTag, listenerConfig.ConsumerArguments);
             }
 
             return Task.CompletedTask;
@@ -60,7 +45,27 @@ namespace Acnys.Core.AspNet.RabbitMQ
 
         public async Task Publish<T>(T @event, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : IEvent
         {
-            await _publisher.Publish(@event, arguments, cancellationToken);
+            await _internal.Publish(@event, arguments, cancellationToken);
+        }
+
+        public void CreateExchange(string name, string type = ExchangeType.Fanout, bool durable = false, bool autoDelete = false, IDictionary<string, object> arguments = null)
+        {
+            _internal.CreateExchange(name, type, durable, autoDelete);
+        }
+
+        public void CreateQueue(string name, bool durable = false, bool exclusive = false, bool autoDelete = false, IDictionary<string, object> arguments = null)
+        {
+            _internal.CreateQueue(name, durable, exclusive, autoDelete, arguments);
+        }
+
+        public void Bind(string queue, string exchange, string routingKey = "", IDictionary<string, object> arguments = null)
+        {
+            _internal.Bind(queue, exchange, routingKey, arguments);
+        }
+
+        public void AddEventListener(string queue, string consumerTag = null, IDictionary<string, object> arguments = null)
+        {
+            _internal.AddEventListener(queue, consumerTag, arguments);
         }
     }
 }

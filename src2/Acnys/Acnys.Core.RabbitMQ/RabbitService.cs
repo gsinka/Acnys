@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
-using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 using Acnys.Core.Eventing.Abstractions;
-using Autofac;
 using RabbitMQ.Client;
 using Serilog;
 
 namespace Acnys.Core.RabbitMQ
 {
-    public class RabbitService
+    public class RabbitService : IRabbitService
     {
         private readonly ILogger _log;
         
@@ -15,14 +15,19 @@ namespace Acnys.Core.RabbitMQ
         private readonly List<EventListener> _listeners = new List<EventListener>();
             
         public readonly IConnection Connection;
+        private EventPublisher _publisher;
         public IModel Model { get; }
 
-        public RabbitService(ILogger log, IConnection connection, IDispatchEvent eventDispatcher)
+        public RabbitService(ILogger log, IConnection connection, IDispatchEvent eventDispatcher, string publisherExchange)
         {
             _log = log;
             Connection = connection;
             _eventDispatcher = eventDispatcher;
             Model = connection.CreateModel();
+
+            // Create publisher
+            _publisher = new EventPublisher(_log.ForContext<EventPublisher>(), Connection, publisherExchange , EventPublisher.DefaultContextBuilder);
+
         }
 
         public void CreateExchange(string name, string type = ExchangeType.Fanout, bool durable = false, bool autoDelete = false, IDictionary<string, object> arguments = null)
@@ -43,6 +48,11 @@ namespace Acnys.Core.RabbitMQ
         public void AddEventListener(string queue, string consumerTag = null, IDictionary<string, object> arguments = null)
         {
             _listeners.Add(new EventListener(_log, Connection, _eventDispatcher, queue, consumerTag ?? "", arguments, EventListener.Default));
+        }
+
+        public Task Publish<T>(T @event, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : IEvent
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
