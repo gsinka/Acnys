@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
+using Serilog.Sinks.SystemConsole.Themes;
 
 namespace WebApplication1
 {
@@ -25,11 +26,14 @@ namespace WebApplication1
             Host.CreateDefaultBuilder(args)
                 
                 .AddAutofac()
-                .AddSerilog((context, configuration) => configuration
-                    .WriteTo.Console()
+                .AddSerilog((context, config) => config
+                    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss+fff}{EventType:x8} {Level:u3}][{App}] {Message:lj} <-- [{SourceContext}]{NewLine}{Exception}", theme: AnsiConsoleTheme.Code)
+                    .Enrich.FromLogContext()
+                    .Enrich.WithProperty("App", "SMC")
                     .MinimumLevel.Verbose()
-                    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning))
-                
+                    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                    .MinimumLevel.Override("System", LogEventLevel.Warning))
+
                 .AddRequests()
                 .AddRequestValidation()
                 .RegisterRequestHandlersFromAssemblyOf<TestEventHandler>()

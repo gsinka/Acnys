@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
@@ -21,6 +21,14 @@
     <ProjectReference Include="..\Acnys.Core.RabbitMQ\Acnys.Core.RabbitMQ.csproj" />
     <ProjectReference Include="..\Acnys.Core.Request.Infrastructure\Acnys.Core.Request.Infrastructure.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GitVersionTask" Version="5.1.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
 
 
 </Project>
