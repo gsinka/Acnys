@@ -31,5 +31,5 @@ jobs:
         dotnet pack ./src2/Acnys/Acnys.sln --configuration Release --output ./packages
         
 
-    # - name: Publish      
-      # run: dotnet nuget push ./packages/**/*.nupkg --no-symbols true --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
+    - name: publish      
+      run: dotnet nuget push ./packages/**/*.nupkg --no-symbols true --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.nuget_api_key }}
