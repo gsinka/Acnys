@@ -21,6 +21,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Acnys.Core.AspNet.Eventing\Acnys.Core.AspNet.Eventing.csproj" />
+    <ProjectReference Include="..\Acnys.Core.AspNet.RabbitMQ\Acnys.Core.AspNet.RabbitMQ.csproj" />
+    <ProjectReference Include="..\Acnys.Core.AspNet.Request\Acnys.Core.AspNet.Request.csproj" />
     <ProjectReference Include="..\Acnys.Core.Request.Infrastructure\Acnys.Core.Request.Infrastructure.csproj" />
   </ItemGroup>
 

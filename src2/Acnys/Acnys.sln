@@ -32,11 +32,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RabbitMQ", "RabbitMQ", "{113A0E1F-C5CC-414D-9BCE-1DB740FF9D1A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AspNet", "AspNet", "{930262B8-522B-4321-9773-76BC112FCFFF}"
-	ProjectSection(SolutionItems) = preProject
-		Acnys.Core.AspNet\ApplicationOptions.cs = Acnys.Core.AspNet\ApplicationOptions.cs
-		Acnys.Core.AspNet\OpenApiDocumentationOptions.cs = Acnys.Core.AspNet\OpenApiDocumentationOptions.cs
-		Acnys.Core.AspNet\SingleSignOnOptions.cs = Acnys.Core.AspNet\SingleSignOnOptions.cs
-	EndProjectSection
+	
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Acnys.Core.RabbitMQ", "Acnys.Core.RabbitMQ\Acnys.Core.RabbitMQ.csproj", "{DF60CE25-11D0-4789-9D7C-665A45E3F580}"
 EndProject
