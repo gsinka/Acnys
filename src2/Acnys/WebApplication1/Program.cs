@@ -8,6 +8,8 @@ using Acnys.Core.AspNet.Request;
 using Acnys.Core.Eventing.Abstractions;
 using Autofac;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
@@ -34,12 +36,14 @@ namespace WebApplication1
                     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                     .MinimumLevel.Override("System", LogEventLevel.Warning))
 
+                .AddHealthChecks((context, builder) => builder.AddCheck("Self", () => HealthCheckResult.Healthy(), new List<string> { "Liveness" }))
+
                 .AddRequests()
                 .AddRequestValidation()
                 .RegisterRequestHandlersFromAssemblyOf<TestEventHandler>()
                 
                 .AddRequestSender(request => "http")
-                .AddHttpRequestSender("http://localhost:5000/api", "http")
+                .AddHttpRequestSender(context => "http://localhost:5000/api", "http")
                 
                 .AddHttpRequestHandler()
             

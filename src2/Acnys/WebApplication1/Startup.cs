@@ -1,4 +1,5 @@
 using System.Reflection;
+using Acnys.Core.AspNet;
 using Acnys.Core.AspNet.RabbitMQ;
 using Acnys.Core.AspNet.Request;
 using Microsoft.AspNetCore.Builder;
@@ -37,8 +38,10 @@ namespace WebApplication1
             }
 
             app.UseRouting();
-
             app.UseAuthorization();
+
+            app.AddReadiness();
+            app.AddLiveness();
 
             app.UseEndpoints(endpoints =>
             {

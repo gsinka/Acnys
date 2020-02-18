@@ -44,11 +44,11 @@ namespace Acnys.Core.AspNet.Request
             });
         }
 
-        public static IHostBuilder AddHttpRequestSender(this IHostBuilder builder, string uri, object senderKey = null)
+        public static IHostBuilder AddHttpRequestSender(this IHostBuilder builder, Func<HostBuilderContext, string> uri, object senderKey = null)
         {
             return builder.ConfigureContainer<ContainerBuilder>((context, containerBuilder) =>
                 {
-                    containerBuilder.RegisterHttpRequestSender(uri, senderKey);
+                    containerBuilder.RegisterHttpRequestSender(uri(context), senderKey);
                 });
         }
         
