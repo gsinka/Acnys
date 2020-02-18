@@ -39,6 +39,16 @@ namespace WebApplication1
 
             app.UseRouting();
             app.UseAuthorization();
+            
+            var appSettings = new ApplicationOptions();
+            Configuration.Bind("Application", appSettings);
+
+            var ssoSettings = new SingleSignOnOptions();
+            Configuration.Bind("SingleSignOn", ssoSettings);
+
+            var openApiSettings = new OpenApiDocumentationOptions() { Path = "/swagger" };
+            
+            app.AddOpenApiDocumentation(appSettings, ssoSettings, openApiSettings);
 
             app.AddReadiness();
             app.AddLiveness();

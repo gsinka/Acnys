@@ -32,20 +32,25 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RabbitMQ", "RabbitMQ", "{113A0E1F-C5CC-414D-9BCE-1DB740FF9D1A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AspNet", "AspNet", "{930262B8-522B-4321-9773-76BC112FCFFF}"
+	ProjectSection(SolutionItems) = preProject
+		Acnys.Core.AspNet\ApplicationOptions.cs = Acnys.Core.AspNet\ApplicationOptions.cs
+		Acnys.Core.AspNet\OpenApiDocumentationOptions.cs = Acnys.Core.AspNet\OpenApiDocumentationOptions.cs
+		Acnys.Core.AspNet\SingleSignOnOptions.cs = Acnys.Core.AspNet\SingleSignOnOptions.cs
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Acnys.Core.RabbitMQ", "Acnys.Core.RabbitMQ\Acnys.Core.RabbitMQ.csproj", "{DF60CE25-11D0-4789-9D7C-665A45E3F580}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Acnys.Core.RabbitMQ.Tests", "Acnys.Core.RabbitMQ.Tests\Acnys.Core.RabbitMQ.Tests.csproj", "{BC6C87F7-DA04-416A-AD49-301D76FA4F09}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Acnys.Core.AspNet", "Acnys.Core.AspNet\Acnys.Core.AspNet.csproj", "{1E35133F-9DC7-4D46-8F5E-A979E5DD2890}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Acnys.Core.AspNet", "Acnys.Core.AspNet\Acnys.Core.AspNet.csproj", "{1E35133F-9DC7-4D46-8F5E-A979E5DD2890}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Acnys.Core.AspNet.Request", "Acnys.Core.AspNet.Request\Acnys.Core.AspNet.Request.csproj", "{4D0EA8E0-859D-4BF8-8FD3-E1B3A3F52AD8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Acnys.Core.AspNet.Request", "Acnys.Core.AspNet.Request\Acnys.Core.AspNet.Request.csproj", "{4D0EA8E0-859D-4BF8-8FD3-E1B3A3F52AD8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication1", "WebApplication1\WebApplication1.csproj", "{7BC440B3-0104-445D-A25B-E73F47AB0E7B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplication1", "WebApplication1\WebApplication1.csproj", "{7BC440B3-0104-445D-A25B-E73F47AB0E7B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Acnys.Core.AspNet.Eventing", "Acnys.Core.AspNet.Eventing\Acnys.Core.AspNet.Eventing.csproj", "{6F0D1A04-79A9-4268-9FD3-E2ADAA1E2588}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Acnys.Core.AspNet.Eventing", "Acnys.Core.AspNet.Eventing\Acnys.Core.AspNet.Eventing.csproj", "{6F0D1A04-79A9-4268-9FD3-E2ADAA1E2588}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Acnys.Core.AspNet.RabbitMQ", "Acnys.Core.AspNet.RabbitMQ\Acnys.Core.AspNet.RabbitMQ.csproj", "{AE4F5288-82CF-487C-8ADB-3FFD5403F8DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Acnys.Core.AspNet.RabbitMQ", "Acnys.Core.AspNet.RabbitMQ\Acnys.Core.AspNet.RabbitMQ.csproj", "{AE4F5288-82CF-487C-8ADB-3FFD5403F8DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

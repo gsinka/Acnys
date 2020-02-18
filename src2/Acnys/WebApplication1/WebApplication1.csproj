@@ -5,8 +5,6 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
-  
-
   <ItemGroup>
     <ProjectReference Include="..\Acnys.Core.AspNet.Eventing\Acnys.Core.AspNet.Eventing.csproj" />
     <ProjectReference Include="..\Acnys.Core.AspNet.RabbitMQ\Acnys.Core.AspNet.RabbitMQ.csproj" />
@@ -15,6 +13,5 @@
     <ProjectReference Include="..\Acnys.Core.Eventing\Acnys.Core.Eventing.csproj" />
     <ProjectReference Include="..\Acnys.Core.Request\Acnys.Core.Request.csproj" />
   </ItemGroup>
-
 
 </Project>

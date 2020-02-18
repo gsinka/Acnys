@@ -1,13 +1,11 @@
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Acnys.Core.AspNet;
 using Acnys.Core.AspNet.Eventing;
 using Acnys.Core.AspNet.RabbitMQ;
 using Acnys.Core.AspNet.Request;
-using Acnys.Core.Eventing.Abstractions;
 using Autofac;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
@@ -37,6 +35,11 @@ namespace WebApplication1
                     .MinimumLevel.Override("System", LogEventLevel.Warning))
 
                 .AddHealthChecks((context, builder) => builder.AddCheck("Self", () => HealthCheckResult.Healthy(), new List<string> { "Liveness" }))
+                .AddHttpMetrics()
+                
+                .AddOpenApiDocumentation(
+                    (context, app) => context.Configuration.Bind("Application", app), 
+                    (context, sso) => context.Configuration.Bind("SingleSignOn", sso))
 
                 .AddRequests()
                 .AddRequestValidation()
@@ -49,6 +52,8 @@ namespace WebApplication1
             
                 .AddEventing()
                 .RegisterEventHandlersFromAssemblyOf<TestEventHandler>()
+
+
 
                 .ConfigureContainer<ContainerBuilder>((context, builder) =>
                     {
