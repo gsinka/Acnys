@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Acnys.Core.RabbitMQ;
 
 namespace WebApplication1
 {
@@ -13,7 +14,9 @@ namespace WebApplication1
 
         public void Start()
         {
-            
+            _rabbitService.CreateQueue("test", autoDelete: true);
+            _rabbitService.CreateExchange("test", autoDelete: true);
+            _rabbitService.Bind("test", "test");
         }
     }
 }

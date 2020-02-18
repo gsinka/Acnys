@@ -34,7 +34,10 @@ namespace WebApplication1
                     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                     .MinimumLevel.Override("System", LogEventLevel.Warning))
 
-                .AddHealthChecks((context, builder) => builder.AddCheck("Self", () => HealthCheckResult.Healthy(), new List<string> { "Liveness" }))
+                .AddHealthChecks((context, builder) => builder
+                    .AddCheck("Self", () => HealthCheckResult.Healthy(), new List<string> { "Liveness", "Readiness" })
+                )
+
                 .AddHttpMetrics()
 
                 .AddOpenApiDocumentation(

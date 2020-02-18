@@ -34,7 +34,13 @@ namespace Acnys.Core.RabbitMQ
             var channel = connection.CreateModel();
             
             _consumer = new EventingBasicConsumer(channel);
+
             _consumer.Received += OnReceived;
+            _consumer.Shutdown += OnConsumerShutdown;
+            _consumer.Registered += OnConsumerRegistered;
+            _consumer.Unregistered += OnConsumerUnregistered;
+            _consumer.ConsumerCancelled += OnConsumerConsumerCancelled;
+
 
             channel.BasicConsume(queue, false, consumerTag, consumerArgs, _consumer);
         }
@@ -84,5 +90,26 @@ namespace Acnys.Core.RabbitMQ
 
             return (evnt, eventArgs);
         }
+
+        private void OnConsumerConsumerCancelled(object sender, ConsumerEventArgs e)
+        {
+            _log.Warning("Consumer {consumerTag} cancelled", (sender as EventingBasicConsumer).ConsumerTag);
+        }
+
+        private void OnConsumerUnregistered(object sender, ConsumerEventArgs e)
+        {
+            _log.Warning("Consumer {consumerTag} unregistered", (sender as EventingBasicConsumer).ConsumerTag);
+        }
+
+        private void OnConsumerRegistered(object sender, ConsumerEventArgs e)
+        {
+            _log.Debug("Consumer {consumerTag} is registered", (sender as EventingBasicConsumer).ConsumerTag);
+        }
+
+        private void OnConsumerShutdown(object sender, ShutdownEventArgs e)
+        {
+            _log.Warning("Consumer {consumerTag} shut down", (sender as EventingBasicConsumer).ConsumerTag);
+        }
+
     }
 }

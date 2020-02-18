@@ -15,7 +15,7 @@ namespace Acnys.Core.RabbitMQ
         private readonly List<EventListener> _listeners = new List<EventListener>();
             
         public readonly IConnection Connection;
-        private EventPublisher _publisher;
+        private readonly EventPublisher _publisher;
         public IModel Model { get; }
 
         public RabbitService(ILogger log, IConnection connection, IDispatchEvent eventDispatcher, string publisherExchange)
@@ -25,6 +25,8 @@ namespace Acnys.Core.RabbitMQ
             _eventDispatcher = eventDispatcher;
             Model = connection.CreateModel();
 
+            connection.ConnectionShutdown += (sender, args) => _log.Error("RabbitMQ connection {endpoint} closed", connection.Endpoint.ToString());
+            
             // Create publisher
             _publisher = new EventPublisher(_log.ForContext<EventPublisher>(), Connection, publisherExchange , EventPublisher.DefaultContextBuilder);
 
@@ -50,9 +52,9 @@ namespace Acnys.Core.RabbitMQ
             _listeners.Add(new EventListener(_log, Connection, _eventDispatcher, queue, consumerTag ?? "", arguments, EventListener.Default));
         }
 
-        public Task Publish<T>(T @event, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : IEvent
+        public async Task Publish<T>(T @event, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : IEvent
         {
-            throw new System.NotImplementedException();
+            await _publisher.Publish(@event, arguments, cancellationToken);
         }
     }
 }

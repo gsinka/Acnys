@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Eventing.Abstractions;
 using Acnys.Core.RabbitMQ;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
