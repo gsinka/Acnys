@@ -15,6 +15,8 @@ namespace Acnys.Core.AspNet.RabbitMQ
                 var rabbitConfig = new RabbitServiceConfiguration();
                 config(context, rabbitConfig);
 
+                Log.Verbose("Adding RabbitMQ service using {rabbitUri}", rabbitConfig.Uri);
+
                 builder.Register(componentContext =>
                         new RabbitHostedService(componentContext.Resolve<ILogger>().ForContext<RabbitHostedService>(),
                             componentContext.Resolve<IDispatchEvent>(), rabbitConfig))

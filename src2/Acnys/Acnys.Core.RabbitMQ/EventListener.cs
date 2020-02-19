@@ -34,15 +34,22 @@ namespace Acnys.Core.RabbitMQ
             var channel = connection.CreateModel();
             
             _consumer = new EventingBasicConsumer(channel);
-
+            
             _consumer.Received += OnReceived;
             _consumer.Shutdown += OnConsumerShutdown;
             _consumer.Registered += OnConsumerRegistered;
             _consumer.Unregistered += OnConsumerUnregistered;
             _consumer.ConsumerCancelled += OnConsumerConsumerCancelled;
 
-
-            channel.BasicConsume(queue, false, consumerTag, consumerArgs, _consumer);
+            try
+            {
+                var tagReceived = channel.BasicConsume(queue, false, consumerTag, consumerArgs, _consumer);
+                _log.Debug("RabbitMQ consumer with tag '{consumerTag}' created for event listener", tagReceived);
+            }
+            catch (Exception exception)
+            {
+                _log.Error(exception, "RabbitMQ consumer failed to create");
+            }
         }
 
         private void OnReceived(object sender, BasicDeliverEventArgs e)

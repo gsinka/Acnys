@@ -1,6 +1,7 @@
 ﻿using Acnys.Core.Eventing.Infrastructure.Extensions;
 using Autofac;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace Acnys.Core.AspNet.Eventing
 {
@@ -10,6 +11,7 @@ namespace Acnys.Core.AspNet.Eventing
         {
             builder.ConfigureContainer<ContainerBuilder>((context, containerBuilder) =>
                 {
+                    Log.Verbose("Registering event dispatcher");
                     containerBuilder.RegisterEventDispatcher();
                 });
 
@@ -20,6 +22,7 @@ namespace Acnys.Core.AspNet.Eventing
         {
             builder.ConfigureContainer<ContainerBuilder>((context, containerBuilder) =>
                 {
+                    Log.Verbose("Registering event handlers from assembly {assembly}", typeof(T).Assembly.FullName);
                     containerBuilder.RegisterEventHandlersFromAssemblyOf<T>();
                 });
 

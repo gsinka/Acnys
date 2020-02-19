@@ -13,13 +13,17 @@ namespace Acnys.Core.AspNet.RabbitMQ
     public class RabbitHostedService : BackgroundService, IRabbitService
     {
         private readonly IConnection _connection;
+        private readonly ILogger _log;
         private readonly RabbitServiceConfiguration _serviceConfiguration;
         private readonly IRabbitService _internal;
 
-
         public RabbitHostedService(ILogger log, IDispatchEvent eventDispatcher, RabbitServiceConfiguration serviceConfiguration)
         {
+            _log = log;
             _serviceConfiguration = serviceConfiguration;
+            
+            _log.Debug("Connecting to RabbitMQ on {rabbitUri}", serviceConfiguration.Uri);
+
             _connection = new ConnectionFactory()
             {
                 Uri = new Uri(_serviceConfiguration.Uri),
@@ -32,9 +36,11 @@ namespace Acnys.Core.AspNet.RabbitMQ
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            _log.Debug("Starting RabbitMQ service");
+
             // Create listeners
             foreach (var listenerConfig in _serviceConfiguration.Listeners)
-            {
+            {                
                 _internal.AddEventListener(listenerConfig.Queue, listenerConfig.ConsumerTag, listenerConfig.ConsumerArguments);
             }
 

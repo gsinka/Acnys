@@ -21,9 +21,7 @@ namespace Acnys.Core.AspNet
         public static IHostBuilder PrebuildDefaultApp(this IHostBuilder hostBuilder)
         {
             return hostBuilder
-
-                .AddAutofac()
-
+                
                 .AddSerilog((context, config) => config
                     .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss+fff}{EventType:x8} {Level:u3}][{App}] {Message:lj} <-- [{SourceContext}]{NewLine}{Exception}", theme: AnsiConsoleTheme.Code)
                     .Enrich.FromLogContext()
@@ -31,6 +29,8 @@ namespace Acnys.Core.AspNet
                     .MinimumLevel.Verbose()
                     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                     .MinimumLevel.Override("System", LogEventLevel.Warning))
+
+                .AddAutofac()
 
                 .AddHealthChecks((context, builder) => builder
                     .AddCheck("Self", () => HealthCheckResult.Healthy(), new List<string> {"Liveness", "Readiness"})

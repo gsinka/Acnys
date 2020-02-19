@@ -1,34 +1,50 @@
+using System;
 using Acnys.Core.AspNet;
 using Acnys.Core.AspNet.Eventing;
 using Acnys.Core.AspNet.Request;
 using Autofac;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace WebApplication1
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
-            
-            AppBuilder.Build(args, hostBuilder =>
+            try
             {
-                hostBuilder
+                var app = AppBuilder.Build(args, hostBuilder =>
+                {
+                    hostBuilder
 
-                    .PrebuildDefaultApp()
-                    .RegisterRequestHandlersFromAssemblyOf<TestEventHandler>()
-                    .RegisterEventHandlersFromAssemblyOf<TestEventHandler>()
+                        .PrebuildDefaultApp()
+                        .RegisterRequestHandlersFromAssemblyOf<TestEventHandler>()
+                        .RegisterEventHandlersFromAssemblyOf<TestEventHandler>()
 
-                    .AddRequestSender(request => "http")
-                    .AddHttpRequestSender(context => "http://localhost:5000/api", "http")
+                        .AddRequestSender(request => "http")
+                        .AddHttpRequestSender(context => "http://localhost:5000/api", "http")
 
-                    .ConfigureContainer<ContainerBuilder>((context, builder) =>
-                    {
-                        builder.RegisterType<Setup>().As<IStartable>().SingleInstance();
-                    });
-            }).Run();
+                        .ConfigureContainer<ContainerBuilder>((context, builder) =>
+                        {
+                            builder.RegisterType<Setup>().As<IStartable>().SingleInstance();
+                        });
+                });
+
+                Log.ForContext<Program>().Information("Running application");
+
+                app.Start();
+                return 0;
+            }
+            catch (Exception exception)
+            {
+                Log.Fatal(exception, "Application failed");
+                return -1;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
     }
-
-
 }

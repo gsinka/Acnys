@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NSwag.AspNetCore;
 using NSwag.Generation.Processors.Security;
+using Serilog;
 
 namespace Acnys.Core.AspNet
 {
@@ -16,9 +17,11 @@ namespace Acnys.Core.AspNet
             {
                 var app = new ApplicationOptions();
                 appOptions(context, app);
+                Log.Verbose("Adding OpenAPI service for application {appName}", app.Name);
 
                 var sso = new SingleSignOnOptions();
                 ssoOptions(context, sso);
+                Log.Verbose("Adding OpenAPI security using authority {authority}", sso.Authority);
 
                 services.AddOpenApiDocument(options =>
                 {
@@ -45,8 +48,10 @@ namespace Acnys.Core.AspNet
 
         public static IApplicationBuilder AddOpenApiDocumentation(this IApplicationBuilder app, ApplicationOptions appSettings, SingleSignOnOptions ssoSettings, OpenApiDocumentationOptions openApiSettings)
         {
+            Log.Verbose("Configured OpenAPI on path {documentPath}", openApiSettings.Path);
+
             return app
-                
+
                 .UseOpenApi(settings => { settings.DocumentName = settings.DocumentName; })
                 
                 .UseSwaggerUi3(settings =>
