@@ -1,6 +1,5 @@
 ﻿using Acnys.Core.Constants;
 using Acnys.Core.Exceptions;
-using Acnys.Core.Hosting.ErrorHandling.Responses;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
@@ -35,7 +34,7 @@ namespace Acnys.Core.Hosting.ErrorHandling
 
                 context.Response.StatusCode = StatusCodes.Status404NotFound;
                 context.Response.ContentType = MediaTypeNames.Application.Json;
-                await context.Response.WriteAsync(JsonConvert.SerializeObject(new ErrorResponse(exception.ErrorCode, exception.Message)));
+                await context.Response.WriteAsync(JsonConvert.SerializeObject(ComposeResponse(exception)));
             }
             catch (BusinessException exception)
             {
@@ -43,7 +42,7 @@ namespace Acnys.Core.Hosting.ErrorHandling
 
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                 context.Response.ContentType = MediaTypeNames.Application.Json;
-                await context.Response.WriteAsync(JsonConvert.SerializeObject(new ErrorResponse(exception.ErrorCode, exception.Message)));
+                await context.Response.WriteAsync(JsonConvert.SerializeObject(ComposeResponse(exception)));
             }
             catch (ValidationException exception)
             {
@@ -51,7 +50,7 @@ namespace Acnys.Core.Hosting.ErrorHandling
 
                 context.Response.StatusCode = StatusCodes.Status400BadRequest;
                 context.Response.ContentType = MediaTypeNames.Application.Json;
-                await context.Response.WriteAsync(JsonConvert.SerializeObject(new ValidationErrorResponse(ErrorCodes.ValidationError, exception.Errors.Select(e => new ValidationError(e.ErrorCode, e.ErrorMessage, e.PropertyName)))));
+                await context.Response.WriteAsync(JsonConvert.SerializeObject(ComposeResponse(exception)));
             }
             catch (Exception exception)
             {
@@ -59,8 +58,36 @@ namespace Acnys.Core.Hosting.ErrorHandling
 
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                 context.Response.ContentType = MediaTypeNames.Application.Json;
-                await context.Response.WriteAsync(JsonConvert.SerializeObject(new ErrorResponse(ErrorCodes.UnknowError, exception.Message)));
+                await context.Response.WriteAsync(JsonConvert.SerializeObject(ComposeResponse(exception)));
             }
+        }
+
+        private string ComposeResponse(BusinessException exception)
+        {
+            return JsonConvert.SerializeObject(new
+            {
+                Code = exception.ErrorCode,
+                exception.Message
+            });
+        }
+
+        private string ComposeResponse(Exception exception)
+        {
+            return JsonConvert.SerializeObject(new
+            {
+                Code = ErrorCodes.UnknowError,
+                exception.Message
+            });
+        }
+
+        private string ComposeResponse(ValidationException exception)
+        {
+            return JsonConvert.SerializeObject(new
+            {
+                Code = ErrorCodes.ValidationError,
+                exception.Message,
+                ValidationErrors = exception.Errors.Select(e => new ValidationError(e.ErrorCode, e.ErrorMessage, e.PropertyName))
+            });
         }
     }
 }
