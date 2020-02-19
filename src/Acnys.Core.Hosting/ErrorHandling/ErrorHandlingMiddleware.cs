@@ -86,7 +86,7 @@ namespace Acnys.Core.Hosting.ErrorHandling
             {
                 Code = ErrorCodes.ValidationError,
                 exception.Message,
-                ValidationErrors = exception.Errors.Select(e => new ValidationError(e.ErrorCode, e.ErrorMessage, e.PropertyName))
+                ValidationErrors = exception.Errors.Select(e => new { Code = e.ErrorCode, Message = e.ErrorMessage, Property = e.PropertyName })
             });
         }
     }
