@@ -41,17 +41,17 @@ namespace Acnys.Core.AspNet
                     (context, sso) => context.Configuration.Bind("SingleSignOn", sso))
                 .AddRequests()
                 .AddRequestValidation()
-                .AddRequestSender(request => "http")
+                
                 .AddHttpRequestHandler()
                 .AddEventing()
-                .AddRabbitService()
+                .AddRabbitService((context, configuration) => context.Configuration.Bind("Rabbit", configuration))
 
                 .ConfigureContainer<ContainerBuilder>((context, builder) => { })
                 
                 .ConfigureServices((context, services) =>
                 {
                     services.AddControllers().AddApplicationPart(Assembly.GetEntryAssembly()).AddControllersAsServices();
-                    services.Configure<RabbitServiceConfiguration>(context.Configuration.GetSection("Rabbit"));
+                    //services.Configure<RabbitServiceConfiguration>(context.Configuration.GetSection("Rabbit"));
                 })
 
                 .ConfigureWebHostDefaults(builder => builder.Configure((context, app) =>

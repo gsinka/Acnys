@@ -14,9 +14,9 @@ namespace WebApplication1
 
         public void Start()
         {
-            _rabbitService.CreateQueue("test", autoDelete: true);
-            _rabbitService.CreateExchange("test", autoDelete: true);
-            _rabbitService.Bind("test", "test");
+            //_rabbitService.CreateQueue("test", autoDelete: true);
+            //_rabbitService.CreateExchange("test", autoDelete: true);
+            //_rabbitService.Bind("test", "test");
         }
     }
 }

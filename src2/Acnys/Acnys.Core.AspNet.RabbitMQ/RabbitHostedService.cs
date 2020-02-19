@@ -4,9 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Eventing.Abstractions;
 using Acnys.Core.RabbitMQ;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using Serilog;
 
@@ -19,10 +17,9 @@ namespace Acnys.Core.AspNet.RabbitMQ
         private readonly IRabbitService _internal;
 
 
-        public RabbitHostedService(ILogger log, IDispatchEvent eventDispatcher, IOptions<RabbitServiceConfiguration> serviceConfiguration)
+        public RabbitHostedService(ILogger log, IDispatchEvent eventDispatcher, RabbitServiceConfiguration serviceConfiguration)
         {
-            _serviceConfiguration = serviceConfiguration.Value;
-
+            _serviceConfiguration = serviceConfiguration;
             _connection = new ConnectionFactory()
             {
                 Uri = new Uri(_serviceConfiguration.Uri),

@@ -18,7 +18,10 @@ namespace WebApplication1
                     .PrebuildDefaultApp()
                     .RegisterRequestHandlersFromAssemblyOf<TestEventHandler>()
                     .RegisterEventHandlersFromAssemblyOf<TestEventHandler>()
+
+                    .AddRequestSender(request => "http")
                     .AddHttpRequestSender(context => "http://localhost:5000/api", "http")
+
                     .ConfigureContainer<ContainerBuilder>((context, builder) =>
                     {
                         builder.RegisterType<Setup>().As<IStartable>().SingleInstance();

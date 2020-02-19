@@ -8,7 +8,7 @@ using Autofac.Core.Registration;
 using Serilog;
 using Module = Autofac.Module;
 
-namespace Acnys.Core.Hosting.Serilog
+namespace Acnys.Core.AspNet
 {
     public static class SerilogContainerBuilderExtensions
     {
