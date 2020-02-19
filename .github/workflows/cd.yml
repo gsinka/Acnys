@@ -32,4 +32,4 @@ jobs:
         
 
     - name: publish      
-      run: dotnet nuget push ./packages/**/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.nuget_api_key }}
+      run: dotnet nuget push ./packages/**/*.nupkg --skip-duplicate true --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.nuget_api_key }}
