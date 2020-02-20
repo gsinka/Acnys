@@ -78,7 +78,6 @@ namespace Acnys.Core.Eventing.Tests
 
             public TestEventHandler()
             {
-                
             }
 
             public Task Handle(TestEvent @event, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)

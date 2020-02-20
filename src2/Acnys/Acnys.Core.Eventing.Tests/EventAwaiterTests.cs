@@ -35,7 +35,8 @@ namespace Acnys.Core.Eventing.Tests
         {
             var svc = _container.Resolve<EventAwaiterService>();
             var testEvent = new TestEvent(correlationId: Guid.NewGuid());
-            var awaiter = svc.GetEventAwaiter<TestEvent>((evnt, args) => evnt.CorrelationId == testEvent.CorrelationId, TimeSpan.FromMilliseconds(50), CancellationToken.None);
+            var stoppingTokenSource = new CancellationTokenSource(1000);
+            var awaiter = svc.GetEventAwaiter<TestEvent>((evnt, args) => evnt.CorrelationId == testEvent.CorrelationId, stoppingTokenSource.Token);
             await _container.Resolve<IPublishEvent>().Publish(testEvent, new Dictionary<string, object>(), CancellationToken.None);
             Assert.NotNull(await awaiter);
         }
@@ -45,9 +46,11 @@ namespace Acnys.Core.Eventing.Tests
         {
             var svc = _container.Resolve<EventAwaiterService>();
             var testEvent = new TestEvent(correlationId: Guid.NewGuid());
-            var awaiter = svc.GetEventAwaiter<TestEvent>((evnt, args) => evnt.CorrelationId == testEvent.CorrelationId, TimeSpan.FromMilliseconds(1), CancellationToken.None);
+            var stoppingTokenSource = new CancellationTokenSource(1);
+            var awaiter = svc.GetEventAwaiter<TestEvent>((evnt, args) => evnt.CorrelationId == testEvent.CorrelationId, stoppingTokenSource.Token);
             await _container.Resolve<IPublishEvent>().Publish(testEvent, new Dictionary<string, object>(), CancellationToken.None);
-            Assert.Null(await awaiter);
+            await Assert.ThrowsAsync<TaskCanceledException>(async () => await awaiter);
+            
         }
 
     }

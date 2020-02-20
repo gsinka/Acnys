@@ -41,13 +41,10 @@ namespace Acnys.Core.Eventing.Infrastructure
             }, cancellationToken);
         }
 
-        public Task<T> GetEventAwaiter<T>(Func<T, IDictionary<string, object>, bool> eventFilter, TimeSpan timeOut, CancellationToken cancellationToken = default) 
+        public Task<T> GetEventAwaiter<T>(Func<T, IDictionary<string, object>, bool> eventFilter, CancellationToken cancellationToken = default) 
             where T : IEvent
         {
             var task = new EventAwaiterTask((evnt, args) => eventFilter((T)evnt, args));
-
-            var stoppingTokenSource = new CancellationTokenSource(timeOut);
-            stoppingTokenSource.Token.Register(() => task.WaitHandle.Set());
             
             cancellationToken.Register(() =>
             {
@@ -67,24 +64,9 @@ namespace Acnys.Core.Eventing.Infrastructure
 
                 lock (_lockObject) { _tasks.Remove(task); }
 
-                stoppingTokenSource = null;
-
                 return (T)task.Event;
 
             }, cancellationToken);
-        }
-    }
-
-    internal class EventAwaiterTask
-    {
-        public Func<IEvent, IDictionary<string, object>, bool> EventFilter { get; }
-        public EventWaitHandle WaitHandle { get; }
-        public IEvent Event { get; set; }
-
-        public EventAwaiterTask(Func<IEvent, IDictionary<string, object>, bool> eventFilter)
-        {
-            EventFilter = eventFilter;
-            WaitHandle = new ManualResetEvent(false);
         }
     }
 }
