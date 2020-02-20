@@ -1,13 +1,11 @@
-﻿using System;
+﻿using Acnys.Core.Request;
+using Newtonsoft.Json;
+using Serilog;
+using System;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Acnys.Core.Request;
-using Microsoft.AspNetCore.Server.IIS;
-using Newtonsoft.Json;
-using Serilog;
 
 namespace Acnys.Core.Hosting.Request.Sender
 {
@@ -42,10 +40,11 @@ namespace Acnys.Core.Hosting.Request.Sender
                 new StringContent(queryJson, Encoding.UTF8, "application/json"),
                 cancellationToken);
 
+            //result.EnsureSuccessStatusCode();
             if (!result.IsSuccessStatusCode)
             {
                 _log.Error("Sending command to HTTP endpoint failed. Reason: {reason}, Response: {response}", result.ReasonPhrase, result.Content.ReadAsStringAsync());
-                throw new InvalidOperationException(await result.Content.ReadAsStringAsync());
+                throw new Exceptions.HttpRequestException(result.StatusCode, await result.Content.ReadAsByteArrayAsync());
             }
         }
 
@@ -69,8 +68,8 @@ namespace Acnys.Core.Hosting.Request.Sender
 
             if (!result.IsSuccessStatusCode)
             {
-                _log.Error("Sending query to HTTP endpoint failed. Reason: {reason}, Response: {response}", result.ReasonPhrase, result.Content.ReadAsStringAsync());
-                throw new InvalidOperationException(await result.Content.ReadAsStringAsync());
+                _log.Error("Sending command to HTTP endpoint failed. Reason: {reason}, Response: {response}", result.ReasonPhrase, await result.Content.ReadAsStringAsync());
+                throw new Exceptions.HttpRequestException(result.StatusCode, await result.Content.ReadAsByteArrayAsync());
             }
 
             var responseContent = await result.Content.ReadAsStringAsync();

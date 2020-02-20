@@ -31,37 +31,30 @@ namespace Acnys.Core.Hosting.Request
         {
             using var reader = new StreamReader(Request.Body, Encoding.UTF8);
 
-            try
+            var json = await reader.ReadToEndAsync();
+            if (string.IsNullOrEmpty(json)) json = "{}";
+
+            var domainType = Request.Headers["domain-type"];
+
+            dynamic request = string.IsNullOrEmpty(domainType)
+                ? JsonConvert.DeserializeObject(json, _jsonSerializerSettings) ?? throw new InvalidOperationException("Unknown request")
+                : JsonConvert.DeserializeObject(json, Type.GetType(domainType));
+
+            Type requestType = request.GetType();
+
+            if (request is ICommand)
             {
-                var json = await reader.ReadToEndAsync();
-                if (string.IsNullOrEmpty(json)) json = "{}";
-
-                var domainType = Request.Headers["domain-type"];
-
-                dynamic request = string.IsNullOrEmpty(domainType)
-                    ? JsonConvert.DeserializeObject(json, _jsonSerializerSettings) ?? throw new InvalidOperationException("Unknown request")
-                    : JsonConvert.DeserializeObject(json, Type.GetType(domainType));
-
-                Type requestType = request.GetType();
-
-                if (request is ICommand)
-                {
-                    await _commandDispatcher.Dispatch(request, cancellationToken);
-                    return Ok();
-                }
-                else if (requestType.GetInterfaces().Any(type => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IQuery<>)))
-                {
-                    var result = await _queryDispatcher.Dispatch(request, cancellationToken);
-                    return Ok(result);
-                } 
-                else
-                {
-                    throw new InvalidOperationException("Unknown request type: {requestType}", request.GetType().ToString());
-                }
+                await _commandDispatcher.Dispatch(request, cancellationToken);
+                return Ok();
             }
-            catch (Exception exception)
+            else if (requestType.GetInterfaces().Any(type => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IQuery<>)))
             {
-                return BadRequest(exception.Message);
+                var result = await _queryDispatcher.Dispatch(request, cancellationToken);
+                return Ok(result);
+            } 
+            else
+            {
+                throw new InvalidOperationException("Unknown request type: {requestType}", request.GetType().ToString());
             }
         }
     }

@@ -7,7 +7,9 @@ using Serilog;
 using System;
 using System.Linq;
 using System.Net.Mime;
+using System.Text;
 using System.Threading.Tasks;
+using HttpRequestException = Acnys.Core.Hosting.Request.Exceptions.HttpRequestException;
 
 namespace Acnys.Core.Hosting.ErrorHandling
 {
@@ -28,7 +30,14 @@ namespace Acnys.Core.Hosting.ErrorHandling
             {
                 await _request.Invoke(context);
             }
-            catch (BusinessException exception) when (exception.ErrorCode == "404")
+            catch (HttpRequestException exception)
+            {
+                _logger.Error("Http request was failed, Status code: {statusCode}, Response: {response}", exception.StatusCode, Encoding.UTF8.GetString(exception.Content));
+
+                context.Response.StatusCode = (int)exception.StatusCode;
+                await context.Response.WriteAsync(Encoding.UTF8.GetString(exception.Content));
+            }
+            catch (BusinessException exception) when (exception.ErrorCode == ErrorCodes.NotFound)
             {
                 _logger.Error(exception, "Resource not found.");
 
