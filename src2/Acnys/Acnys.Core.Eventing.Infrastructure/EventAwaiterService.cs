@@ -24,12 +24,12 @@ namespace Acnys.Core.Eventing.Infrastructure
         {
             return Task.Run(() =>
             {
-                _log.Debug("Processing event awaiters");
-                _log.Verbose("Checking {awaiterCount} awaiters", _tasks.Count);
+                _log.Debug("Processing event awaiters for event {eventType}", @event.GetType().FullName);
+                _log.Verbose("Checking {awaiterCount} awaiter(s)", _tasks.Count);
 
                 lock (_lockObject)
                 {
-                    foreach (var task in _tasks.Where(x => x.EventType == typeof(T) && x.EventFilter(@event, arguments)))
+                    foreach (var task in _tasks.Where(x => @event.GetType() == x.EventType && x.EventFilter(@event, arguments)))
                     {
                         _log.Verbose("Event awaiter task {awaiterTaskId} matching event", task.GetHashCode());
 
