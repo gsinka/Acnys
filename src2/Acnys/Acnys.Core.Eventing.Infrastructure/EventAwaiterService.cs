@@ -29,7 +29,7 @@ namespace Acnys.Core.Eventing.Infrastructure
 
                 lock (_lockObject)
                 {
-                    foreach (var task in _tasks.Where(x => x.EventFilter(@event, arguments)))
+                    foreach (var task in _tasks.Where(x => x.EventType == typeof(T) && x.EventFilter(@event, arguments)))
                     {
                         _log.Verbose("Event awaiter task {awaiterTaskId} matching event", task.GetHashCode());
 
@@ -44,7 +44,7 @@ namespace Acnys.Core.Eventing.Infrastructure
         public Task<T> GetEventAwaiter<T>(Func<T, IDictionary<string, object>, bool> eventFilter, CancellationToken cancellationToken = default) 
             where T : IEvent
         {
-            var task = new EventAwaiterTask((evnt, args) => eventFilter((T)evnt, args));
+            var task = new EventAwaiterTask((evnt, args) => eventFilter((T)evnt, args), typeof(T));
             
             cancellationToken.Register(() =>
             {
