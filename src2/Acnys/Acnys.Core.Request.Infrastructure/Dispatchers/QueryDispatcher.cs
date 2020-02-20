@@ -34,36 +34,35 @@ namespace Acnys.Core.Request.Infrastructure.Dispatchers
 
             _log.Verbose("Query object: {@query}", query);
 
-            using (var scope = _scope.BeginLifetimeScope())
+            using var scope = _scope.BeginLifetimeScope();
+
+            _log.Verbose("Lifetime scope {scopeId} created for query", scope.GetHashCode());
+
+            try
             {
-                _log.Verbose("Lifetime scope {scopeId} created for query", scope.GetHashCode());
+                var queryType = query.GetType();
+                var requestedHandlerType = typeof(IHandleQuery<,>).MakeGenericType(query.GetType(), typeof(TResult));
+                _log.Verbose("Looking handler with type {handlerType}", requestedHandlerType);
 
-                try
-                {
-                    var queryType = query.GetType();
-                    var requestedHandlerType = typeof(IHandleQuery<,>).MakeGenericType(query.GetType(), typeof(TResult));
-                    _log.Verbose("Looking handler with type {handlerType}", requestedHandlerType);
+                var handler = (dynamic) scope.Resolve(requestedHandlerType);
+                Type handlerType = handler.GetType();
 
-                    var handler = (dynamic) scope.Resolve(requestedHandlerType);
-                    Type handlerType = handler.GetType();
+                _log.Verbose("Handling {queryType} with {handlerType}", queryType.Name, handlerType.Name);
+                TResult result = await handler.Handle((dynamic) query, arguments, cancellationToken);
 
-                    _log.Verbose("Handling {queryType} with {handlerType}", queryType.Name, handlerType.Name);
-                    TResult result = await handler.Handle((dynamic) query, arguments, cancellationToken);
+                _log.Debug("Query dispatch completed successfully");
+                _log.Verbose("Query result object: {@queryResult}", result);
 
-                    _log.Debug("Query dispatch completed successfully");
-                    _log.Verbose("Query result object: {@queryResult}", result);
-
-                    return result;
-                }
-                catch (Exception exception)
-                {
-                    _log.Error(exception, "Query dispatch failed");
-                    throw;
-                }
-                finally
-                {
-                    _log.Verbose("Ending lifetime scope {scopeId}", scope.GetHashCode());
-                }
+                return result;
+            }
+            catch (Exception exception)
+            {
+                _log.Error(exception, "Query dispatch failed");
+                throw;
+            }
+            finally
+            {
+                _log.Verbose("Ending lifetime scope {scopeId}", scope.GetHashCode());
             }
         }
     }

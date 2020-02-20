@@ -5,6 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="EventListenerConfiguration.cs" />
+    <Compile Remove="EventPublisherConfiguration.cs" />
+    <Compile Remove="RabbitHostedService.cs" />
+    <Compile Remove="RabbitServiceConfiguration.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 

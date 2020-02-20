@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,7 +8,7 @@ using Acnys.Core.Request.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-namespace Acnys.Core.Hosting.Request
+namespace Acnys.Core.AspNet.Request
 {
     [Produces("application/json")]
     public class GenericRequestHandlerController : ControllerBase

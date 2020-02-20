@@ -6,9 +6,9 @@ namespace Acnys.Core.AspNet.RabbitMQ
     {
         public string Uri { get; set; }
 
-        public EventPublisherConfiguration Publisher { get; set; }
+        public EventPublisherConfiguration Publisher { get; set; } = new EventPublisherConfiguration();
 
-        public List<EventListenerConfiguration> Listeners { get; set; }
+        public List<EventListenerConfiguration> Listeners { get; set; } = new List<EventListenerConfiguration>();
 
     }
 }

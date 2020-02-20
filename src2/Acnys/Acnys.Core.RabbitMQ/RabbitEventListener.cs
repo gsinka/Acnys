@@ -11,14 +11,18 @@ using Serilog;
 
 namespace Acnys.Core.RabbitMQ
 {
-    public class EventListener
+    public class RabbitEventListener
     {
         private readonly ILogger _log;
+        private readonly IConnection _connection;
         private readonly IDispatchEvent _eventDispatcher;
+        public readonly string Queue;
+        public readonly string ConsumerTag;
+        private readonly IDictionary<string, object> _consumerArgs;
         private readonly Func<ILogger, EventingBasicConsumer, BasicDeliverEventArgs, (IEvent evnt, IDictionary<string, object> args)> _eventMapper;
-        private readonly EventingBasicConsumer _consumer;
+        public EventingBasicConsumer Consumer;
 
-        public EventListener(
+        public RabbitEventListener(
             ILogger log,
             IConnection connection, 
             IDispatchEvent eventDispatcher,
@@ -28,30 +32,50 @@ namespace Acnys.Core.RabbitMQ
             Func<ILogger, EventingBasicConsumer, BasicDeliverEventArgs, (IEvent evnt, IDictionary<string, object> args)> eventMapper)
         {
             _log = log;
+            _connection = connection;
             _eventDispatcher = eventDispatcher;
+            Queue = queue;
+            ConsumerTag = consumerTag;
+            _consumerArgs = consumerArgs;
             _eventMapper = eventMapper;
+        }
 
-            var channel = connection.CreateModel();
-            
-            _consumer = new EventingBasicConsumer(channel);
-            _consumer.Received += OnReceived;
+        public void Start()
+        {
+            var channel = _connection.CreateModel();
 
-            channel.BasicConsume(queue, false, consumerTag, consumerArgs, _consumer);
+            Consumer = new EventingBasicConsumer(channel);
+
+            Consumer.Received += OnReceived;
+            Consumer.Shutdown += OnConsumerShutdown;
+            Consumer.Registered += OnConsumerRegistered;
+            Consumer.Unregistered += OnConsumerUnregistered;
+            Consumer.ConsumerCancelled += OnConsumerConsumerCancelled;
+
+            try
+            {
+                var tagReceived = channel.BasicConsume(Queue, false, ConsumerTag, _consumerArgs, Consumer);
+                _log.Debug("RabbitMQ consumer with tag '{consumerTag}' created for event listener", tagReceived);
+            }
+            catch (Exception exception)
+            {
+                _log.Error(exception, "RabbitMQ consumer failed to create for {queue}", Queue);
+            }
         }
 
         private void OnReceived(object sender, BasicDeliverEventArgs e)
         {
             try
             {
-                var (evnt, args) = _eventMapper(_log, _consumer, e);
+                var (evnt, args) = _eventMapper(_log, Consumer, e);
                 _eventDispatcher.Dispatch(evnt, args, CancellationToken.None);
-                _consumer.Model.BasicAck(e.DeliveryTag, false);
+                Consumer.Model.BasicAck(e.DeliveryTag, false);
 
             }
             catch (Exception exception)
             {
                 _log.Error(exception, "Message delivery failed");
-                _consumer.Model.BasicNack(e.DeliveryTag, false, false);
+                Consumer.Model.BasicNack(e.DeliveryTag, false, false);
             }
         }
 
@@ -84,5 +108,26 @@ namespace Acnys.Core.RabbitMQ
 
             return (evnt, eventArgs);
         }
+
+        private void OnConsumerConsumerCancelled(object sender, ConsumerEventArgs e)
+        {
+            _log.Error("Consumer {consumerTag} cancelled", (sender as EventingBasicConsumer).ConsumerTag);
+        }
+
+        private void OnConsumerUnregistered(object sender, ConsumerEventArgs e)
+        {
+            _log.Error("Consumer {consumerTag} unregistered", (sender as EventingBasicConsumer).ConsumerTag);
+        }
+
+        private void OnConsumerRegistered(object sender, ConsumerEventArgs e)
+        {
+            _log.Debug("Consumer {consumerTag} is registered", (sender as EventingBasicConsumer).ConsumerTag);
+        }
+
+        private void OnConsumerShutdown(object sender, ShutdownEventArgs e)
+        {
+            _log.Warning("Consumer {consumerTag} shut down", (sender as EventingBasicConsumer).ConsumerTag);
+        }
+
     }
 }

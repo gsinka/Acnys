@@ -1,5 +1,4 @@
 ﻿using System;
-using Acnys.Core.Hosting.Serilog;
 using Autofac;
 using Microsoft.Extensions.Hosting;
 using Serilog;

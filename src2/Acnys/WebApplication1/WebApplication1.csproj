@@ -5,7 +5,9 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
-  
+  <ItemGroup>
+    <Compile Remove="Startup.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Acnys.Core.AspNet.Eventing\Acnys.Core.AspNet.Eventing.csproj" />
@@ -15,6 +17,5 @@
     <ProjectReference Include="..\Acnys.Core.Eventing\Acnys.Core.Eventing.csproj" />
     <ProjectReference Include="..\Acnys.Core.Request\Acnys.Core.Request.csproj" />
   </ItemGroup>
-
 
 </Project>

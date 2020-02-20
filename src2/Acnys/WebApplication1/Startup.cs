@@ -1,4 +1,5 @@
 using System.Reflection;
+using Acnys.Core.AspNet;
 using Acnys.Core.AspNet.RabbitMQ;
 using Acnys.Core.AspNet.Request;
 using Microsoft.AspNetCore.Builder;
@@ -25,6 +26,7 @@ namespace WebApplication1
                 .AddControllers().AddApplicationPart(Assembly.GetEntryAssembly()).AddControllersAsServices();
 
             services.Configure<RabbitServiceConfiguration>(Configuration.GetSection("Rabbit"));
+            
             //services.AddHostedService<RabbitHostedService>();
         }
 
@@ -37,8 +39,20 @@ namespace WebApplication1
             }
 
             app.UseRouting();
-
             app.UseAuthorization();
+            
+            var appSettings = new ApplicationOptions();
+            Configuration.Bind("Application", appSettings);
+
+            var ssoSettings = new SingleSignOnOptions();
+            Configuration.Bind("SingleSignOn", ssoSettings);
+
+            var openApiSettings = new OpenApiDocumentationOptions() { Path = "/swagger" };
+            
+            app.AddOpenApiDocumentation(appSettings, ssoSettings, openApiSettings);
+
+            app.AddReadiness();
+            app.AddLiveness();
 
             app.UseEndpoints(endpoints =>
             {

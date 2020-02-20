@@ -1,9 +1,9 @@
 ﻿using System;
 using Acnys.Core.Request.Abstractions;
 using Acnys.Core.Request.Infrastructure.Extensions;
-using Acnys.Core.Request.Infrastructure.Senders;
 using Autofac;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace Acnys.Core.AspNet.Request
 {
@@ -13,7 +13,10 @@ namespace Acnys.Core.AspNet.Request
         {
             return builder.ConfigureContainer<ContainerBuilder>((context, containerBuilder) =>
             {
+                Log.Verbose("Registering command dispatcher");
                 containerBuilder.RegisterCommandDispatcher();
+
+                Log.Verbose("Registering query dispatcher");
                 containerBuilder.RegisterQueryDispatcher();
             });
         }
@@ -22,7 +25,10 @@ namespace Acnys.Core.AspNet.Request
         {
             return builder.ConfigureContainer<ContainerBuilder>((context, containerBuilder) =>
             {
+                Log.Verbose("Registering command handlers from assembly {assembly}", typeof(T).Assembly.FullName);
                 containerBuilder.RegisterCommandHandlersFromAssemblyOf<T>();
+
+                Log.Verbose("Registering query handlers from assembly {assembly}", typeof(T).Assembly.FullName);
                 containerBuilder.RegisterQueryHandlersFromAssemblyOf<T>();
             });
         }
@@ -31,7 +37,10 @@ namespace Acnys.Core.AspNet.Request
         {
             return builder.ConfigureContainer<ContainerBuilder>((context, containerBuilder) =>
                 {
+                    Log.Verbose("Adding command validation behaviour");
                     containerBuilder.AddCommandValidationBehaviour();
+
+                    Log.Verbose("Adding query validation behaviour");
                     containerBuilder.AddQueryValidationBehaviour();
                 });
         }
@@ -40,22 +49,26 @@ namespace Acnys.Core.AspNet.Request
         {
             return builder.ConfigureContainer<ContainerBuilder>((context, containerBuilder) =>
             {
+                Log.Verbose("Registering validators from assembly {assembly}", typeof(T).Assembly.FullName);
                 containerBuilder.RegisterValidatorsFromAssemblyOf<T>();
             });
         }
 
-        public static IHostBuilder AddHttpRequestSender(this IHostBuilder builder, string uri, object senderKey = null)
+        public static IHostBuilder AddHttpRequestSender(this IHostBuilder builder, Func<HostBuilderContext, string> uri, object senderKey = null)
         {
             return builder.ConfigureContainer<ContainerBuilder>((context, containerBuilder) =>
-                {
-                    containerBuilder.RegisterHttpRequestSender(uri, senderKey);
-                });
+            {
+                var senderUri = uri(context);
+                Log.Verbose("Registering HTTP request sender with key {senderKey} for URI {uri}", senderKey, senderUri);
+                containerBuilder.RegisterHttpRequestSender(senderUri, senderKey);
+            });
         }
-        
+
         public static IHostBuilder AddLoopbackRequestSender(this IHostBuilder builder, object senderKey = null)
         {
             return builder.ConfigureContainer<ContainerBuilder>((context, containerBuilder) =>
                 {
+                    Log.Verbose("Registering Loopback request sender with key {senderKey}", senderKey);
                     containerBuilder.RegisterLoopbackRequestSender(senderKey);
                 });
         }
@@ -64,6 +77,7 @@ namespace Acnys.Core.AspNet.Request
         {
             return builder.ConfigureContainer<ContainerBuilder>((context, containerBuilder) =>
             {
+                Log.Verbose("Adding request sender service");
                 containerBuilder.RegisterRequestSender(keySelector);
             });
         }
