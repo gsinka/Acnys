@@ -1,6 +1,7 @@
 using System;
 using Acnys.Core.AspNet;
 using Acnys.Core.AspNet.Eventing;
+using Acnys.Core.AspNet.RabbitMQ;
 using Acnys.Core.AspNet.Request;
 using Autofac;
 using Microsoft.Extensions.Hosting;
@@ -25,15 +26,27 @@ namespace WebApplication1
                         .AddRequestSender(request => "http")
                         .AddHttpRequestSender(context => "http://localhost:5000/api", "http")
 
+                        .AddRabbit((context, factory) =>
+                        {
+                            factory.Uri = new Uri(context.Configuration["Rabbit:Uri"]);
+                            factory.AutomaticRecoveryEnabled = true;
+
+                        }, "test", "test")
+
                         .ConfigureContainer<ContainerBuilder>((context, builder) =>
                         {
                             builder.RegisterType<Setup>().As<IStartable>().SingleInstance();
-                        });
+                        })
+
+                        ;
+
+
                 });
 
                 Log.ForContext<Program>().Information("Running application");
 
-                app.Start();
+                app.Run();
+
                 return 0;
             }
             catch (Exception exception)

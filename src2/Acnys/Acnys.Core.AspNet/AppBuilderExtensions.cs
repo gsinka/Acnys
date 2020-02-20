@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
 using Acnys.Core.AspNet.Eventing;
-using Acnys.Core.AspNet.RabbitMQ;
 using Acnys.Core.AspNet.Request;
 using Autofac;
 using Microsoft.AspNetCore.Builder;
@@ -33,7 +32,7 @@ namespace Acnys.Core.AspNet
                 .AddAutofac()
 
                 .AddHealthChecks((context, builder) => builder
-                    .AddCheck("Self", () => HealthCheckResult.Healthy(), new List<string> {"Liveness", "Readiness"})
+                    .AddCheck("Self", () => HealthCheckResult.Healthy(), new List<string> {"Liveness"})
                 )
                 .AddHttpMetrics()
                 .AddOpenApiDocumentation(
@@ -44,7 +43,8 @@ namespace Acnys.Core.AspNet
                 
                 .AddHttpRequestHandler()
                 .AddEventing()
-                .AddRabbitService((context, configuration) => context.Configuration.Bind("Rabbit", configuration))
+                
+                //.AddRabbitService((context, configuration) => context.Configuration.Bind("Rabbit", configuration))
 
                 .ConfigureContainer<ContainerBuilder>((context, builder) => { })
                 

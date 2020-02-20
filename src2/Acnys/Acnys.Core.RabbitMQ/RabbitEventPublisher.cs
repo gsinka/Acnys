@@ -14,7 +14,7 @@ namespace Acnys.Core.RabbitMQ
     /// <summary>
     /// RabbitMQ event publisher
     /// </summary>
-    public class EventPublisher : IPublishEvent
+    public class RabbitEventPublisher : IPublishEvent
     {
         public static string RoutingKey = nameof(RoutingKey);
         public static string Mandatory = nameof(Mandatory);
@@ -30,7 +30,7 @@ namespace Acnys.Core.RabbitMQ
         /// <param name="connection">RabbitMQ connection instance</param>
         /// <param name="exchange">Exchange to use for event publishing</param>
         /// <param name="publishContext">Publish context builder function for building routing key, mandatory flag and properties</param>
-        public EventPublisher(
+        public RabbitEventPublisher(
             ILogger log,
             IConnection connection, 
             string exchange, 

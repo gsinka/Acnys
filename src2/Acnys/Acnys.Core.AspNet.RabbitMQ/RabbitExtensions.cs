@@ -1,29 +1,35 @@
 ﻿using System;
+using System.Collections.Generic;
 using Acnys.Core.Eventing.Abstractions;
+using Acnys.Core.RabbitMQ;
+using Acnys.Core.RabbitMQ.Extensions;
 using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using RabbitMQ.Client;
 using Serilog;
 
 namespace Acnys.Core.AspNet.RabbitMQ
 {
     public static class RabbitExtensions
     {
-        public static IHostBuilder AddRabbitService(this IHostBuilder hostBuilder, Action<HostBuilderContext, RabbitServiceConfiguration> config)
+        public static IHostBuilder AddRabbit(this IHostBuilder hostBuilder, Action<HostBuilderContext, ConnectionFactory> connectionBuilder, string exchange, string queue, bool autoStartListener = true)
         {
             return hostBuilder.ConfigureContainer<ContainerBuilder>((context, builder) =>
-            {
-                var rabbitConfig = new RabbitServiceConfiguration();
-                config(context, rabbitConfig);
+                {
+                    builder.AddRabbitConnection(factory => connectionBuilder(context, factory));
+                    builder.AddRabbitEventPublisher(exchange);
+                    builder.AddRabbitEventListener(queue);
+                    builder.RegisterType<RabbitService>().AsImplementedInterfaces().SingleInstance();
 
-                Log.Verbose("Adding RabbitMQ service using {rabbitUri}", rabbitConfig.Uri);
+                    if (autoStartListener) builder.AutoStartRabbitEventListeners();
+                })
 
-                builder.Register(componentContext =>
-                        new RabbitHostedService(componentContext.Resolve<ILogger>().ForContext<RabbitHostedService>(),
-                            componentContext.Resolve<IDispatchEvent>(), rabbitConfig))
-                    .AsImplementedInterfaces().SingleInstance();
-
-                //builder.RegisterType<RabbitHostedService>().AsImplementedInterfaces().SingleInstance();
-            });
+                    .ConfigureServices((context, services) => services
+                        .AddHealthChecks()
+                            .AddCheck<RabbitEventListenerHealthCheck>("RabbitMQ event listener", tags: new [] { "Readiness" }))
+                
+                ;
         }
     }
 }

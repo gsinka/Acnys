@@ -10,6 +10,8 @@ namespace Acnys.Core.RabbitMQ.Extensions
     {
         public static ContainerBuilder AddRabbitConnection(this ContainerBuilder builder, Action<ConnectionFactory> connectionBuilder, object serviceKey = null)
         {
+            Log.Debug("Adding RabbitMQ connection with service key {serviceKey}", serviceKey);
+
             var connectionFactory = new ConnectionFactory();
             connectionBuilder(connectionFactory);
             var connection = connectionFactory.CreateConnection();
@@ -27,20 +29,43 @@ namespace Acnys.Core.RabbitMQ.Extensions
             return builder;
         }
 
-        public static ContainerBuilder AddEventListener(this ContainerBuilder builder, string queue)
+        public static ContainerBuilder AddRabbitEventListener(this ContainerBuilder builder, string queue)
         {
+            Log.Debug("Adding RabbitMQ event listener for queue {queue}", queue);
+
             builder.Register(context =>
-                    new EventListener(
-                        context.Resolve<ILogger>().ForContext<EventListener>(),
+                    new RabbitEventListener(
+                        context.Resolve<ILogger>().ForContext<RabbitEventListener>(),
                         context.Resolve<IConnection>(),
                         context.Resolve<IDispatchEvent>(),
                         queue,
                         string.Empty,
                         null,
-                        EventListener.Default
+                        RabbitEventListener.Default
                     )
-                ).AsSelf().SingleInstance().AutoActivate();
+                ).AsSelf().SingleInstance();
 
+            return builder;
+        }
+
+        public static ContainerBuilder AddRabbitEventPublisher(this ContainerBuilder builder, string exchange)
+        {
+            Log.Debug("Adding RabbitMQ event publisher for exchange {queue}", exchange);
+
+            builder.Register(context => new RabbitEventPublisher(
+                    context.Resolve<ILogger>().ForContext<RabbitEventPublisher>(),
+                    context.Resolve<IConnection>(),
+                    exchange,
+                    RabbitEventPublisher.DefaultContextBuilder
+                    )
+            ).AsImplementedInterfaces().SingleInstance();
+
+            return builder;
+        }
+
+        public static ContainerBuilder AutoStartRabbitEventListeners(this ContainerBuilder builder)
+        {
+            builder.RegisterType<RabbitAutoStartService>().AsImplementedInterfaces().SingleInstance();
             return builder;
         }
     }
