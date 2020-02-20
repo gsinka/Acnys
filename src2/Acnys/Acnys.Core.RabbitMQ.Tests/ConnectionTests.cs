@@ -4,8 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Eventing;
 using Acnys.Core.Eventing.Abstractions;
-using Acnys.Core.Eventing.Infrastructure.Extensions;
-using Acnys.Core.RabbitMQ.Extensions;
 using Autofac;
 using RabbitMQ.Client;
 using Serilog;

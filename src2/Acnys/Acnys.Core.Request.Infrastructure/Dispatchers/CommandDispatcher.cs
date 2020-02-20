@@ -37,34 +37,32 @@ namespace Acnys.Core.Request.Infrastructure.Dispatchers
 
                 _log.Verbose("Command object: {@command}", command);
 
-                using (var scope = _scope.BeginLifetimeScope())
+                using var scope = _scope.BeginLifetimeScope();
+
+                _log.Verbose("Lifetime scope {scopeId} created for command", scope.GetHashCode());
+
+                try
                 {
-                    _log.Verbose("Lifetime scope {scopeId} created for command", scope.GetHashCode());
+                    var commandType = typeof(T);
+                    var handlerType = typeof(IHandleCommand<>).MakeGenericType(commandType);
+                    _log.Verbose("Looking handler with type {handlerType}", handlerType);
 
-                    try
-                    {
-                        var commandType = typeof(T);
-                        var handlerType = typeof(IHandleCommand<>).MakeGenericType(commandType);
-                        _log.Verbose("Looking handler with type {handlerType}", handlerType);
-
-                        var handler = (IHandleCommand<T>)scope.Resolve(handlerType);
+                    var handler = (IHandleCommand<T>)scope.Resolve(handlerType);
                             
-                        _log.Verbose("Handling {commandType} with {handler}", commandType.Name, handler.GetType().Name);
-                        await handler.Handle(command, arguments, cancellationToken);
+                    _log.Verbose("Handling {commandType} with {handler}", commandType.Name, handler.GetType().Name);
+                    await handler.Handle(command, arguments, cancellationToken);
 
-                        _log.Debug("Command dispatch completed successfully");
-                    }
-                    catch (Exception exception)
-                    {
-                        _log.Error(exception, "Command dispatch failed");
-                        throw;
-                    }
-                    finally
-                    {
-                        _log.Verbose("Ending lifetime scope {scopeId}", scope.GetHashCode());
-                    }
+                    _log.Debug("Command dispatch completed successfully");
                 }
-
+                catch (Exception exception)
+                {
+                    _log.Error(exception, "Command dispatch failed");
+                    throw;
+                }
+                finally
+                {
+                    _log.Verbose("Ending lifetime scope {scopeId}", scope.GetHashCode());
+                }
             }, cancellationToken);
         }
     }
