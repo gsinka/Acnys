@@ -109,16 +109,11 @@ namespace Acnys.Core.RabbitMQ
 
             if (args.BasicProperties.Headers.ContainsKey(CorrelationExtensions.CausationIdName))
             {
-                var causationId = args.BasicProperties.Headers[CorrelationExtensions.CausationIdName];
-                if (causationId is Guid)
-                {
-                    eventArgs.UseCausationId((Guid) causationId);
-                }
-                else
-                {
-                    if (Guid.TryParse(causationId.ToString(), out var result))
-                        eventArgs.UseCausationId(result);
-                }
+                var causationId = Encoding.UTF8.GetString((byte[])args.BasicProperties.Headers[CorrelationExtensions.CausationIdName]);
+                
+                if (Guid.TryParse(causationId.ToString(), out var result))
+                    eventArgs.UseCausationId(result);
+                
                 
             }
 
