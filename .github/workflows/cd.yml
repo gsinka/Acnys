@@ -1,9 +1,7 @@
 name: Continous Delivery
 
 on:
-  push:
-    branches: 
-      - develop    
+  push:    
     tags:
     - '*'
       
