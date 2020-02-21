@@ -6,13 +6,16 @@ namespace Acnys.Core.Request
 {
     public static class RequestCorrelationExtensions
     {
-        public static IDictionary<string, object> CorrelateTo(this IDictionary<string, object> source, ICommand command)
+        public static IDictionary<string, object> EnrichWithCorrelation(this IDictionary<string, object> target, ICommand command, IDictionary<string, object> source)
         {
-            return new Dictionary<string, object>
-            {
-                { CorrelationExtensions.CorrelationIdName, source.CorrelationId() },
-                { CorrelationExtensions.CausationIdName, command.RequestId }
-            };
+            if (target == null) return target;
+            
+            var correlationId = source.CorrelationId();
+            if (correlationId.HasValue) target.UseCorrelationId(correlationId.Value);
+            
+            target.UseCausationId(command.RequestId);
+
+            return target;
         }
     }
 }

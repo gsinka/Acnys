@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Acnys.Core.Abstractions.Extensions;
 using Acnys.Core.Eventing.Abstractions;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
@@ -75,7 +76,20 @@ namespace Acnys.Core.RabbitMQ
             { 
                 foreach (var arg in args)
                 {
-                    basicProps.Headers.Add(arg);
+                    switch (arg.Key)
+                    {
+                        case CorrelationExtensions.CorrelationIdName:
+                            basicProps.CorrelationId = arg.Value?.ToString() ?? "";
+                            break;
+
+                        case CorrelationExtensions.CausationIdName:
+                            basicProps.Headers.Add(CorrelationExtensions.CausationIdName, arg.Value?.ToString() ?? "");
+                            break;
+
+                        default:
+                            basicProps.Headers.Add(arg);
+                            break;
+                    }
                 }
             }
 

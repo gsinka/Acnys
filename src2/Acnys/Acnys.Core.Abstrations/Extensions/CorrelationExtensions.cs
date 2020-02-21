@@ -10,12 +10,30 @@ namespace Acnys.Core.Abstractions.Extensions
 
         public static Guid? CorrelationId(this IDictionary<string, object> arguments)
         {
-            return (arguments != null && arguments.ContainsKey(CorrelationIdName) ? arguments[CorrelationIdName] as Guid? : null);
+            if (arguments == null || !arguments.ContainsKey(CorrelationIdName)) return null;
+
+            var value = arguments[CorrelationIdName];
+
+            return
+                value is Guid guid
+                    ? guid
+                    : Guid.TryParse(value.ToString(), out Guid parsedGuid)
+                        ? parsedGuid
+                        : (Guid?)null;
         }
 
         public static Guid? CausationId(this IDictionary<string, object> arguments)
         {
-            return (arguments != null && arguments.ContainsKey(CausationIdName) ? arguments[CausationIdName] as Guid? : null);
+            if (arguments == null || !arguments.ContainsKey(CausationIdName)) return null;
+
+            var value = arguments[CausationIdName];
+
+            return
+                value is Guid guid
+                    ? guid
+                    : Guid.TryParse(value.ToString(), out Guid parsedGuid)
+                        ? parsedGuid
+                        : (Guid?)null;
         }
 
         public static IDictionary<string, object> UseCorrelationId(this IDictionary<string, object> arguments, Guid correlationId)

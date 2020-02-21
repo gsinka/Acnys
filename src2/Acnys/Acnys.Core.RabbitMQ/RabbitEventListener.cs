@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Acnys.Core.Abstractions.Extensions;
 using Acnys.Core.Eventing.Abstractions;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
@@ -98,8 +99,29 @@ namespace Acnys.Core.RabbitMQ
             var eventJson = Encoding.UTF8.GetString(args.Body);
             var evnt = (IEvent)JsonConvert.DeserializeObject(eventJson, eventType);
 
-            var eventArgs = args.BasicProperties.Headers.ToDictionary(pair => pair.Key, pair => pair.Value);
-            
+            var eventArgs = args.BasicProperties.Headers.Where(pair => pair.Key != CorrelationExtensions.CausationIdName).ToDictionary(pair => pair.Key, pair => pair.Value);
+
+            if (args.BasicProperties.IsCorrelationIdPresent())
+            {
+                if (Guid.TryParse(args.BasicProperties.CorrelationId, out var result))
+                    eventArgs.UseCorrelationId(result);
+            }
+
+            if (args.BasicProperties.Headers.ContainsKey(CorrelationExtensions.CausationIdName))
+            {
+                var causationId = args.BasicProperties.Headers[CorrelationExtensions.CausationIdName];
+                if (causationId is Guid)
+                {
+                    eventArgs.UseCausationId((Guid) causationId);
+                }
+                else
+                {
+                    if (Guid.TryParse(causationId.ToString(), out var result))
+                        eventArgs.UseCausationId(result);
+                }
+                
+            }
+
             eventArgs.Add(nameof(args.DeliveryTag), args.DeliveryTag);
             eventArgs.Add(nameof(args.ConsumerTag), args.ConsumerTag);
             eventArgs.Add(nameof(args.Exchange), args.Exchange);
