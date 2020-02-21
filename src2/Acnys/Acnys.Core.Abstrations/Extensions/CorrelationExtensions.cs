@@ -36,14 +36,16 @@ namespace Acnys.Core.Abstractions.Extensions
                         : (Guid?)null;
         }
 
-        public static IDictionary<string, object> UseCorrelationId(this IDictionary<string, object> arguments, Guid correlationId)
+        public static IDictionary<string, object> UseCorrelationId(this IDictionary<string, object> arguments, Guid? correlationId)
         {
+            if (!correlationId.HasValue) return arguments;
             arguments.Add(CorrelationIdName, correlationId);
             return arguments;
         }
         
-        public static IDictionary<string, object> UseCausationId(this IDictionary<string, object> arguments, Guid causationId)
+        public static IDictionary<string, object> UseCausationId(this IDictionary<string, object> arguments, Guid? causationId)
         {
+            if (!causationId.HasValue) return arguments;
             arguments.Add(CausationIdName, causationId);
             return arguments;
         }
