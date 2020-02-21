@@ -10,17 +10,13 @@ namespace Acnys.Core.Request.Tests.Commands
         {
             var command = new TestCommand();
             Assert.NotEqual(Guid.Empty, command.RequestId);
-            Assert.Null(command.CausationId);
-            Assert.Null(command.CorrelationId);
 
             var requestId = Guid.NewGuid();
             var correlationId = Guid.NewGuid();
             var causationId = Guid.NewGuid();
             
-            command = new TestCommand(requestId, causationId, correlationId);
+            command = new TestCommand(requestId);
             Assert.Equal(requestId, command.RequestId);
-            Assert.Equal(causationId, command.CausationId);
-            Assert.Equal(correlationId, command.CorrelationId);
         }
 
         [Fact]
@@ -38,7 +34,7 @@ namespace Acnys.Core.Request.Tests.Commands
 
         public class TestCommand : Command
         {
-            public TestCommand(Guid? requestId = null, Guid? causationId = null, Guid? correlationId = null) : base(requestId, causationId, correlationId)
+            public TestCommand(Guid? requestId = null) : base(requestId)
             {
             }
         }

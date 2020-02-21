@@ -8,15 +8,22 @@ namespace Acnys.Core.Request.Tests
 {
     public class TestCommand : Command
     {
-        public TestCommand(Guid? requestId = null, Guid? causationId = null, Guid? correlationId = null) : base(requestId, causationId, correlationId)
+        public TestCommand(Guid? requestId = null) : base(requestId)
         {
         }
     }
 
     public class TestCommandHandler : IHandleCommand<TestCommand>
     {
+        public IDictionary<string, object> Arguments { get; private set; }
+
+        public TestCommand Command { get; private set; }
+
         public Task Handle(TestCommand command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
+            Arguments = arguments;
+            Command = command;
+
             return Task.CompletedTask;
         }
     }

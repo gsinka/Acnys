@@ -1,5 +1,4 @@
 ﻿using System;
-using Acnys.Core.Abstractions;
 using Acnys.Core.Request.Abstractions;
 
 namespace Acnys.Core.Request
@@ -7,28 +6,18 @@ namespace Acnys.Core.Request
     /// <summary>
     /// Command object
     /// </summary>
-    public abstract class Command : ICommand, ICausedBy, ICorrelatedBy
+    public abstract class Command : ICommand
     {
         /// <inheritdoc />
         public Guid RequestId { get; }
-
-        /// <inheritdoc />
-        public Guid? CausationId { get; }
-
-        /// <inheritdoc />
-        public Guid? CorrelationId { get; }
 
         /// <summary>
         /// Create new command
         /// </summary>
         /// <param name="requestId">Command id</param>
-        /// <param name="causationId">Causation id</param>
-        /// <param name="correlationId">Correlation id</param>
-        protected Command(Guid? requestId = null, Guid? causationId = null, Guid? correlationId = null)
+        protected Command(Guid? requestId = null)
         {
             RequestId = requestId ?? Guid.NewGuid();
-            CausationId = causationId;
-            CorrelationId = correlationId;
         }
 
         public override int GetHashCode()

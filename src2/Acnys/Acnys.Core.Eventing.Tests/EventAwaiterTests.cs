@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Acnys.Core.Abstractions.Extensions;
 using Acnys.Core.Eventing.Abstractions;
-using Acnys.Core.Eventing.Infrastructure;
 using Acnys.Core.Eventing.Infrastructure.Extensions;
+using Acnys.Core.Eventing.Infrastructure;
 using Autofac;
 using Serilog;
 using Xunit;
@@ -33,22 +34,25 @@ namespace Acnys.Core.Eventing.Tests
         [Fact]
         public async Task Event_awaiter_returns_with_event()
         {
+            var correlationId = Guid.NewGuid();
+
             var svc = _container.Resolve<EventAwaiterService>();
-            var testEvent = new TestEvent(correlationId: Guid.NewGuid());
+            var testEvent = new TestEvent();
             var stoppingTokenSource = new CancellationTokenSource(1000);
-            var awaiter = svc.GetEventAwaiter<TestEvent>((evnt, args) => evnt.CorrelationId == testEvent.CorrelationId, stoppingTokenSource.Token);
-            await _container.Resolve<IPublishEvent>().Publish(testEvent, new Dictionary<string, object>(), CancellationToken.None);
+            var awaiter = svc.GetEventAwaiter<TestEvent>((evnt, args) => correlationId == args.CorrelationId(), stoppingTokenSource.Token);
+            await _container.Resolve<IPublishEvent>().Publish(testEvent, new Dictionary<string, object>().UseCorrelationId(correlationId), CancellationToken.None);
             Assert.NotNull(await awaiter);
         }
 
         [Fact]
         public async Task Event_awaiter_returns_no_event_without_publish()
         {
+            var correlationId = Guid.NewGuid();
+
             var svc = _container.Resolve<EventAwaiterService>();
-            var testEvent = new TestEvent(correlationId: Guid.NewGuid());
+            var testEvent = new TestEvent();
             var stoppingTokenSource = new CancellationTokenSource(1);
-            var awaiter = svc.GetEventAwaiter<TestEvent>((evnt, args) => evnt.CorrelationId == testEvent.CorrelationId, stoppingTokenSource.Token);
-            await _container.Resolve<IPublishEvent>().Publish(testEvent, new Dictionary<string, object>(), CancellationToken.None);
+            var awaiter = svc.GetEventAwaiter<TestEvent>((evnt, args) => correlationId == args.CorrelationId(), stoppingTokenSource.Token);
             await Assert.ThrowsAsync<TaskCanceledException>(async () => await awaiter);
             
         }

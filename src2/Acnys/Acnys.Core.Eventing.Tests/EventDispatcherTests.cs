@@ -35,7 +35,7 @@ namespace Acnys.Core.Eventing.Tests
         [Fact]
         public async Task Event_dispatcher_shall_work_without_registered_event_awaiter()
         {
-            var testEvent = new TestEvent(correlationId: Guid.NewGuid());
+            var testEvent = new TestEvent();
             var dispatcher = _container.Resolve<IDispatchEvent>();
             await dispatcher.Dispatch(testEvent, new Dictionary<string, object>(), CancellationToken.None);
         }
@@ -43,7 +43,7 @@ namespace Acnys.Core.Eventing.Tests
         [Fact]
         public async Task Event_dispatcher_called()
         {
-            var testEvent = new TestEvent(correlationId: Guid.NewGuid());
+            var testEvent = new TestEvent();
             var args = new Dictionary<string, object>()
             {
                 { "test key", "test value" }
@@ -61,7 +61,7 @@ namespace Acnys.Core.Eventing.Tests
         [Fact]
         public async Task Dispatch_event_with_no_arguments()
         {
-            var testEvent = new TestEvent(correlationId: Guid.NewGuid());
+            var testEvent = new TestEvent();
             var dispatcher = _container.Resolve<IDispatchEvent>();
             await dispatcher.Dispatch(testEvent, cancellationToken: CancellationToken.None);
 

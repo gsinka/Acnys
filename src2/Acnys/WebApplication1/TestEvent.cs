@@ -13,7 +13,7 @@ namespace WebApplication1
     {
         public string Data { get; }
 
-        public TestEvent(string data, Guid? eventId = null, Guid? causationId = null, Guid? correlationId = null) : base(eventId, causationId, correlationId)
+        public TestEvent(string data, Guid? eventId = null) : base(eventId)
         {
             Data = data;
         }
@@ -31,7 +31,7 @@ namespace WebApplication1
     {
         public string Data { get; }
 
-        public TestCommand(string data, Guid? requestId = null, Guid? causationId = null, Guid? correlationId = null) : base(requestId, causationId, correlationId)
+        public TestCommand(string data, Guid? requestId = null) : base(requestId)
         {
             Data = data;
         }
@@ -48,11 +48,13 @@ namespace WebApplication1
 
         public async Task Handle(TestCommand command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
-            await _eventPublisher.Publish(
-                new TestEvent(command.Data, command.RequestId, command.CorrelationId), 
-                new Dictionary<string, object> { {"test", "test"}, {"int", 1}}, 
-                cancellationToken);
+            var testEvent = new TestEvent(command.Data);
 
+            await _eventPublisher.Publish(
+                testEvent,
+                new Dictionary<string, object>(arguments.CorrelateTo(command)) 
+                    { {"test", "test"}, {"int", 1}}, 
+                cancellationToken);
         }
     }
 }

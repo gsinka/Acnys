@@ -8,7 +8,7 @@ namespace Acnys.Core.Eventing
     /// <summary>
     /// Event object
     /// </summary>
-    public abstract class Event : IEvent, ICausedBy, ICorrelatedBy
+    public abstract class Event : IEvent
     {
         /// <summary>
         /// Event Id
@@ -16,26 +16,12 @@ namespace Acnys.Core.Eventing
         public Guid EventId { get; }
 
         /// <summary>
-        /// Causation id
-        /// </summary>
-        public Guid? CausationId { get; }
-
-        /// <summary>
-        /// Correlation id
-        /// </summary>
-        public Guid? CorrelationId { get; }
-
-        /// <summary>
         /// Create new event
         /// </summary>
         /// <param name="eventId">Event id</param>
-        /// <param name="causationId">Causation id</param>
-        /// <param name="correlationId">Correlation id</param>
-        protected Event(Guid? eventId = null, Guid? causationId = null, Guid? correlationId = null)
+        protected Event(Guid? eventId = null)
         {
             EventId = eventId ?? Guid.NewGuid();
-            CausationId = causationId;
-            CorrelationId = correlationId;
         }
 
         protected bool Equals(Event other)
@@ -47,8 +33,7 @@ namespace Acnys.Core.Eventing
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((Event) obj);
+            return obj.GetType() == this.GetType() && Equals((Event) obj);
         }
 
         public override int GetHashCode()
