@@ -48,5 +48,14 @@ namespace Acnys.Core.Tests
             Assert.Equal(causationId, args.CausationId());
         }
 
+        //[Fact]
+        //public void Create_correlation_from_source_dictionary()
+        //{
+        //    var source = new Dictionary<string, object>()
+        //    {
+        //        { CorrelationExtensions.CorrelationIdName, Guid.NewGuid() },
+        //        { CorrelationExtensions.CausationIdName, Guid.NewGuid() },
+        //    };
+        //}
     }
 }
