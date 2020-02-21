@@ -24,6 +24,7 @@
     <ProjectReference Include="..\Acnys.Core.AspNet.Eventing\Acnys.Core.AspNet.Eventing.csproj" />
     <ProjectReference Include="..\Acnys.Core.AspNet.Request\Acnys.Core.AspNet.Request.csproj" />
     <ProjectReference Include="..\Acnys.Core.Request.Infrastructure\Acnys.Core.Request.Infrastructure.csproj" />
+    <ProjectReference Include="..\Acnys.Core\Acnys.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

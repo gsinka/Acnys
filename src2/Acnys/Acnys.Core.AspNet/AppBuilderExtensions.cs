@@ -18,25 +18,12 @@ namespace Acnys.Core.AspNet
 {
     public static class AppBuilderExtensions
     {
-        public static IHostBuilder PrebuildDefaultApp(this IHostBuilder hostBuilder)
-        {
-
-            return hostBuilder
-                .AddSerilog((context, config) => config
-                    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss+fff}{EventType:x8} {Level:u3}][{App}] {Message:lj} <-- [{SourceContext}]{NewLine}{Exception}", theme: AnsiConsoleTheme.Code)
-                    .Enrich.FromLogContext()
-                    .Enrich.WithProperty("App", "SMC")
-                    .MinimumLevel.Verbose()
-                    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-                    .MinimumLevel.Override("System", LogEventLevel.Warning));
-        }
-
         public static IHostBuilder PrebuildDefaultApp(this IHostBuilder hostBuilder, Action<HostBuilderContext, LoggerConfiguration> logger)
         {
             return hostBuilder
                     
-                    .AddSerilog(logger)
                     .AddAutofac()
+                    .AddSerilog(logger)
 
                     .AddHealthChecks((context, builder) => builder
                         .AddCheck("Self", () => HealthCheckResult.Healthy(), new List<string> { "Liveness" })
@@ -65,6 +52,7 @@ namespace Acnys.Core.AspNet
                             app.UseDeveloperExceptionPage();
                         }
 
+                        app.AddErrorHandling();
                         app.UseRouting();
                         app.UseAuthorization();
 
@@ -88,6 +76,17 @@ namespace Acnys.Core.AspNet
                         });
                     }))
                 ;
+        }
+
+        public static Action<HostBuilderContext, LoggerConfiguration> DefaultLogger(string appName, LogEventLevel minimumLevel)
+        {
+            return (context, config) => config
+                .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss+fff}{EventType:x8} {Level:u3}][{App}] {Message:lj} <-- [{SourceContext}]{NewLine}{Exception}", theme: AnsiConsoleTheme.Code)
+                .Enrich.FromLogContext()
+                .Enrich.WithProperty("Application", appName)
+                .MinimumLevel.Is(minimumLevel)
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Override("System", LogEventLevel.Warning);
         }
     }
 }
