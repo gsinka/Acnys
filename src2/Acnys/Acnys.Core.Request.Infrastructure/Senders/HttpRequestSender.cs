@@ -27,6 +27,9 @@ namespace Acnys.Core.Request.Infrastructure.Senders
         {
             _log.Debug("Sending command to HTTP endpoint {uri}", _uri.ToString());
 
+            _log.Verbose("Command data: {@command}", command);
+            _log.Verbose("Command arguments: {@arguments}", arguments);
+
             using var httpClient = new HttpClient(_httpHandler, false)
             {
                 Timeout = TimeSpan.FromMinutes(5),
@@ -53,6 +56,9 @@ namespace Acnys.Core.Request.Infrastructure.Senders
         public async Task<T> Send<T>(IQuery<T> query, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
             _log.Debug("Sending query to HTTP endpoint {uri}", _uri.ToString());
+
+            _log.Verbose("Query data: {@query}", query);
+            _log.Verbose("Query arguments: {@query}", arguments);
 
             using var httpClient = new HttpClient(_httpHandler, false)
             {

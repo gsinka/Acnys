@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Acnys.Core.Request.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Serilog;
 
 namespace Acnys.Core.AspNet.Request
 {
@@ -15,17 +16,21 @@ namespace Acnys.Core.AspNet.Request
     {
         private readonly IDispatchCommand _commandDispatcher;
         private readonly IDispatchQuery _queryDispatcher;
+        private readonly ILogger _log;
         private readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All };
 
-        public GenericRequestHandlerController(IDispatchCommand commandDispatcher, IDispatchQuery queryDispatcher)
+        public GenericRequestHandlerController(IDispatchCommand commandDispatcher, IDispatchQuery queryDispatcher, ILogger log)
         {
             _commandDispatcher = commandDispatcher;
             _queryDispatcher = queryDispatcher;
+            _log = log;
         }
 
         [HttpPost]
         public async Task<IActionResult> Post(CancellationToken cancellationToken = default)
         {
+            _log.Debug("Handling incoming request with generic request handler");
+
             using var reader = new StreamReader(Request.Body, Encoding.UTF8);
 
             var json = await reader.ReadToEndAsync();
@@ -39,7 +44,11 @@ namespace Acnys.Core.AspNet.Request
 
             Type requestType = request.GetType();
 
+            _log.Debug("Generic request identified as {requestType}", requestType.FullName);
+
             var arguments = Request.Headers.Keys.ToDictionary<string, string, object>(key => key, key => Request.Headers[key]);
+
+            _log.Verbose("Arguments parsed from request header: {@arguments}", arguments);
 
             if (request is ICommand)
             {
