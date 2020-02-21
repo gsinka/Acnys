@@ -113,8 +113,6 @@ namespace Acnys.Core.RabbitMQ
                 
                 if (Guid.TryParse(causationId.ToString(), out var result))
                     eventArgs.UseCausationId(result);
-                
-                
             }
 
             eventArgs.Add(nameof(args.DeliveryTag), args.DeliveryTag);
