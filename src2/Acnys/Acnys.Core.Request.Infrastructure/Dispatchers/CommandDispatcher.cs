@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Acnys.Core.Abstractions.Extensions;
 using Acnys.Core.Request.Abstractions;
 using Autofac;
 using Serilog;
+using Serilog.Context;
 
 namespace Acnys.Core.Request.Infrastructure.Dispatchers
 {
@@ -33,6 +35,9 @@ namespace Acnys.Core.Request.Infrastructure.Dispatchers
         {
             return Task.Run(async() =>
             {
+                //using var correlationId = LogContext.PushProperty("correlationId", arguments.CorrelationId());
+                //using var causationId = LogContext.PushProperty("causationId", arguments.CausationId());
+
                 _log.Debug("Dispatching command {commandType}", typeof(T).Name);
 
                 _log.Verbose("Command object: {@command}", command);

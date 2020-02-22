@@ -21,7 +21,17 @@ namespace WebApplication1
                 {
                     hostBuilder
 
-                        .PrebuildDefaultApp(AppBuilderExtensions.DefaultLogger("Test application", LogEventLevel.Verbose))
+                        //.PrebuildDefaultApp(AppBuilderExtensions.DefaultLogger("Test application", LogEventLevel.Verbose))
+                        .PrebuildDefaultApp((context, config) =>
+                        {
+                            config
+                                .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss+fff}{EventType:x8} {Level:u3}][{App}] {Message:lj} <-- [{SourceContext}]{NewLine}{Exception}", theme: AnsiConsoleTheme.Code)
+                                .WriteTo.Seq(context.Configuration["Seq:Url"])
+                                .MinimumLevel.Verbose()
+                                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                                .Enrich.FromLogContext()
+                                .Enrich.WithProperty("Application", "TEST");
+                        })
 
                         .RegisterRequestHandlersFromAssemblyOf<TestEventHandler>()
                         .RegisterEventHandlersFromAssemblyOf<TestEventHandler>()

@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Acnys.Core.Abstrations\Acnys.Core.Abstractions.csproj" />
     <ProjectReference Include="..\Acnys.Core.Request.Abstraction\Acnys.Core.Request.Abstractions.csproj" />
   </ItemGroup>
 

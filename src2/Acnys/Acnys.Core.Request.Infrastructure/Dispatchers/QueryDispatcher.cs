@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Acnys.Core.Abstractions.Extensions;
 using Acnys.Core.Request.Abstractions;
 using Autofac;
 using Serilog;
+using Serilog.Context;
 
 namespace Acnys.Core.Request.Infrastructure.Dispatchers
 {
@@ -28,6 +30,9 @@ namespace Acnys.Core.Request.Infrastructure.Dispatchers
         /// <returns></returns>
         public async Task<TResult> Dispatch<TResult>(IQuery<TResult> query, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
+            //using var correlationId = LogContext.PushProperty("correlationId", arguments.CorrelationId());
+            //using var causationId = LogContext.PushProperty("causationId", arguments.CausationId());
+
             var queryName = query.GetType().Name;
 
             _log.Verbose("Dispatching query {queryName}", queryName);

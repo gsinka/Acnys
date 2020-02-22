@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Acnys.Core.Abstractions.Extensions;
 using Acnys.Core.Request.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Serilog;
+using Serilog.Context;
 
 namespace Acnys.Core.AspNet.Request
 {
@@ -47,6 +49,9 @@ namespace Acnys.Core.AspNet.Request
             _log.Debug("Generic request identified as {requestType}", requestType.FullName);
 
             var arguments = Request.Headers.Keys.ToDictionary<string, string, object>(key => key, key => Request.Headers[key]);
+
+            using var correlationId = LogContext.PushProperty("correlationId", arguments.CorrelationId());
+            using var causationId = LogContext.PushProperty("causationId", arguments.CausationId());
 
             _log.Verbose("Arguments parsed from request header: {@arguments}", arguments);
 

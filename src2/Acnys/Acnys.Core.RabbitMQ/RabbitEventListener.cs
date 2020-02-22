@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Serilog;
+using Serilog.Context;
 
 namespace Acnys.Core.RabbitMQ
 {
@@ -69,6 +70,10 @@ namespace Acnys.Core.RabbitMQ
             try
             {
                 var (evnt, args) = _eventMapper(_log, Consumer, e);
+
+                using var correlationId = LogContext.PushProperty("correlationId", args.CorrelationId());
+                using var causationId = LogContext.PushProperty("causationId", args.CausationId());
+
                 _eventDispatcher.Dispatch(evnt, args, CancellationToken.None);
                 Consumer.Model.BasicAck(e.DeliveryTag, false);
 

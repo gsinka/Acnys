@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Acnys.Core.Abstractions.Extensions;
 using Acnys.Core.Request.Abstractions;
 using Serilog;
+using Serilog.Context;
 
 namespace Acnys.Core.Request.Infrastructure.Senders
 {

@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Acnys.Core.Abstractions.Extensions;
 using Acnys.Core.Request.Abstractions;
 using Autofac.Features.Indexed;
 using Serilog;
+using Serilog.Context;
 
 namespace Acnys.Core.Request.Infrastructure.Senders
 {
@@ -23,6 +25,9 @@ namespace Acnys.Core.Request.Infrastructure.Senders
 
         public async Task Send<T>(T command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : ICommand
         {
+            using var correlationId = LogContext.PushProperty("correlationId", arguments.CorrelationId());
+            using var causationId = LogContext.PushProperty("causationId", arguments.CausationId());
+
             var senderKey = _senderKeySelector(command);
             _log.Verbose("Sender key {senderKey} resolved for command {commandType}", senderKey, command.GetType().Name);
 
@@ -34,6 +39,9 @@ namespace Acnys.Core.Request.Infrastructure.Senders
 
         public async Task<T> Send<T>(IQuery<T> query, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
+            using var correlationId = LogContext.PushProperty("correlationId", arguments.CorrelationId());
+            using var causationId = LogContext.PushProperty("causationId", arguments.CausationId());
+
             var senderKey = _senderKeySelector(query);
             _log.Verbose("Sender key {senderKey} resolved for query {queryType}", senderKey, query.GetType().Name);
 

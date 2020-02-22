@@ -4,9 +4,11 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Acnys.Core.Abstractions.Extensions;
 using Acnys.Core.Request.Abstractions;
 using Newtonsoft.Json;
 using Serilog;
+using Serilog.Context;
 
 namespace Acnys.Core.Request.Infrastructure.Senders
 {
@@ -25,6 +27,9 @@ namespace Acnys.Core.Request.Infrastructure.Senders
 
         public async Task Send<T>(T command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : ICommand
         {
+            //using var correlationId = LogContext.PushProperty("correlationId", arguments.CorrelationId());
+            //using var causationId = LogContext.PushProperty("causationId", arguments.CorrelationId());
+
             _log.Debug("Sending command to HTTP endpoint {uri}", _uri.ToString());
 
             _log.Verbose("Command data: {@command}", command);
@@ -55,6 +60,9 @@ namespace Acnys.Core.Request.Infrastructure.Senders
 
         public async Task<T> Send<T>(IQuery<T> query, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
+            //using var correlationId = LogContext.PushProperty("correlationId", arguments.CorrelationId());
+            //using var causationId = LogContext.PushProperty("causationId", arguments.CorrelationId());
+
             _log.Debug("Sending query to HTTP endpoint {uri}", _uri.ToString());
 
             _log.Verbose("Query data: {@query}", query);

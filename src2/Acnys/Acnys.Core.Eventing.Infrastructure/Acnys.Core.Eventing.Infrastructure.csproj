@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Acnys.Core.Abstrations\Acnys.Core.Abstractions.csproj" />
     <ProjectReference Include="..\Acnys.Core.Eventing.Abstractions\Acnys.Core.Eventing.Abstractions.csproj" />
   </ItemGroup>
 
