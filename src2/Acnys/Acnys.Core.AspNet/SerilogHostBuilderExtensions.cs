@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.AccessControl;
 using Autofac;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -14,9 +15,10 @@ namespace Acnys.Core.AspNet
                     {
                         var logConfig = new LoggerConfiguration();
                         config(context, logConfig);
-                        builder.RegisterLogger(logConfig.CreateLogger());
+                        Log.Logger = logConfig.CreateLogger();
+                        builder.RegisterLogger();
                     })
-                    .UseSerilog(config, preserveStaticLogger, writeToProviders)
+                    .UseSerilog()
                 ;
         }
     }
