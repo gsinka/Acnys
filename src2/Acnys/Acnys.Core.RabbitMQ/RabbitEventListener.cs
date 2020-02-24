@@ -123,7 +123,7 @@ namespace Acnys.Core.RabbitMQ
             eventArgs.Add(nameof(args.ConsumerTag), args.ConsumerTag);
             eventArgs.Add(nameof(args.Exchange), args.Exchange);
             eventArgs.Add(nameof(args.Redelivered), args.Redelivered);
-            eventArgs.Add(nameof(args.RoutingKey), args.RoutingKey);
+            if (!eventArgs.ContainsKey(nameof(args.RoutingKey))) eventArgs.Add(nameof(args.RoutingKey), args.RoutingKey);
 
             return (evnt, eventArgs);
         }
