@@ -46,8 +46,10 @@ namespace Acnys.Core.RabbitMQ
         public Task Publish<T>(T @event, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : IEvent
         {
             _log.Debug("Publishing event {eventType} to exchange {exchangeName}", typeof(T).Name, _exchange);
-            _log.Verbose("Event data: {@event}", @event);
             var (routingKey, mandatory, props, body) = _publishContext(@event, arguments);
+            _log.Verbose("Event data: {@event}", @event);
+            _log.Verbose("Routing key: {routingKey}, mandatory: {mandatory}, event arguments: {@eventProps}", routingKey, mandatory, props);
+
             _model.BasicPublish(_exchange, routingKey, mandatory, props, body);
             return Task.CompletedTask;
         }

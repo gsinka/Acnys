@@ -69,12 +69,19 @@ namespace Acnys.Core.RabbitMQ
         {
             try
             {
+                _log.Debug("Receiving new message from exchange '{exchange}' with routing key '{routingKey}'", e.Exchange, e.RoutingKey);
+
                 var (evnt, args) = _eventMapper(_log, Consumer, e);
 
                 using var correlationId = LogContext.PushProperty("correlationId", args.CorrelationId());
                 using var causationId = LogContext.PushProperty("causationId", args.CausationId());
 
+                //_log.Verbose("Event data: {@event}", evnt);
+                //_log.Verbose("Event args: {@args}", args);
+
                 _eventDispatcher.Dispatch(evnt, args, CancellationToken.None);
+                
+                _log.Debug("Sending ACK to message queue for delivery tag '{deliveryTag}'", e.DeliveryTag);
                 Consumer.Model.BasicAck(e.DeliveryTag, false);
 
             }
@@ -104,7 +111,7 @@ namespace Acnys.Core.RabbitMQ
             var eventJson = Encoding.UTF8.GetString(args.Body);
             var evnt = (IEvent)JsonConvert.DeserializeObject(eventJson, eventType);
 
-            var eventArgs = args.BasicProperties.Headers.Where(pair => pair.Key != CorrelationExtensions.CausationIdName).ToDictionary(pair => pair.Key, pair => pair.Value);
+            var eventArgs = args.BasicProperties.Headers.Where(pair => pair.Key != CorrelationExtensions.CausationIdName && pair.Key != nameof(args.RoutingKey)).ToDictionary(pair => pair.Key, pair => pair.Value);
 
             if (args.BasicProperties.IsCorrelationIdPresent())
             {

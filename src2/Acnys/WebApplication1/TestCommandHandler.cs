@@ -19,7 +19,13 @@ namespace WebApplication1
         public async Task Handle(TestCommand command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
             var testEvent = new TestEvent(command.Data);
-            var args = new Dictionary<string, object>() { { "test", "test" }, { "int", 1 } }.EnrichWithCorrelation(command, arguments);
+            
+            var args = new Dictionary<string, object>()
+            {
+                { "test", "test" }, 
+                { "int", 1 },
+                { "RoutingKey", "test.level" }
+            }.EnrichWithCorrelation(command, arguments);
 
             await _eventPublisher.Publish(testEvent, args, cancellationToken);
         }
