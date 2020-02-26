@@ -51,9 +51,11 @@ namespace Acnys.Core.AspNet
                         {
                             app.UseDeveloperExceptionPage();
                         }
-
+                        
                         app.AddErrorHandling();
                         app.UseRouting();
+
+                        app.UseAuthentication();
                         app.UseAuthorization();
 
                         var appSettings = new ApplicationOptions();
@@ -65,7 +67,7 @@ namespace Acnys.Core.AspNet
                         var openApiSettings = new OpenApiDocumentationOptions() { Path = "/swagger" };
 
                         app.AddOpenApiDocumentation(appSettings, ssoSettings, openApiSettings);
-
+                        
                         app.AddReadiness();
                         app.AddLiveness();
 
@@ -85,8 +87,8 @@ namespace Acnys.Core.AspNet
                 .Enrich.FromLogContext()
                 .Enrich.WithProperty("Application", appName)
                 .MinimumLevel.Is(minimumLevel)
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-                .MinimumLevel.Override("System", LogEventLevel.Warning);
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Verbose)
+                .MinimumLevel.Override("System", LogEventLevel.Verbose);
         }
     }
 }

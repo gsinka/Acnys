@@ -4,6 +4,8 @@ using Acnys.Core.AspNet.Eventing;
 using Acnys.Core.AspNet.RabbitMQ;
 using Acnys.Core.AspNet.Request;
 using Autofac;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
@@ -28,10 +30,12 @@ namespace WebApplication1
                                 .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss+fff}{EventType:x8} {Level:u3}][{App}] {Message:lj} <-- [{SourceContext}]{NewLine}{Exception}", theme: AnsiConsoleTheme.Code)
                                 .WriteTo.Seq(context.Configuration["Seq:Url"])
                                 .MinimumLevel.Verbose()
-                                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                                .MinimumLevel.Override("Microsoft", LogEventLevel.Verbose)
                                 .Enrich.FromLogContext()
                                 .Enrich.WithProperty("Application", "TEST");
                         })
+
+                        .AddSingleSignOn((context, options) => context.Configuration.Bind("SingleSignOn", options))
 
                         .RegisterRequestHandlersFromAssemblyOf<TestEventHandler>()
                         .RegisterEventHandlersFromAssemblyOf<TestEventHandler>()
@@ -51,6 +55,10 @@ namespace WebApplication1
                             builder.RegisterType<Setup>().As<IStartable>().SingleInstance();
                         })
 
+                        .ConfigureServices((context, services) => { services.AddAuthorization(options =>
+                        {
+                            options.AddPolicy("admin", builder => builder.RequireClaim("user-roles", new [] { "administrator"}));
+                        }); })
                         ;
 
 

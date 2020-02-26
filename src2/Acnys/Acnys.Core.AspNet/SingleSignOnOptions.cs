@@ -10,5 +10,11 @@ namespace Acnys.Core.AspNet
         public OpenApiOAuth2Flow OAuthFlow { get; set; } = OpenApiOAuth2Flow.Implicit;
         public string Authority { get; set; }
         public string ClientId { get; set; }
+        public string Audience { get; set; } = "account";
+        public bool RequireHttpsMetadata { get; set; } = true;
+        public bool SaveToken { get; set; } = true;
+
     }
+
+    
 }
