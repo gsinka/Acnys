@@ -29,6 +29,8 @@ namespace Acnys.Core.AspNet
                     options.Title = app.Title;
                     options.Version = app.Version;
 
+                    options.OperationProcessors.Add(new OperationSecurityScopeProcessor(sso.SecuritySchemeName));
+
                     options.DocumentProcessors.Add(new SecurityDefinitionAppender(sso.SecuritySchemeName, new NSwag.OpenApiSecurityScheme
                     {
                         Name = sso.SecuritySchemeName,
