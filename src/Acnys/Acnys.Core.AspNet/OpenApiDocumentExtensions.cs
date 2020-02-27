@@ -48,6 +48,36 @@ namespace Acnys.Core.AspNet
             });
         }
 
+        public static IApplicationBuilder AddOpenApiDocumentation(this IApplicationBuilder app, Action<ApplicationOptions> appOptions, Action<SingleSignOnOptions> ssoOptions, Action<OpenApiDocumentationOptions> openApiOptions)
+        {
+            var openApiSettings = new OpenApiDocumentationOptions();
+            openApiOptions(openApiSettings);
+
+            var appSettings = new ApplicationOptions();
+            appOptions(appSettings);
+
+            var ssoSettings = new SingleSignOnOptions();
+            ssoOptions(ssoSettings);
+            
+            Log.Verbose("Configured OpenAPI on path {documentPath}", openApiSettings.Path);
+
+            return app
+
+                .UseOpenApi(settings => { settings.DocumentName = settings.DocumentName; })
+                
+                .UseSwaggerUi3(settings =>
+                {
+                    settings.Path = openApiSettings.Path;
+                    settings.OAuth2Client = new OAuth2ClientSettings
+                    {
+                        AppName = appSettings.Name,
+                        ClientId = ssoSettings.ClientId
+                    };
+                    settings.OAuth2Client.AdditionalQueryStringParameters.Add("nonce", "123456");
+                });
+        }
+        
+        [Obsolete]
         public static IApplicationBuilder AddOpenApiDocumentation(this IApplicationBuilder app, ApplicationOptions appSettings, SingleSignOnOptions ssoSettings, OpenApiDocumentationOptions openApiSettings)
         {
             Log.Verbose("Configured OpenAPI on path {documentPath}", openApiSettings.Path);

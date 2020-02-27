@@ -81,8 +81,14 @@ namespace WebApplication1
                             builder.RegisterType<TestMiddleware>().AsImplementedInterfaces().AsSelf().InstancePerLifetimeScope();
                         })
 
-                        .ConfigureServices((context, services) =>
-                        {
+                        .ConfigureServices((context, services) => { 
+                            services.AddAuthorization(options => 
+                            {
+                                options.AddPolicy("admin", builder => builder.RequireClaim("user-roles", new [] { "administrator"}));
+                            });
+
+                        })
+                        ;
 
                             //services.AddTransient<TestMiddleware>();
                             services.AddControllers().AddApplicationPart(Assembly.GetEntryAssembly()).AddControllersAsServices();
