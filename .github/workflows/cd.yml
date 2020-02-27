@@ -28,7 +28,7 @@ jobs:
     
     - name: Pack
       run: |
-        dotnet pack ./src2/Acnys/Acnys.sln --configuration Release --output ./packages --include-symbols --include-source
+        dotnet pack ./src/Acnys/Acnys.sln --configuration Release --output ./packages --include-symbols --include-source
         
 
     - name: publish      
