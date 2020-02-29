@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Acnys.Core.Abstractions.Extensions;
 using Acnys.Core.Request.Abstractions;
 using Autofac;
 using Serilog;
-using Serilog.Context;
 
 namespace Acnys.Core.Request.Infrastructure.Dispatchers
 {
@@ -30,18 +28,15 @@ namespace Acnys.Core.Request.Infrastructure.Dispatchers
         /// <returns></returns>
         public async Task<TResult> Dispatch<TResult>(IQuery<TResult> query, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
-            //using var correlationId = LogContext.PushProperty("correlationId", arguments.CorrelationId());
-            //using var causationId = LogContext.PushProperty("causationId", arguments.CausationId());
-
             var queryName = query.GetType().Name;
 
             _log.Verbose("Dispatching query {queryName}", queryName);
 
             _log.Verbose("Query object: {@query}", query);
 
-            using var scope = _scope.BeginLifetimeScope();
+            //using var scope = _scope.BeginLifetimeScope();
 
-            _log.Verbose("Lifetime scope {scopeId} created for query", scope.GetHashCode());
+            _log.Verbose("Lifetime scope {scopeId} created for query", _scope.GetHashCode());
 
             try
             {
@@ -49,7 +44,7 @@ namespace Acnys.Core.Request.Infrastructure.Dispatchers
                 var requestedHandlerType = typeof(IHandleQuery<,>).MakeGenericType(query.GetType(), typeof(TResult));
                 _log.Verbose("Looking handler with type {handlerType}", requestedHandlerType);
 
-                var handler = (dynamic) scope.Resolve(requestedHandlerType);
+                var handler = (dynamic) _scope.Resolve(requestedHandlerType);
                 Type handlerType = handler.GetType();
 
                 _log.Verbose("Handling {queryType} with {handlerType}", queryType.Name, handlerType.Name);
@@ -67,7 +62,7 @@ namespace Acnys.Core.Request.Infrastructure.Dispatchers
             }
             finally
             {
-                _log.Verbose("Ending lifetime scope {scopeId}", scope.GetHashCode());
+                _log.Verbose("Ending lifetime scope {scopeId}", _scope.GetHashCode());
             }
         }
     }

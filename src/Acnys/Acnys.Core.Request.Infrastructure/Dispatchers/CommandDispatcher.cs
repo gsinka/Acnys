@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Acnys.Core.Abstractions.Extensions;
 using Acnys.Core.Request.Abstractions;
 using Autofac;
 using Serilog;
-using Serilog.Context;
 
 namespace Acnys.Core.Request.Infrastructure.Dispatchers
 {
@@ -35,16 +33,11 @@ namespace Acnys.Core.Request.Infrastructure.Dispatchers
         {
             return Task.Run(async() =>
             {
-                //using var correlationId = LogContext.PushProperty("correlationId", arguments.CorrelationId());
-                //using var causationId = LogContext.PushProperty("causationId", arguments.CausationId());
-
                 _log.Debug("Dispatching command {commandType}", typeof(T).Name);
 
                 _log.Verbose("Command object: {@command}", command);
 
-                using var scope = _scope.BeginLifetimeScope();
-
-                _log.Verbose("Lifetime scope {scopeId} created for command", scope.GetHashCode());
+                _log.Verbose("Lifetime scope {scopeId} created for command", _scope.GetHashCode());
 
                 try
                 {
@@ -52,7 +45,7 @@ namespace Acnys.Core.Request.Infrastructure.Dispatchers
                     var handlerType = typeof(IHandleCommand<>).MakeGenericType(commandType);
                     _log.Verbose("Looking handler with type {handlerType}", handlerType);
 
-                    var handler = (IHandleCommand<T>)scope.Resolve(handlerType);
+                    var handler = (IHandleCommand<T>)_scope.Resolve(handlerType);
                             
                     _log.Verbose("Handling {commandType} with {handler}", commandType.Name, handler.GetType().Name);
                     await handler.Handle(command, arguments, cancellationToken);
@@ -66,7 +59,7 @@ namespace Acnys.Core.Request.Infrastructure.Dispatchers
                 }
                 finally
                 {
-                    _log.Verbose("Ending lifetime scope {scopeId}", scope.GetHashCode());
+                    _log.Verbose("Ending lifetime scope {scopeId}", _scope.GetHashCode());
                 }
             }, cancellationToken);
         }

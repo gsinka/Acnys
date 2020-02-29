@@ -15,15 +15,17 @@ namespace WebApplication1.Controllers
     public class WeatherForecastController : ControllerBase
     {
         private readonly ISendRequest _sender;
+        private readonly UserContext _userContext;
 
         private static readonly string[] Summaries = new[]
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
-        public WeatherForecastController(ISendRequest sender)
+        public WeatherForecastController(ISendRequest sender, UserContext userContext)
         {
             _sender = sender;
+            _userContext = userContext;
         }
 
         [HttpGet]
