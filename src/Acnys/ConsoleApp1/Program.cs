@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Scheduler;
+using Acnys.Core.Scheduler.Jobs.Http;
 using Serilog;
 
 namespace ConsoleApp1
@@ -12,24 +14,29 @@ namespace ConsoleApp1
         {
             Console.WriteLine("Hello World!");
 
-            Log.Logger = new LoggerConfiguration().WriteTo.Console().MinimumLevel.Verbose().CreateLogger();
+            var mqttJob = new HttpJob(Guid.NewGuid(), "", "", "", HttpMethod.Get, null, "");
 
-            var stoppingTokenSource = new CancellationTokenSource();
+            var runner = new JobRunnr();
+            runner.Run(mqttJob, CancellationToken.None);
 
-            var scheduler = new SchedulerService(Log.Logger, null, new SchedulerOptions());
-            var shcedulerTask = scheduler.Process(stoppingTokenSource.Token);
+            //Log.Logger = new LoggerConfiguration().WriteTo.Console().MinimumLevel.Verbose().CreateLogger();
 
-            var task1 = scheduler.Schedule(() => Console.WriteLine("1 sec"), TimeSpan.FromSeconds(1), stoppingTokenSource.Token);
-            var task2 = scheduler.Schedule(() => Console.WriteLine("2 sec"), TimeSpan.FromSeconds(2), stoppingTokenSource.Token);
-            var task3 = scheduler.Schedule(() => Console.WriteLine("3 sec"), TimeSpan.FromSeconds(3), stoppingTokenSource.Token);
+            //var stoppingTokenSource = new CancellationTokenSource();
 
-            Console.WriteLine("Waiting for tasks to finish");
+            //var scheduler = new SchedulerService(Log.Logger, null, new SchedulerOptions());
+            //var shcedulerTask = scheduler.Process(stoppingTokenSource.Token);
 
-            Task.WaitAll(task1, task2, task3);
+            //var task1 = scheduler.Schedule(() => Console.WriteLine("1 sec"), TimeSpan.FromSeconds(1), stoppingTokenSource.Token);
+            //var task2 = scheduler.Schedule(() => Console.WriteLine("2 sec"), TimeSpan.FromSeconds(2), stoppingTokenSource.Token);
+            //var task3 = scheduler.Schedule(() => Console.WriteLine("3 sec"), TimeSpan.FromSeconds(3), stoppingTokenSource.Token);
 
-            stoppingTokenSource.Cancel();
+            //Console.WriteLine("Waiting for tasks to finish");
 
-            Task.Delay(500);
+            //Task.WaitAll(task1, task2, task3);
+
+            //stoppingTokenSource.Cancel();
+
+            //Task.Delay(500);
         }
     }
 }
