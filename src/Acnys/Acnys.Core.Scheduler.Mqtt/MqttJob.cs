@@ -1,6 +1,7 @@
 ﻿using System;
+using Acnys.Core.Scheduler.Jobs;
 
-namespace Acnys.Core.Scheduler.Jobs
+namespace Acnys.Core.Scheduler.Mqtt
 {
     public class MqttJob : Job
     {

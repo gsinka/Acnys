@@ -1,4 +1,4 @@
-﻿namespace Acnys.Core.Scheduler.Jobs
+﻿namespace Acnys.Core.Scheduler
 {
     public class JobResult
     {

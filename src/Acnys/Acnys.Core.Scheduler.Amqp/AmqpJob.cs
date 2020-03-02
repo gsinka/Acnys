@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Acnys.Core.Scheduler.Jobs;
 
-namespace Acnys.Core.Scheduler.Jobs.Amqp
+namespace Acnys.Core.Scheduler.Amqp
 {
     public class AmqpJob : Job
     {

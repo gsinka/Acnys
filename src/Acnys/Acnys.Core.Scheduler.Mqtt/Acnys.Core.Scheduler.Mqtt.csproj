@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Acnys.Core\Acnys.Core.csproj" />
+    <ProjectReference Include="..\Acnys.Core.Scheduler\Acnys.Core.Scheduler.csproj" />
   </ItemGroup>
 
 </Project>
