@@ -47,8 +47,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Acnys.Core.AspNet.RabbitMQ"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Acnys.Core.Tests", "Acnys.Core.Tests\Acnys.Core.Tests.csproj", "{CC136432-1D95-44DC-80B0-54C4EBFE737A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication2", "WebApplication2\WebApplication2.csproj", "{B55EA300-FD09-482D-BADA-74A152FE5A11}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -123,10 +121,6 @@ Global
 		{CC136432-1D95-44DC-80B0-54C4EBFE737A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC136432-1D95-44DC-80B0-54C4EBFE737A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CC136432-1D95-44DC-80B0-54C4EBFE737A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B55EA300-FD09-482D-BADA-74A152FE5A11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B55EA300-FD09-482D-BADA-74A152FE5A11}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B55EA300-FD09-482D-BADA-74A152FE5A11}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B55EA300-FD09-482D-BADA-74A152FE5A11}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
