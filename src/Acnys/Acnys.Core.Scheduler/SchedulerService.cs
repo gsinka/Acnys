@@ -11,17 +11,18 @@ namespace Acnys.Core.Scheduler
     {
         private readonly ILogger _log;
         private readonly IJobStore _jobStore;
+        private readonly SchedulerOptions _options;
         private readonly ConcurrentDictionary<Guid, DateTime> _schedules = new ConcurrentDictionary<Guid, DateTime>();
         
-        public SchedulerService(ILogger log, IJobStore jobStore)
+        public SchedulerService(ILogger log, IJobStore jobStore, SchedulerOptions options)
         {
             _log = log;
             _jobStore = jobStore;
+            _options = options;
         }
 
         public async Task Process(CancellationToken cancellationToken)
         {
-
             try
             {
                 var stoppingTokenSource = new CancellationTokenSource();
@@ -29,7 +30,7 @@ namespace Acnys.Core.Scheduler
 
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    await Task.Delay(1000, stoppingTokenSource.Token);
+                    await Task.Delay(_options.PollInterval, stoppingTokenSource.Token);
                     _log.Debug("Checking tasks to run");
                 }
 

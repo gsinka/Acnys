@@ -14,8 +14,9 @@ namespace Acnys.Core.AspNet
 
             return hostBuilder.ConfigureServices((context, services) =>
             {
-                IdentityModelEventSource.ShowPII = true;
                 options(context, ssoOptions);
+
+                IdentityModelEventSource.ShowPII = ssoOptions.ShowPII;
 
                 if (string.IsNullOrWhiteSpace(ssoOptions.Authority)) throw new ArgumentNullException(nameof(ssoOptions.Authority));
                 

@@ -29,9 +29,11 @@ namespace Acnys.Core.AspNet
                         .AddCheck("Self", () => HealthCheckResult.Healthy(), new List<string> { "Liveness" })
                     )
                     .AddHttpMetrics()
+                    
                     .AddOpenApiDocumentation(
                         (context, app) => context.Configuration.Bind("Application", app),
                         (context, sso) => context.Configuration.Bind("SingleSignOn", sso))
+                    
                     .AddRequests()
                     .AddRequestValidation()
 

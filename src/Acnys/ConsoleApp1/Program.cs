@@ -16,7 +16,7 @@ namespace ConsoleApp1
 
             var stoppingTokenSource = new CancellationTokenSource();
 
-            var scheduler = new SchedulerService(Log.Logger, null);
+            var scheduler = new SchedulerService(Log.Logger, null, new SchedulerOptions());
             var shcedulerTask = scheduler.Process(stoppingTokenSource.Token);
 
             var task1 = scheduler.Schedule(() => Console.WriteLine("1 sec"), TimeSpan.FromSeconds(1), stoppingTokenSource.Token);
