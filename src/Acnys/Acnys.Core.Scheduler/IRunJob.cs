@@ -9,20 +9,6 @@ namespace Acnys.Core.Scheduler
     {
         Task<JobResult> Run(IJob job, CancellationToken cancellationToken);
     }
-
-    public class JobRunnr : IRunJob
-    {
-        public Task<JobResult> Run(IJob job, CancellationToken cancellationToken)
-        {
-            return default;
-        }
-
-        public Task<JobResult> Run(HttpJob httpJob, CancellationToken cancellationToken)
-        {
-            return default;
-        }
-
-    }
     
     public interface IRunJob<in T> where T : IJob
     {
@@ -31,6 +17,7 @@ namespace Acnys.Core.Scheduler
 
     public interface IResolveJobRunner
     {
-        IRunJob<IJob> RunnerFor(IJob job);
+        IRunJob GetRunner(IJob job);
     }
+    
 }

@@ -16,7 +16,7 @@ namespace ConsoleApp1
 
             var mqttJob = new HttpJob(Guid.NewGuid(), "", "", "", HttpMethod.Get, null, "");
 
-            var runner = new JobRunnr();
+            var runner = new JobRunner();
             runner.Run(mqttJob, CancellationToken.None);
 
             //Log.Logger = new LoggerConfiguration().WriteTo.Console().MinimumLevel.Verbose().CreateLogger();

@@ -11,14 +11,16 @@ namespace Acnys.Core.Scheduler
     public class SchedulerService
     {
         private readonly ILogger _log;
+        private readonly IResolveJobRunner _jobRunnerResolver;
         private readonly IRunJob _jobRunner;
         private readonly IJobStore _jobStore;
         private readonly SchedulerOptions _options;
         private readonly ConcurrentDictionary<Guid, DateTime> _schedules = new ConcurrentDictionary<Guid, DateTime>();
         
-        public SchedulerService(ILogger log, IRunJob jobRunner, IJobStore jobStore, SchedulerOptions options)
+        public SchedulerService(ILogger log, IResolveJobRunner jobRunnerResolver, IRunJob jobRunner, IJobStore jobStore, SchedulerOptions options)
         {
             _log = log;
+            _jobRunnerResolver = jobRunnerResolver;
             _jobRunner = jobRunner;
             _jobStore = jobStore;
             _options = options;
@@ -37,8 +39,8 @@ namespace Acnys.Core.Scheduler
                     _log.Debug("Checking tasks to run");
 
                     IJob job = null;
-
-                    await _jobRunner.Run(job, cancellationToken);
+                    
+                    var result = await _jobRunner.Run(job, cancellationToken);
 
                 }
 
