@@ -107,15 +107,23 @@ namespace WebApplication1
                             app.UseAuthentication();
                             app.UseAuthorization();
 
-                            var appSettings = new ApplicationOptions();
-                            context.Configuration.Bind("Application", appSettings);
+                            //var appSettings = new ApplicationOptions();
+                            //context.Configuration.Bind("Application", appSettings);
 
-                            var ssoSettings = new SingleSignOnOptions();
-                            context.Configuration.Bind("SingleSignOn", ssoSettings);
+                            //var ssoSettings = new SingleSignOnOptions();
+                            //context.Configuration.Bind("SingleSignOn", ssoSettings);
 
                             var openApiSettings = new OpenApiDocumentationOptions() {Path = "/swagger"};
 
-                            app.AddOpenApiDocumentation(appSettings, ssoSettings, openApiSettings);
+                            //app.AddOpenApiDocumentation(appSettings, ssoSettings, openApiSettings);
+                            app.AddOpenApiDocumentation(
+                                options => context.Configuration.Bind("Application", options),
+                                options =>
+                                {
+                                    context.Configuration.Bind("SingleSignOn", options);
+                                    options.Authority = context.Configuration["Swagger:Authority"];
+                                },
+                                options => options.Path = "/swagger");
 
                             app.AddReadiness();
                             app.AddLiveness();

@@ -1,13 +1,13 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Scheduler.Jobs;
-using Acnys.Core.Scheduler.Jobs.Http;
 
 namespace Acnys.Core.Scheduler
 {
     public interface IRunJob
     {
-        Task<JobResult> Run(IJob job, CancellationToken cancellationToken);
+        Task Run(Guid job, CancellationToken cancellationToken);
     }
     
     public interface IRunJob<in T> where T : IJob
@@ -18,6 +18,11 @@ namespace Acnys.Core.Scheduler
     public interface IResolveJobRunner
     {
         IRunJob GetRunner(IJob job);
+    }
+
+    public interface IJobTrigger
+    {
+
     }
     
 }

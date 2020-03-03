@@ -8,11 +8,4 @@ namespace Acnys.Core.Scheduler.Jobs
         string Name { get; }
         string Description { get; }
     }
-
-    public interface IJobSchedule
-    {
-
-    }
-
-    
 }

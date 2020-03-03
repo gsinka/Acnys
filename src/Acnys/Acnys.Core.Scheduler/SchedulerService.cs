@@ -15,7 +15,7 @@ namespace Acnys.Core.Scheduler
         private readonly IRunJob _jobRunner;
         private readonly IJobStore _jobStore;
         private readonly SchedulerOptions _options;
-        private readonly ConcurrentDictionary<Guid, DateTime> _schedules = new ConcurrentDictionary<Guid, DateTime>();
+        private readonly ConcurrentDictionary<Guid, (IJob job, IJobTrigger trigger)> _schedules = new ConcurrentDictionary<Guid, (IJob job, IJobTrigger trigger)>();
         
         public SchedulerService(ILogger log, IResolveJobRunner jobRunnerResolver, IRunJob jobRunner, IJobStore jobStore, SchedulerOptions options)
         {
@@ -36,12 +36,15 @@ namespace Acnys.Core.Scheduler
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     await Task.Delay(_options.PollInterval, stoppingTokenSource.Token);
+                    
                     _log.Debug("Checking tasks to run");
 
-                    IJob job = null;
-                    
-                    var result = await _jobRunner.Run(job, cancellationToken);
+                    foreach (var schedule in _schedules)
+                    {
+                        var (job, trigger) = schedule.Value;
 
+                        
+                    }
                 }
 
             }
@@ -51,14 +54,13 @@ namespace Acnys.Core.Scheduler
             }
         }
 
-        public Task Schedule(Action action, TimeSpan delay, CancellationToken cancellationToken)
+        public Guid Schedule(IJob job, IJobTrigger trigger, CancellationToken cancellationToken)
         {
-            return Task.Run(async () =>
-            {
-                await Task.Delay(delay, cancellationToken);
-                action();
+            var scheduleId = Guid.NewGuid();
 
-            }, cancellationToken);
+            return _schedules.TryAdd(scheduleId, (job, trigger))
+                ? scheduleId
+                : throw new InvalidOperationException("Adding schedule failed");
         }
     }
 }
