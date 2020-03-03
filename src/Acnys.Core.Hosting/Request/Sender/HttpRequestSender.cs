@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Acnys.Core.Request;
+using Newtonsoft.Json;
+using Serilog;
+using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Acnys.Core.Abstractions.Extensions;
-using Acnys.Core.Request.Abstractions;
-using Newtonsoft.Json;
-using Serilog;
-using Serilog.Context;
 
-namespace Acnys.Core.Request.Infrastructure.Senders
+namespace Acnys.Core.Hosting.Request.Sender
 {
     public class HttpRequestSender : ISendRequest
     {
@@ -25,15 +22,9 @@ namespace Acnys.Core.Request.Infrastructure.Senders
             _uri = new Uri(uri);
         }
 
-        public async Task Send<T>(T command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : ICommand
+        public async Task Send<T>(T command, CancellationToken cancellationToken = default) where T : ICommand
         {
-            //using var correlationId = LogContext.PushProperty("correlationId", arguments.CorrelationId());
-            //using var causationId = LogContext.PushProperty("causationId", arguments.CorrelationId());
-
             _log.Debug("Sending command to HTTP endpoint {uri}", _uri.ToString());
-
-            _log.Verbose("Command data: {@command}", command);
-            _log.Verbose("Command arguments: {@arguments}", arguments);
 
             using var httpClient = new HttpClient(_httpHandler, false)
             {
@@ -44,17 +35,12 @@ namespace Acnys.Core.Request.Infrastructure.Senders
 
             httpClient.DefaultRequestHeaders.Add("domain-type", command.GetType().AssemblyQualifiedName);
 
-            if (arguments != null)
-                foreach (var argument in arguments)
-                {
-                    httpClient.DefaultRequestHeaders.Add(argument.Key, argument.Value.ToString());
-                }
-
             var result = await httpClient.PostAsync(
                 _uri,
                 new StringContent(queryJson, Encoding.UTF8, "application/json"),
                 cancellationToken);
 
+            //result.EnsureSuccessStatusCode();
             if (!result.IsSuccessStatusCode)
             {
                 _log.Error("Sending command to HTTP endpoint failed. Reason: {reason}, Response: {response}", result.ReasonPhrase, result.Content.ReadAsStringAsync());
@@ -62,15 +48,9 @@ namespace Acnys.Core.Request.Infrastructure.Senders
             }
         }
 
-        public async Task<T> Send<T>(IQuery<T> query, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
+        public async Task<T> Send<T>(IQuery<T> query, CancellationToken cancellationToken = default)
         {
-            //using var correlationId = LogContext.PushProperty("correlationId", arguments.CorrelationId());
-            //using var causationId = LogContext.PushProperty("causationId", arguments.CorrelationId());
-
             _log.Debug("Sending query to HTTP endpoint {uri}", _uri.ToString());
-
-            _log.Verbose("Query data: {@query}", query);
-            _log.Verbose("Query arguments: {@query}", arguments);
 
             using var httpClient = new HttpClient(_httpHandler, false)
             {
@@ -80,18 +60,12 @@ namespace Acnys.Core.Request.Infrastructure.Senders
             var queryJson = JsonConvert.SerializeObject(query);
             
             httpClient.DefaultRequestHeaders.Add("domain-type", query.GetType().AssemblyQualifiedName);
-
-            if (arguments != null)
-                foreach (var argument in arguments)
-                {
-                    httpClient.DefaultRequestHeaders.Add(argument.Key, argument.Value.ToString());
-                }
-
+            
             var result = await httpClient.PostAsync(
                 _uri, 
                 new StringContent(queryJson, Encoding.UTF8, "application/json"), 
                 cancellationToken);
-            
+
             if (!result.IsSuccessStatusCode)
             {
                 _log.Error("Sending command to HTTP endpoint failed. Reason: {reason}, Response: {response}", result.ReasonPhrase, await result.Content.ReadAsStringAsync());
