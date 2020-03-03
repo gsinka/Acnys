@@ -44,6 +44,7 @@ namespace Acnys.Core.AspNet
                             { "profile", "Profile" }
                         }
                     }));
+
                 });
             });
         }
