@@ -1,4 +1,4 @@
-name: Continous Delivery
+name: Continous Delivery (master branch)
 
 on:
   push:    

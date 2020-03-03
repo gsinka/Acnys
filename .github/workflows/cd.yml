@@ -1,11 +1,11 @@
-name: Continous Delivery
+name: Continous Delivery (release branch)
 
 on:
   push:
     tags:
     - '*'
     branches-ignore:
-     - '!releases/**'
+     - '!release/**'
       
 jobs:
   
