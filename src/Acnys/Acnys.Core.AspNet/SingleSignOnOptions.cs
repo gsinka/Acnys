@@ -1,4 +1,5 @@
-﻿using NSwag;
+﻿using Microsoft.IdentityModel.Tokens;
+using NSwag;
 
 namespace Acnys.Core.AspNet
 {
@@ -14,8 +15,5 @@ namespace Acnys.Core.AspNet
         public bool RequireHttpsMetadata { get; set; } = true;
         public bool SaveToken { get; set; } = true;
         public bool ShowPII { get; set; } = false;
-
     }
-
-    
 }
