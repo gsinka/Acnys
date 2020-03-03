@@ -2,8 +2,8 @@ name: Continous Delivery
 
 on:
   push:    
-    tags:
-    - '*'    
+    branches:
+      - master
       
 jobs:
   
