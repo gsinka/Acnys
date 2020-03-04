@@ -27,5 +27,9 @@ jobs:
     - name: Test
       run: dotnet test ./src/Acnys/Acnys.sln
       
+    - name: Pack
+      run: |
+        dotnet pack ./src/Acnys/Acnys.sln --configuration Release --output ./packages --include-symbols --include-source
+        
     - name: publish      
       run: dotnet nuget push ./packages/**/*.nupkg --skip-duplicate true --no-symbols true --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.nuget_api_key }}
