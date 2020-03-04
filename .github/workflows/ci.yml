@@ -13,8 +13,7 @@ jobs:
     steps:
 
     - uses: actions/checkout@v2
-    - run: |
-        git fetch --unshallow --tags
+    
 
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
