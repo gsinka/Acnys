@@ -5,7 +5,7 @@ on:
     tags:
       - '*'
     baranches-ignore:
-      - !master
+      - '!master'
     
       
 jobs:
