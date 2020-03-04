@@ -19,10 +19,4 @@ namespace Acnys.Core.Scheduler
     {
         IRunJob GetRunner(IJob job);
     }
-
-    public interface IJobTrigger
-    {
-
-    }
-    
 }
