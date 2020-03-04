@@ -1,9 +1,12 @@
 name: Continous Delivery (master branch)
 
 on:
-  push:    
-    branches:
-      - master
+  push:
+    tags:
+      - '*'
+    baranches-ignore:
+      - !master
+    
       
 jobs:
   

@@ -1,11 +1,11 @@
-name: Continous Delivery (release branch)
+name: CI
 
 on:
   push:
     tags:
-    - '*'
+      - '*'
     branches-ignore:
-     - '!release/**'
+      - !release/**
       
 jobs:
   
@@ -14,8 +14,6 @@ jobs:
     steps:
     
     - uses: actions/checkout@v2
-    - run: |
-        git fetch origin +refs/heads/*:refs/remotes/origin/* --unshallow --tags      
                
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
@@ -23,14 +21,4 @@ jobs:
         dotnet-version: 3.1.100
     
     - name: Build
-      run: dotnet build ./src/Acnys/Acnys.sln --configuration Release
-    
-    - name: Test
-      run: dotnet test ./src/Acnys/Acnys.sln
-    
-    - name: Pack
-      run: |
-        dotnet pack ./src/Acnys/Acnys.sln --configuration Release --output ./packages --include-symbols --include-source
-
-    - name: publish      
-      run: dotnet nuget push ./packages/**/*.nupkg --skip-duplicate true --no-symbols true --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.nuget_api_key }}
+      run: dotnet build ConsoleApp1/ConsoleApp1.sln --configuration Release
