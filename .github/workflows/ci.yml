@@ -2,9 +2,11 @@ name: Continous Integration
 
 on:
   push:
-    branches:      
+    branches: 
       - develop
       - release/*
+    tags-ignore:
+      - '*'
       
 jobs:
   
