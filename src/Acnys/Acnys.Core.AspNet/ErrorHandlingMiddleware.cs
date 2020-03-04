@@ -1,13 +1,15 @@
-﻿using System;
-using System.Linq;
-using System.Net.Mime;
-using System.Threading.Tasks;
-using Acnys.Core.Exceptions;
+﻿using Acnys.Core.Exceptions;
+using Acnys.Core.Request.Infrastructure.Exceptions;
 using Acnys.Core.ValueObjects;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Serilog;
+using System;
+using System.Linq;
+using System.Net.Mime;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Acnys.Core.AspNet
 {
@@ -28,9 +30,16 @@ namespace Acnys.Core.AspNet
             {
                 await _request.Invoke(context);
             }
+            catch (HttpRequestException exception)
+            {
+                _logger.Error("Http request was failed, Status code: {statusCode}, Response: {response}", exception.StatusCode, Encoding.UTF8.GetString(exception.Content));
+
+                context.Response.StatusCode = (int)exception.StatusCode;
+                await context.Response.WriteAsync(Encoding.UTF8.GetString(exception.Content));
+            }
             catch (BusinessException exception) when (exception.ErrorCode == ErrorCode.NotFound.Id)
             {
-                _logger.Error(exception, ErrorCode.NotFound.Message);
+                _logger.Error(exception, "Resource not found.");
 
                 context.Response.StatusCode = StatusCodes.Status404NotFound;
                 context.Response.ContentType = MediaTypeNames.Application.Json;
