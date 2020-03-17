@@ -3,6 +3,7 @@ using Acnys.Core.Request.Infrastructure.Exceptions;
 using Acnys.Core.ValueObjects;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Serilog;
 using System;
@@ -32,9 +33,10 @@ namespace Acnys.Core.AspNet
             }
             catch (HttpRequestException exception)
             {
-                _logger.Error("Http request was failed, Status code: {statusCode}, Response: {response}", exception.StatusCode, Encoding.UTF8.GetString(exception.Content));
+                _logger.Error("Http request was failed, Status code: {statusCode}, Response: {response}", exception.StatusCode, exception.Content);
 
                 context.Response.StatusCode = (int)exception.StatusCode;
+                context.Response.ContentType = MediaTypeNames.Application.Json;
                 await context.Response.WriteAsync(Encoding.UTF8.GetString(exception.Content));
             }
             catch (BusinessException exception) when (exception.ErrorCode == ErrorCode.NotFound.Id)
@@ -43,7 +45,7 @@ namespace Acnys.Core.AspNet
 
                 context.Response.StatusCode = StatusCodes.Status404NotFound;
                 context.Response.ContentType = MediaTypeNames.Application.Json;
-                await context.Response.WriteAsync(JsonConvert.SerializeObject(ComposeResponse(exception)));
+                await context.Response.WriteAsync(ComposeResponse(exception));
             }
             catch (BusinessException exception)
             {
@@ -51,7 +53,7 @@ namespace Acnys.Core.AspNet
 
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                 context.Response.ContentType = MediaTypeNames.Application.Json;
-                await context.Response.WriteAsync(JsonConvert.SerializeObject(ComposeResponse(exception)));
+                await context.Response.WriteAsync(ComposeResponse(exception));
             }
             catch (ValidationException exception)
             {
@@ -59,7 +61,7 @@ namespace Acnys.Core.AspNet
 
                 context.Response.StatusCode = StatusCodes.Status400BadRequest;
                 context.Response.ContentType = MediaTypeNames.Application.Json;
-                await context.Response.WriteAsync(JsonConvert.SerializeObject(ComposeResponse(exception)));
+                await context.Response.WriteAsync(ComposeResponse(exception));
             }
             catch (Exception exception)
             {
@@ -67,7 +69,7 @@ namespace Acnys.Core.AspNet
 
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                 context.Response.ContentType = MediaTypeNames.Application.Json;
-                await context.Response.WriteAsync(JsonConvert.SerializeObject(ComposeResponse(exception)));
+                await context.Response.WriteAsync(ComposeResponse(exception));
             }
         }
 
@@ -96,7 +98,7 @@ namespace Acnys.Core.AspNet
                 Code = ErrorCode.Validation,
                 exception.Message,
                 ValidationErrors = exception.Errors.Select(e => new { Code = e.ErrorCode, Message = e.ErrorMessage, Property = e.PropertyName })
-            });
+            }, Formatting.Indented);
         }
     }
 }
