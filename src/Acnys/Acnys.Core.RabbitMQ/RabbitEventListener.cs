@@ -109,7 +109,7 @@ namespace Acnys.Core.RabbitMQ
             }
             
             var eventJson = Encoding.UTF8.GetString(args.Body);
-            var evnt = (IEvent)JsonConvert.DeserializeObject(eventJson, eventType);
+            var evnt = (IEvent)JsonConvert.DeserializeObject(eventJson, eventType, new JsonSerializerSettings() { TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple });
 
             var eventArgs = args.BasicProperties.Headers.Where(pair => pair.Key != CorrelationExtensions.CausationIdName && pair.Key != nameof(args.RoutingKey)).ToDictionary(pair => pair.Key, pair => pair.Value);
 
