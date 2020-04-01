@@ -26,7 +26,7 @@ namespace Acnys.Core.RabbitMQ
 
         public RabbitEventListener(
             ILogger log,
-            IConnection connection, 
+            IConnection connection,
             IDispatchEvent eventDispatcher,
             string queue,
             string consumerTag,
@@ -76,11 +76,8 @@ namespace Acnys.Core.RabbitMQ
                 using var correlationId = LogContext.PushProperty("correlationId", args.CorrelationId());
                 using var causationId = LogContext.PushProperty("causationId", args.CausationId());
 
-                //_log.Verbose("Event data: {@event}", evnt);
-                //_log.Verbose("Event args: {@args}", args);
-
                 _eventDispatcher.Dispatch(evnt, args, CancellationToken.None);
-                
+
                 _log.Debug("Sending ACK to message queue for delivery tag '{deliveryTag}'", e.DeliveryTag);
                 Consumer.Model.BasicAck(e.DeliveryTag, false);
 
@@ -92,7 +89,7 @@ namespace Acnys.Core.RabbitMQ
             }
         }
 
-        public static (IEvent evnt, IDictionary<string, object> args) Default(ILogger log,  EventingBasicConsumer consumer, BasicDeliverEventArgs args)
+        public static (IEvent evnt, IDictionary<string, object> args) Default(ILogger log, EventingBasicConsumer consumer, BasicDeliverEventArgs args)
         {
             IEvent evnt;
 
@@ -127,7 +124,10 @@ namespace Acnys.Core.RabbitMQ
                 throw new InvalidOperationException("Cannot deserialize message to event. Either add type property to message header or put type information into the JSON.", exception);
             }
 
-            var eventArgs = args.BasicProperties.Headers.Where(pair => pair.Key != CorrelationExtensions.CausationIdName && pair.Key != nameof(args.RoutingKey)).ToDictionary(pair => pair.Key, pair => pair.Value);
+            var eventArgs = 
+                args.BasicProperties.Headers ?? new Dictionary<string, object>()
+                    .Where(pair => pair.Key != CorrelationExtensions.CausationIdName && pair.Key != nameof(args.RoutingKey))
+                    .ToDictionary(pair => pair.Key, pair => pair.Value);
 
             if (args.BasicProperties.IsCorrelationIdPresent())
             {
@@ -135,7 +135,7 @@ namespace Acnys.Core.RabbitMQ
                     eventArgs.UseCorrelationId(result);
             }
 
-            if (args.BasicProperties.Headers.ContainsKey(CorrelationExtensions.CausationIdName))
+            if (args.BasicProperties.Headers?.ContainsKey(CorrelationExtensions.CausationIdName) != null)
             {
                 var causationId = Encoding.UTF8.GetString((byte[])args.BasicProperties.Headers[CorrelationExtensions.CausationIdName]);
                 if (Guid.TryParse(causationId.ToString(), out var result))
