@@ -76,9 +76,6 @@ namespace Acnys.Core.RabbitMQ
                 using var correlationId = LogContext.PushProperty("correlationId", args.CorrelationId());
                 using var causationId = LogContext.PushProperty("causationId", args.CausationId());
 
-                //_log.Verbose("Event data: {@event}", evnt);
-                //_log.Verbose("Event args: {@args}", args);
-
                 _eventDispatcher.Dispatch(evnt, args, CancellationToken.None);
 
                 _log.Debug("Sending ACK to message queue for delivery tag '{deliveryTag}'", e.DeliveryTag);
@@ -127,9 +124,10 @@ namespace Acnys.Core.RabbitMQ
                 throw new InvalidOperationException("Cannot deserialize message to event. Either add type property to message header or put type information into the JSON.", exception);
             }
 
-            var eventArgs = args.BasicProperties.Headers?.Where(pair => pair.Key != CorrelationExtensions.CausationIdName && pair.Key != nameof(args.RoutingKey)).ToDictionary(pair => pair.Key, pair => pair.Value);
-
-            eventArgs ??= new Dictionary<string, object>();
+            var eventArgs = 
+                args.BasicProperties.Headers ?? new Dictionary<string, object>()
+                    .Where(pair => pair.Key != CorrelationExtensions.CausationIdName && pair.Key != nameof(args.RoutingKey))
+                    .ToDictionary(pair => pair.Key, pair => pair.Value);
 
             if (args.BasicProperties.IsCorrelationIdPresent())
             {
