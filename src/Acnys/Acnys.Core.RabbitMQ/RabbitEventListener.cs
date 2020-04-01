@@ -94,22 +94,38 @@ namespace Acnys.Core.RabbitMQ
 
         public static (IEvent evnt, IDictionary<string, object> args) Default(ILogger log,  EventingBasicConsumer consumer, BasicDeliverEventArgs args)
         {
-            if (args.BasicProperties.Type == null)
-            {
-                log.Error("Missing event type");
-                return (null, null);
-            }
+            IEvent evnt;
 
-            var eventType = Type.GetType(args.BasicProperties.Type);
-
-            if (!typeof(IEvent).IsAssignableFrom(eventType))
+            try
             {
-                log.Error("Message is not an event");
-                return (null, null);
+                var eventJson = Encoding.UTF8.GetString(args.Body);
+
+                if (args.BasicProperties.IsTypePresent())
+                {
+                    // Type in properties
+
+                    var eventType = Type.GetType(args.BasicProperties.Type);
+
+                    if (!typeof(IEvent).IsAssignableFrom(eventType))
+                    {
+                        log.Error("Message is not an event");
+                        return (null, null);
+                    }
+
+                    evnt = (IEvent)JsonConvert.DeserializeObject(eventJson, eventType, new JsonSerializerSettings() { TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple });
+                }
+                else
+                {
+                    // Try to get type from json ($type)
+
+                    evnt = (IEvent)JsonConvert.DeserializeObject(eventJson, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto, TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple });
+                }
+
             }
-            
-            var eventJson = Encoding.UTF8.GetString(args.Body);
-            var evnt = (IEvent)JsonConvert.DeserializeObject(eventJson, eventType, new JsonSerializerSettings() { TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple });
+            catch (Exception exception)
+            {
+                throw new InvalidOperationException("Cannot deserialize message to event. Either add type property to message header or put type information into the JSON.", exception);
+            }
 
             var eventArgs = args.BasicProperties.Headers.Where(pair => pair.Key != CorrelationExtensions.CausationIdName && pair.Key != nameof(args.RoutingKey)).ToDictionary(pair => pair.Key, pair => pair.Value);
 
