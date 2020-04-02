@@ -19,9 +19,12 @@ namespace Acnys.Core.AspNet.Request
         private readonly IDispatchCommand _commandDispatcher;
         private readonly IDispatchQuery _queryDispatcher;
         private readonly ILogger _log;
-        private readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All };
 
-        public GenericRequestHandlerController(IDispatchCommand commandDispatcher, IDispatchQuery queryDispatcher, ILogger log)
+        private readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings()
+            {TypeNameHandling = TypeNameHandling.All};
+
+        public GenericRequestHandlerController(IDispatchCommand commandDispatcher, IDispatchQuery queryDispatcher,
+            ILogger log)
         {
             _commandDispatcher = commandDispatcher;
             _queryDispatcher = queryDispatcher;
@@ -38,20 +41,22 @@ namespace Acnys.Core.AspNet.Request
             var json = await reader.ReadToEndAsync();
             if (string.IsNullOrEmpty(json)) json = "{}";
 
-            var domainType = Request.Headers["domain-type"];
+            var domainType = Request.Headers[HttpRequestHeaderConstants.DomainType];
 
             dynamic request = string.IsNullOrEmpty(domainType)
-                ? JsonConvert.DeserializeObject(json, _jsonSerializerSettings) ?? throw new InvalidOperationException("Unknown request")
+                ? JsonConvert.DeserializeObject(json, _jsonSerializerSettings) ??
+                  throw new InvalidOperationException("Unknown request")
                 : JsonConvert.DeserializeObject(json, Type.GetType(domainType));
 
             Type requestType = request.GetType();
 
             _log.Debug("Generic request identified as {requestType}", requestType.FullName);
 
-            var arguments = Request.Headers.Keys.ToDictionary<string, string, object>(key => key, key => Request.Headers[key]);
+            var arguments =
+                Request.Headers.Keys.ToDictionary<string, string, object>(key => key, key => Request.Headers[key]);
 
-            using var correlationId = LogContext.PushProperty("correlationId", arguments.CorrelationId());
-            using var causationId = LogContext.PushProperty("causationId", arguments.CausationId());
+            using var correlationId = LogContext.PushProperty(HttpRequestHeaderConstants.CorrelationId, arguments.CorrelationId());
+            using var causationId = LogContext.PushProperty(HttpRequestHeaderConstants.CausationId, arguments.CausationId());
 
             _log.Verbose("Arguments parsed from request header: {@arguments}", arguments);
 
@@ -61,7 +66,8 @@ namespace Acnys.Core.AspNet.Request
                 return Ok();
             }
 
-            if (requestType.GetInterfaces().Any(type => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IQuery<>)))
+            if (requestType.GetInterfaces()
+                .Any(type => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IQuery<>)))
             {
                 var result = await _queryDispatcher.Dispatch(request, arguments, cancellationToken);
                 return Ok(result);
