@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading;
 using Acnys.Core.Abstractions.Extensions;
@@ -124,10 +125,9 @@ namespace Acnys.Core.RabbitMQ
                 throw new InvalidOperationException("Cannot deserialize message to event. Either add type property to message header or put type information into the JSON.", exception);
             }
 
-            var eventArgs = 
-                args.BasicProperties.Headers ?? new Dictionary<string, object>()
-                    .Where(pair => pair.Key != CorrelationExtensions.CausationIdName && pair.Key != nameof(args.RoutingKey))
-                    .ToDictionary(pair => pair.Key, pair => pair.Value);
+            var eventArgs = (args.BasicProperties?.Headers ?? new Dictionary<string, object>())
+                .Where(pair => pair.Key != CorrelationExtensions.CausationIdName && pair.Key != nameof(args.RoutingKey))
+                .ToDictionary(pair => pair.Key, pair => pair.Value);
 
             if (args.BasicProperties.IsCorrelationIdPresent())
             {
@@ -135,11 +135,10 @@ namespace Acnys.Core.RabbitMQ
                     eventArgs.UseCorrelationId(result);
             }
 
-            if (args.BasicProperties.Headers?.ContainsKey(CorrelationExtensions.CausationIdName) != null)
+            if (args.BasicProperties?.Headers?.ContainsKey(CorrelationExtensions.CausationIdName) ?? false)
             {
                 var causationId = Encoding.UTF8.GetString((byte[])args.BasicProperties.Headers[CorrelationExtensions.CausationIdName]);
-                if (Guid.TryParse(causationId.ToString(), out var result))
-                    eventArgs.UseCausationId(result);
+                if (Guid.TryParse(causationId.ToString(), out var result)) eventArgs.UseCausationId(result);
             }
 
             eventArgs.Add(nameof(args.DeliveryTag), args.DeliveryTag);
