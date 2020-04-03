@@ -64,9 +64,6 @@ namespace Acnys.Core.Request.Infrastructure.Senders
 
         public async Task<T> Send<T>(IQuery<T> query, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
-            //using var correlationId = LogContext.PushProperty("correlationId", arguments.CorrelationId());
-            //using var causationId = LogContext.PushProperty("causationId", arguments.CorrelationId());
-
             _log.Debug("Sending query to HTTP endpoint {uri}", _uri.ToString());
 
             _log.Verbose("Query data: {@query}", query);
