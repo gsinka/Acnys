@@ -39,7 +39,7 @@ namespace WebApplication1
                                     theme: AnsiConsoleTheme.Code)
                                 .WriteTo.Seq(context.Configuration["Seq:Url"])
                                 .MinimumLevel.Verbose()
-                                .MinimumLevel.Override("Microsoft", LogEventLevel.Verbose)
+                                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                                 .Enrich.FromLogContext()
                                 .Enrich.WithProperty("Application", "TEST");
                         })

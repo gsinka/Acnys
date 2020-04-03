@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Acnys.Core.Abstractions.Extensions;
 using Acnys.Core.Eventing.Abstractions;
 using Autofac;
 using Serilog;
-using Serilog.Context;
 
 namespace Acnys.Core.Eventing.Infrastructure
 {

@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Acnys.Core.Abstractions.Extensions;
+﻿using System.Collections.Generic;
 using Acnys.Core.Eventing.Abstractions;
+using Acnys.Core.Extensions;
+using Acnys.Core.ValueObjects;
 
 namespace Acnys.Core.Eventing
 {
@@ -11,8 +10,8 @@ namespace Acnys.Core.Eventing
         public static IDictionary<string, object> CorrelateTo(this IDictionary<string, object> source, IEvent @event)
         {
             return new Dictionary<string, object>{
-                { CorrelationExtensions.CorrelationIdName, source.CorrelationId() },
-                { CorrelationExtensions.CausationIdName, @event.EventId },
+                { RequestConstants.CorrelationId, source.CorrelationId() },
+                { RequestConstants.CausationId, @event.EventId },
             };
         }
 

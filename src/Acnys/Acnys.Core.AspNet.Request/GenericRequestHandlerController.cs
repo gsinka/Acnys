@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Acnys.Core.Abstractions.Extensions;
 using Acnys.Core.Request.Abstractions;
+using Acnys.Core.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Serilog;
-using Serilog.Context;
 
 namespace Acnys.Core.AspNet.Request
 {
@@ -34,6 +33,8 @@ namespace Acnys.Core.AspNet.Request
         [HttpPost]
         public async Task<IActionResult> Post(CancellationToken cancellationToken = default)
         {
+           _log.EnrichWithHttpRequest(Request);
+
             _log.Debug("Handling incoming request with generic request handler");
 
             using var reader = new StreamReader(Request.Body, Encoding.UTF8);
@@ -41,7 +42,7 @@ namespace Acnys.Core.AspNet.Request
             var json = await reader.ReadToEndAsync();
             if (string.IsNullOrEmpty(json)) json = "{}";
 
-            var domainType = Request.Headers[HttpRequestHeaderConstants.DomainType];
+            var domainType = Request.Headers[RequestConstants.DomainType];
 
             dynamic request = string.IsNullOrEmpty(domainType)
                 ? JsonConvert.DeserializeObject(json, _jsonSerializerSettings) ??
@@ -54,9 +55,6 @@ namespace Acnys.Core.AspNet.Request
 
             var arguments =
                 Request.Headers.Keys.ToDictionary<string, string, object>(key => key, key => Request.Headers[key]);
-
-            using var correlationId = LogContext.PushProperty(HttpRequestHeaderConstants.CorrelationId, arguments.CorrelationId());
-            using var causationId = LogContext.PushProperty(HttpRequestHeaderConstants.CausationId, arguments.CausationId());
 
             _log.Verbose("Arguments parsed from request header: {@arguments}", arguments);
 

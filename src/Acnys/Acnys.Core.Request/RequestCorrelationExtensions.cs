@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Acnys.Core.Abstractions.Extensions;
+using Acnys.Core.Extensions;
 using Acnys.Core.Request.Abstractions;
 
 namespace Acnys.Core.Request

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Acnys.Core.Abstractions.Extensions;
+using Acnys.Core.Extensions;
 using Xunit;
 
 namespace Acnys.Core.Tests

@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Acnys.Core.Request.Infrastructure\Acnys.Core.Request.Infrastructure.csproj" />
+    <ProjectReference Include="..\Acnys.Core\Acnys.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

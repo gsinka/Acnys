@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Acnys.Core.Abstractions.Extensions;
 using Acnys.Core.Eventing.Abstractions;
+using Acnys.Core.Extensions;
+using Acnys.Core.ValueObjects;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Framing;
@@ -45,6 +46,8 @@ namespace Acnys.Core.RabbitMQ
 
         public Task Publish<T>(T @event, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : IEvent
         {
+            arguments.EnrichLogContextWithCorrelation();
+
             _log.Debug("Publishing event {eventType} to exchange {exchangeName}", typeof(T).Name, _exchange);
             var (routingKey, mandatory, props, body) = _publishContext(@event, arguments);
             _log.Verbose("Event data: {@event}", @event);
@@ -80,12 +83,12 @@ namespace Acnys.Core.RabbitMQ
                 {
                     switch (arg.Key)
                     {
-                        case CorrelationExtensions.CorrelationIdName:
+                        case RequestConstants.CorrelationId:
                             basicProps.CorrelationId = arg.Value?.ToString() ?? "";
                             break;
 
-                        case CorrelationExtensions.CausationIdName:
-                            basicProps.Headers.Add(CorrelationExtensions.CausationIdName, arg.Value?.ToString() ?? "");
+                        case RequestConstants.CausationId:
+                            basicProps.Headers.Add(RequestConstants.CausationId, arg.Value?.ToString() ?? "");
                             break;
 
                         default:

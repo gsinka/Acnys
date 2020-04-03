@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Acnys.Core.Abstractions.Extensions;
 using Acnys.Core.Eventing.Abstractions;
+using Acnys.Core.Extensions;
 using Serilog;
 using Serilog.Context;
 
@@ -21,9 +21,8 @@ namespace Acnys.Core.Eventing.Infrastructure.Publishers
 
         public async Task Publish<T>(T @event, IDictionary<string, object> arguments, CancellationToken cancellationToken = default) where T : IEvent
         {
-            using var correlationId = LogContext.PushProperty("correlationId", arguments.CorrelationId());
-            using var causationId = LogContext.PushProperty("causationId", arguments.CausationId());
-
+            arguments.EnrichLogContextWithCorrelation();
+            
             await _eventDispatcher.Dispatch(@event, arguments, cancellationToken);
         }
     }

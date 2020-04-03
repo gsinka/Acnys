@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using Acnys.Core.ValueObjects;
+using Serilog.Context;
 
-namespace Acnys.Core.Abstractions.Extensions
+namespace Acnys.Core.Extensions
 {
     public static class CorrelationExtensions
     {
-        public const string CorrelationIdName = "correlation-id";
-        public const string CausationIdName = "causation-id";
-
         public static Guid? CorrelationId(this IDictionary<string, object> arguments)
         {
-            if (arguments == null || !arguments.ContainsKey(CorrelationIdName)) return null;
+            if (arguments == null || !arguments.ContainsKey(RequestConstants.CorrelationId)) return null;
 
-            var value = arguments[CorrelationIdName];
+            var value = arguments[RequestConstants.CorrelationId];
 
             return
                 value is Guid guid
@@ -24,9 +23,9 @@ namespace Acnys.Core.Abstractions.Extensions
 
         public static Guid? CausationId(this IDictionary<string, object> arguments)
         {
-            if (arguments == null || !arguments.ContainsKey(CausationIdName)) return null;
+            if (arguments == null || !arguments.ContainsKey(RequestConstants.CausationId)) return null;
 
-            var value = arguments[CausationIdName];
+            var value = arguments[RequestConstants.CausationId];
 
             return
                 value is Guid guid
@@ -39,15 +38,21 @@ namespace Acnys.Core.Abstractions.Extensions
         public static IDictionary<string, object> UseCorrelationId(this IDictionary<string, object> arguments, Guid? correlationId)
         {
             if (!correlationId.HasValue) return arguments;
-            arguments.Add(CorrelationIdName, correlationId);
+            arguments.Add(RequestConstants.CorrelationId, correlationId);
             return arguments;
         }
         
         public static IDictionary<string, object> UseCausationId(this IDictionary<string, object> arguments, Guid? causationId)
         {
             if (!causationId.HasValue) return arguments;
-            arguments.Add(CausationIdName, causationId);
+            arguments.Add(RequestConstants.CausationId, causationId);
             return arguments;
+        }
+
+        public static void EnrichLogContextWithCorrelation(this IDictionary<string, object> args)
+        {
+            LogContext.PushProperty(RequestConstants.CorrelationId, args.CorrelationId());
+            LogContext.PushProperty(RequestConstants.CausationId, args.CausationId());
         }
     }
 }

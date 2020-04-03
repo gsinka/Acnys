@@ -4,11 +4,11 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Acnys.Core.Abstractions.Extensions;
+using Acnys.Core.Extensions;
 using Acnys.Core.Request.Abstractions;
+using Acnys.Core.ValueObjects;
 using Newtonsoft.Json;
 using Serilog;
-using Serilog.Context;
 
 namespace Acnys.Core.Request.Infrastructure.Senders
 {
@@ -27,8 +27,7 @@ namespace Acnys.Core.Request.Infrastructure.Senders
 
         public async Task Send<T>(T command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : ICommand
         {
-            //using var correlationId = LogContext.PushProperty("correlationId", arguments.CorrelationId());
-            //using var causationId = LogContext.PushProperty("causationId", arguments.CorrelationId());
+            arguments.EnrichLogContextWithCorrelation();
 
             _log.Debug("Sending command to HTTP endpoint {uri}", _uri.ToString());
 
@@ -37,12 +36,13 @@ namespace Acnys.Core.Request.Infrastructure.Senders
 
             using var httpClient = new HttpClient(_httpHandler, false)
             {
-                Timeout = TimeSpan.FromMinutes(5),
+                Timeout = TimeSpan.FromSeconds(30),
             };
 
             var queryJson = JsonConvert.SerializeObject(command);
 
-            httpClient.DefaultRequestHeaders.Add("domain-type", command.GetType().AssemblyQualifiedName);
+            httpClient.DefaultRequestHeaders.Add(RequestConstants.DomainType, command.GetType().AssemblyQualifiedName);
+            httpClient.DefaultRequestHeaders.Add(RequestConstants.RequestId, command.RequestId.ToString());
 
             if (arguments != null)
                 foreach (var argument in arguments)

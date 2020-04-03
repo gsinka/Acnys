@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading;
-using Acnys.Core.Abstractions.Extensions;
 using Acnys.Core.Eventing.Abstractions;
+using Acnys.Core.Extensions;
+using Acnys.Core.RabbitMQ.Extensions;
+using Acnys.Core.ValueObjects;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -73,9 +74,7 @@ namespace Acnys.Core.RabbitMQ
                 _log.Debug("Receiving new message from exchange '{exchange}' with routing key '{routingKey}'", e.Exchange, e.RoutingKey);
 
                 var (evnt, args) = _eventMapper(_log, Consumer, e);
-
-                using var correlationId = LogContext.PushProperty("correlationId", args.CorrelationId());
-                using var causationId = LogContext.PushProperty("causationId", args.CausationId());
+                args.EnrichLogContextWithCorrelation();
 
                 _eventDispatcher.Dispatch(evnt, args, CancellationToken.None);
 
@@ -126,7 +125,7 @@ namespace Acnys.Core.RabbitMQ
             }
 
             var eventArgs = (args.BasicProperties?.Headers ?? new Dictionary<string, object>())
-                .Where(pair => pair.Key != CorrelationExtensions.CausationIdName && pair.Key != nameof(args.RoutingKey))
+                .Where(pair => pair.Key != RequestConstants.CausationId && pair.Key != nameof(args.RoutingKey))
                 .ToDictionary(pair => pair.Key, pair => pair.Value);
 
             if (args.BasicProperties.IsCorrelationIdPresent())
@@ -135,9 +134,9 @@ namespace Acnys.Core.RabbitMQ
                     eventArgs.UseCorrelationId(result);
             }
 
-            if (args.BasicProperties?.Headers?.ContainsKey(CorrelationExtensions.CausationIdName) ?? false)
+            if (args.BasicProperties?.Headers?.ContainsKey(RequestConstants.CausationId) ?? false)
             {
-                var causationId = Encoding.UTF8.GetString((byte[])args.BasicProperties.Headers[CorrelationExtensions.CausationIdName]);
+                var causationId = Encoding.UTF8.GetString((byte[])args.BasicProperties.Headers[RequestConstants.CausationId]);
                 if (Guid.TryParse(causationId.ToString(), out var result)) eventArgs.UseCausationId(result);
             }
 
