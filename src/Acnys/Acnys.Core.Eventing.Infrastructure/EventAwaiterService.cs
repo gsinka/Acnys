@@ -31,7 +31,7 @@ namespace Acnys.Core.Eventing.Infrastructure
                 {
                     foreach (var task in _tasks.Where(x => @event.GetType() == x.EventType && x.EventFilter(@event, arguments)))
                     {
-                        _log.Verbose("Event awaiter task {awaiterTaskId} matching event", task.GetHashCode());
+                        _log.Verbose("Event awaiter task {awaiterTaskId} matching event {eventType}", task.GetHashCode(), typeof(T).FullName);
 
                         task.Event = @event;
                         task.WaitHandle.Set();
@@ -48,11 +48,11 @@ namespace Acnys.Core.Eventing.Infrastructure
             
             cancellationToken.Register(() =>
             {
-                _log.Debug("Awaiting event on task {awaiterTaskId} cancelled", task.GetHashCode());
+                _log.Debug("Awaiting event on task {awaiterTaskId} cancelled for event {eventType}", task.GetHashCode(), typeof(T).FullName);
                 task.WaitHandle.Set();
             });
 
-            _log.Debug("Creating event awaiter task {awaiterTaskId}", task.GetHashCode());
+            _log.Debug("Creating event awaiter task {awaiterTaskId} for event {eventType}", task.GetHashCode(), typeof(T).FullName);
 
             lock (_lockObject) { _tasks.Add(task); }
 
@@ -60,7 +60,7 @@ namespace Acnys.Core.Eventing.Infrastructure
             {
                 task.WaitHandle.WaitOne();
 
-                _log.Verbose("Removing awaiting event task {awaiterTaskId}", task.GetHashCode());
+                _log.Verbose("Removing awaiting event task {awaiterTaskId} for event {eventType}", task.GetHashCode(), typeof(T).FullName);
 
                 lock (_lockObject) { _tasks.Remove(task); }
 
