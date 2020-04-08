@@ -25,6 +25,8 @@ namespace Acnys.Core.Request.Infrastructure.Senders
             _uri = new Uri(uri);
         }
 
+        private readonly Func<Type, string> _typeNameBuilder = type => $"{type.FullName}, {type.Assembly.GetName().Name}";
+
         public async Task Send<T>(T command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : ICommand
         {
             arguments.EnrichLogContextWithCorrelation();
@@ -39,9 +41,9 @@ namespace Acnys.Core.Request.Infrastructure.Senders
                 Timeout = TimeSpan.FromSeconds(30),
             };
 
-            var queryJson = JsonConvert.SerializeObject(command);
-
-            httpClient.DefaultRequestHeaders.Add(RequestConstants.DomainType, command.GetType().AssemblyQualifiedName);
+            var commandJson = JsonConvert.SerializeObject(command);
+            
+            httpClient.DefaultRequestHeaders.Add(RequestConstants.DomainType, _typeNameBuilder(command.GetType()));
             httpClient.DefaultRequestHeaders.Add(RequestConstants.RequestId, command.RequestId.ToString());
 
             if (arguments != null)
@@ -52,7 +54,7 @@ namespace Acnys.Core.Request.Infrastructure.Senders
 
             var result = await httpClient.PostAsync(
                 _uri,
-                new StringContent(queryJson, Encoding.UTF8, "application/json"),
+                new StringContent(commandJson, Encoding.UTF8, "application/json"),
                 cancellationToken);
 
             if (!result.IsSuccessStatusCode)
@@ -76,7 +78,7 @@ namespace Acnys.Core.Request.Infrastructure.Senders
 
             var queryJson = JsonConvert.SerializeObject(query);
             
-            httpClient.DefaultRequestHeaders.Add("domain-type", query.GetType().AssemblyQualifiedName);
+            httpClient.DefaultRequestHeaders.Add("domain-type", _typeNameBuilder(query.GetType()));
 
             if (arguments != null)
                 foreach (var argument in arguments)

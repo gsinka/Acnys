@@ -57,6 +57,8 @@ namespace Acnys.Core.RabbitMQ
             return Task.CompletedTask;
         }
 
+        private static readonly Func<Type, string> TypeNameBuilder = type => $"{type.FullName}, {type.Assembly.GetName().Name}";
+
         /// <summary>
         /// Default publish context builder function
         /// </summary>
@@ -73,7 +75,7 @@ namespace Acnys.Core.RabbitMQ
             var basicProps = new BasicProperties()
             {
                 ContentType = "application/json",
-                Type = evnt.GetType().AssemblyQualifiedName,
+                Type = TypeNameBuilder(evnt.GetType()),
                 Headers = new Dictionary<string, object>(),
             };
 

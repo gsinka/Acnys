@@ -19,8 +19,7 @@ namespace Acnys.Core.AspNet.Request
         private readonly IDispatchQuery _queryDispatcher;
         private readonly ILogger _log;
 
-        private readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings()
-            {TypeNameHandling = TypeNameHandling.All};
+        private readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All, TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple};
 
         public GenericRequestHandlerController(IDispatchCommand commandDispatcher, IDispatchQuery queryDispatcher,
             ILogger log)
