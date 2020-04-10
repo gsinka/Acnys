@@ -10,14 +10,16 @@ using Serilog;
 using Xunit;
 using Xunit.Abstractions;
 
+// ReSharper disable InconsistentNaming
+
 namespace Acnys.Core.Request.Tests
 {
-    public class UnitTest1
+    public class Command_Tests
     {
         private readonly IContainer _container;
         private readonly TestCommandHandler _testCommandHandler = new TestCommandHandler();
 
-        public UnitTest1(ITestOutputHelper testOutputHelper)
+        public Command_Tests(ITestOutputHelper testOutputHelper)
         {
             Log.Logger = new LoggerConfiguration().WriteTo.TestOutput(testOutputHelper).MinimumLevel.Verbose().CreateLogger();
 
@@ -32,6 +34,8 @@ namespace Acnys.Core.Request.Tests
 
             _container = builder.Build();
         }
+
+        
 
         [Fact]
         public async Task Test1()
