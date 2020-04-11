@@ -20,11 +20,9 @@ namespace Acnys.Core.Eventing.Infrastructure
         private readonly IList<EventAwaiterTask> _tasks = new List<EventAwaiterTask>();
         private readonly IList<(DateTime timeStamp, IEvent evnt, IDictionary<string, object> args)> _unprocessedEvents = new List<(DateTime timeStamp, IEvent evnt, IDictionary<string, object> args)>();
 
-        public EventAwaiterService(ILogger log, IClock clock, int eventTtl = 1000)
+        public EventAwaiterService(ILogger log)
         {
             _log = log;
-            _clock = clock;
-            _eventTtl = new TimeSpan(eventTtl);
         }
 
         public Task ProcessEvent<T>(T @event, IDictionary<string, object> arguments, CancellationToken cancellationToken) where T : IEvent
@@ -60,24 +58,6 @@ namespace Acnys.Core.Eventing.Infrastructure
         public Task<T> GetEventAwaiter<T>(Func<T, IDictionary<string, object>, bool> eventFilter, CancellationToken cancellationToken = default) 
             where T : IEvent
         {
-            if (_eventTtl > TimeSpan.Zero)
-            {
-                var unprocessed = default(T);
-
-                lock (_lockObject)
-                {
-                    var matchingEvents = _unprocessedEvents
-                        .Where(tuple => tuple.evnt.GetType() == typeof(T) && eventFilter((T) tuple.evnt, tuple.args)).ToList();
-
-                    if (matchingEvents.Any())
-                    {
-                        foreach (var match in matchingEvents) _unprocessedEvents.Remove(match);
-                        unprocessed = (T) matchingEvents.First().evnt;
-                    }
-                }
-
-                if (unprocessed != null) return Task.FromResult(unprocessed);
-            }
 
             var task = new EventAwaiterTask((evnt, args) => eventFilter((T)evnt, args), typeof(T));
             
