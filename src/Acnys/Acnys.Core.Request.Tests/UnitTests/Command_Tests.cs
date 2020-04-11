@@ -10,21 +10,23 @@ using Serilog;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Acnys.Core.Request.Tests
+// ReSharper disable InconsistentNaming
+
+namespace Acnys.Core.Request.Tests.UnitTests
 {
-    public class UnitTest1
+    public class Command_Tests
     {
         private readonly IContainer _container;
         private readonly TestCommandHandler _testCommandHandler = new TestCommandHandler();
 
-        public UnitTest1(ITestOutputHelper testOutputHelper)
+        public Command_Tests(ITestOutputHelper testOutputHelper)
         {
             Log.Logger = new LoggerConfiguration().WriteTo.TestOutput(testOutputHelper).MinimumLevel.Verbose().CreateLogger();
 
             var builder = new ContainerBuilder();
 
             builder.RegisterInstance(Log.Logger).As<ILogger>().SingleInstance();
-
+            
             builder.RegisterLoopbackRequestSender();
             builder.RegisterCommandDispatcher();
             builder.RegisterQueryDispatcher();
@@ -39,9 +41,9 @@ namespace Acnys.Core.Request.Tests
             var sender = _container.Resolve<ISendRequest>();
 
             var correlationId = Guid.NewGuid();
-            var caustaionId = Guid.NewGuid();
+            var causationId = Guid.NewGuid();
 
-            var args = new Dictionary<string, object>().UseCorrelationId(correlationId).UseCausationId(caustaionId);
+            var args = new Dictionary<string, object>().UseCorrelationId(correlationId).UseCausationId(causationId);
 
             await sender.Send(new TestCommand(), args, CancellationToken.None);
 
@@ -49,7 +51,7 @@ namespace Acnys.Core.Request.Tests
             Assert.NotNull(_testCommandHandler.Arguments);
 
             Assert.Equal(correlationId, args.CorrelationId());
-            Assert.Equal(caustaionId, args.CausationId());
+            Assert.Equal(causationId, args.CausationId());
         }
     }
 }

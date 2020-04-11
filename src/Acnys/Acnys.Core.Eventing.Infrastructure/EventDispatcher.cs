@@ -49,6 +49,8 @@ namespace Acnys.Core.Eventing.Infrastructure
                     _log.Debug("Finished handling event {eventName} with handler {handlerName}", eventName, (string)handler.GetType().Name);
                 }
 
+                //TODO: obsolate, remove in version 1.0
+
                 if (_eventAwaiterService != null)
                 {
                     await _eventAwaiterService.ProcessEvent(@event, arguments, cancellationToken);

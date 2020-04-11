@@ -2,7 +2,7 @@
 using Autofac;
 using Serilog;
 
-namespace Acnys.Core.RabbitMQ.Extensions
+namespace Acnys.Core.RabbitMQ
 {
     public class RabbitAutoStartService : IStartable
     {

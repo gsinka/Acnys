@@ -1,7 +1,7 @@
 ﻿using System;
 using Xunit;
 
-namespace Acnys.Core.Request.Tests.Commands
+namespace Acnys.Core.Request.Tests.UnitTests
 {
     public class RequestIdTests
     {
@@ -12,8 +12,6 @@ namespace Acnys.Core.Request.Tests.Commands
             Assert.NotEqual(Guid.Empty, command.RequestId);
 
             var requestId = Guid.NewGuid();
-            var correlationId = Guid.NewGuid();
-            var causationId = Guid.NewGuid();
             
             command = new TestCommand(requestId);
             Assert.Equal(requestId, command.RequestId);
@@ -22,32 +20,12 @@ namespace Acnys.Core.Request.Tests.Commands
         [Fact]
         public void Query_base_id_check()
         {
-            var requestId = Guid.NewGuid();
-            
             var query = new TestQuery();
             Assert.NotEqual(Guid.Empty, query.RequestId);
 
+            var requestId = Guid.NewGuid();
             query = new TestQuery(requestId);
             Assert.Equal(requestId, query.RequestId);
-        }
-
-
-        public class TestCommand : Command
-        {
-            public TestCommand(Guid? requestId = null) : base(requestId)
-            {
-            }
-        }
-
-        public class TestQuery : Query<string>
-        {
-            public TestQuery()
-            {
-            }
-
-            public TestQuery(Guid requestId) : base(requestId)
-            {
-            }
         }
     }
 }

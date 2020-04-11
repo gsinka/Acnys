@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Acnys.Core.Abstractions;
 using Acnys.Core.AspNet;
 using Acnys.Core.AspNet.Eventing;
 using Acnys.Core.AspNet.RabbitMQ;
 using Acnys.Core.AspNet.Request;
+using Acnys.Core.Eventing.Infrastructure;
+using Acnys.Core.Eventing.Infrastructure.Extensions;
+using Acnys.Core.Services;
 using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -74,11 +78,16 @@ namespace WebApplication1
 
                         .ConfigureContainer<ContainerBuilder>((context, builder) =>
                         {
+                            builder.RegisterType<ComputerClock>().AsImplementedInterfaces();
                             builder.RegisterType<Setup>().As<IStartable>().SingleInstance();
                             builder.RegisterType<UserContext>().AsSelf().InstancePerLifetimeScope();
 
-                            //builder.RegisterType<MiddlewareFactory>().AsImplementedInterfaces().AsSelf().SingleInstance();
                             builder.RegisterType<TestMiddleware>().AsImplementedInterfaces().AsSelf().InstancePerLifetimeScope();
+
+                            builder.RegisterEventRecorderService(10000);
+
+                            //builder.RegisterType<EventRecorder>().AsImplementedInterfaces().SingleInstance();
+                            //builder.Register((ctx => new EventRecorder(ctx.Resolve<ILogger>(), ctx.Resolve<IClock>(), 100))).AsImplementedInterfaces().SingleInstance();
                         })
 
                         .ConfigureServices((context, services) => {

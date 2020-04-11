@@ -69,16 +69,10 @@ namespace Acnys.Core.Eventing.Tests
             Assert.Null(_testHandler.LastArguments);
         }
 
-
-
         public class TestEventHandler : IHandleEvent<TestEvent>
         {
-            public TestEvent LastEvent = null;
-            public IDictionary<string, object> LastArguments = null;
-
-            public TestEventHandler()
-            {
-            }
+            public TestEvent LastEvent;
+            public IDictionary<string, object> LastArguments;
 
             public Task Handle(TestEvent @event, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
             {
