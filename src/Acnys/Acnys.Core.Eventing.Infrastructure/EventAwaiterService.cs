@@ -9,6 +9,7 @@ using Serilog;
 
 namespace Acnys.Core.Eventing.Infrastructure
 {
+    [Obsolete("EventAwaiterService is obsolete and will be removed in version 1.0. Please use IRecordEvent and EventRecorder instead of this.")]
     public class EventAwaiterService
     {
         private readonly ILogger _log;

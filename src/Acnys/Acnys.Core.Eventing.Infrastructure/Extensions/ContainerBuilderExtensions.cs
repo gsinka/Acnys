@@ -1,6 +1,9 @@
-﻿using Acnys.Core.Eventing.Abstractions;
+﻿using System;
+using Acnys.Core.Abstractions;
+using Acnys.Core.Eventing.Abstractions;
 using Acnys.Core.Eventing.Infrastructure.Publishers;
 using Autofac;
+using Serilog;
 
 namespace Acnys.Core.Eventing.Infrastructure.Extensions
 {
@@ -27,9 +30,19 @@ namespace Acnys.Core.Eventing.Infrastructure.Extensions
             return builder;
         }
 
+        [Obsolete("EventAwaiterService is obsolete and will be removed in version 1.0. Please use IRecordEvent and EventRecorder instead of this.")]
         public static ContainerBuilder RegisterEventAwaiterService(this ContainerBuilder builder)
         {
             builder.RegisterType<EventAwaiterService>().AsSelf().SingleInstance();
+            return builder;
+        }
+
+        public static ContainerBuilder RegisterEventRecorderService(this ContainerBuilder builder, int eventTTL = 60000)
+        {
+            builder
+                .Register(context => new EventRecorder(context.Resolve<ILogger>().ForContext<EventRecorder>(), context.Resolve<IClock>(), eventTTL))
+                .AsImplementedInterfaces().SingleInstance();
+            
             return builder;
         }
     }
