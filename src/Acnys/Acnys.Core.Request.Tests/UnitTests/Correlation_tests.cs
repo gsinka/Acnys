@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Acnys.Core.Extensions;
 using Acnys.Core.Request.Abstractions;
 using Acnys.Core.Request.Infrastructure.Extensions;
-using Acnys.Core.Request.Tests.Commands;
 using Autofac;
 using Serilog;
 using Xunit;
