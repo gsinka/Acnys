@@ -15,6 +15,7 @@ namespace Acnys.Core
             {
                 return false;
             }
+
             return left is null || left.Equals(right);
         }
 
@@ -38,8 +39,8 @@ namespace Acnys.Core
             }
             var other = (ValueObject)obj;
 
-            var thisValues = GetAtomicValues().GetEnumerator();
-            var otherValues = other.GetAtomicValues().GetEnumerator();
+            using var thisValues = GetAtomicValues().GetEnumerator();
+            using var otherValues = other.GetAtomicValues().GetEnumerator();
 
             while (thisValues.MoveNext() && otherValues.MoveNext())
             {
@@ -55,9 +56,11 @@ namespace Acnys.Core
             return !thisValues.MoveNext() && !otherValues.MoveNext();
         }
 
-        public static bool operator ==(ValueObject x, ValueObject y) => x is null && y is null || (x?.Equals(y) ?? false);
+        //public static bool operator ==(ValueObject x, ValueObject y) => x is null && y is null || (x?.Equals(y) ?? false);
+        public static bool operator ==(ValueObject x, ValueObject y) => EqualOperator(x, y);
 
-        public static bool operator !=(ValueObject x, ValueObject y) => !(x == y);
+        //public static bool operator !=(ValueObject x, ValueObject y) => !(x == y);
+        public static bool operator !=(ValueObject x, ValueObject y) => NotEqualOperator(x, y);
 
         public override int GetHashCode()
         {
