@@ -1,0 +1,65 @@
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using Xunit;
+
+namespace Acnys.Core.Tests
+{
+    public class CommandTests
+    {
+        [Fact]
+        public void RequestId_from_constructor()
+        {
+            var requestId = Guid.NewGuid();
+            var evnt = new TestCommand(requestId);
+
+            Assert.Equal(requestId, evnt.RequestId);
+        }
+
+        [Fact]
+        public void RequestId_created_in_case_of_default_constructor()
+        {
+            var evnt = new TestCommand();
+            Assert.NotEqual(Guid.Empty, evnt.RequestId);
+        }
+
+        [Fact]
+        [SuppressMessage("ReSharper", "EqualExpressionComparison")]
+        public void Events_are_equal_if_event_ids_are_equal_or_references_equal()
+        {
+            var requestId = Guid.NewGuid();
+            Assert.Equal(new TestCommand(requestId), new TestCommand(requestId));
+            
+            Assert.True(Equals(new TestCommand(requestId), new TestCommand(requestId)));
+            Assert.True(new TestCommand(requestId) == new TestCommand(requestId));
+            Assert.True(new TestCommand() != new TestCommand());
+            Assert.True((TestCommand)null == (TestCommand)null);
+            Assert.False((TestCommand)null == new TestCommand());
+            Assert.False(new TestCommand() == null);
+
+            var testEvent = new TestCommand();
+            var testEvent2 = testEvent;
+            Assert.True(testEvent.Equals(testEvent2));
+        }
+
+        [Fact]
+        public void Event_compared_not_to_event_gives_false()
+        {
+            Assert.False(new TestCommand().Equals(null));
+        }
+
+        [Fact]
+        public void Event_hash_tests()
+        {
+            var requestId = Guid.NewGuid();
+            Assert.Equal(new TestCommand(requestId).GetHashCode(), new TestCommand(requestId).GetHashCode());
+            Assert.NotEqual(new TestCommand().GetHashCode(), new TestCommand().GetHashCode());
+
+        }
+
+        private class TestCommand : Command
+        {
+            public TestCommand() { }
+            public TestCommand(Guid requestId) : base(requestId) { }
+        }
+    }
+}
