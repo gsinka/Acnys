@@ -1,11 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Acnys.Core.Application\Acnys.Core.Application.csproj" />
     <ProjectReference Include="..\Acnys.Core\Acnys.Core.csproj" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Autofac" Version="5.1.2" />
+    <PackageReference Include="Serilog" Version="2.9.0" />
   </ItemGroup>
 
 </Project>
