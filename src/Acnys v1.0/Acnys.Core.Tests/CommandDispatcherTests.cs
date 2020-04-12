@@ -55,6 +55,20 @@ namespace Acnys.Core.Tests
             await Assert.ThrowsAsync<InvalidOperationException>(async () => await dispatcher.Dispatch(command));
         }
 
+        [Fact]
+        public async Task Multiple_handlers_registered_shall_raise_an_error()
+        {
+            await using var scope = _container.BeginLifetimeScope(builder => builder.RegisterType<DuplicatedTestCommandHandler>().AsImplementedInterfaces());
+            await Assert.ThrowsAsync<InvalidOperationException>(async () => await scope.Resolve<IDispatchCommand>().Dispatch(new TestCommand()));
+        }
+
+
+        [Fact]
+        public async Task No_handler_registered_shall_raise_an_error()
+        {
+            await Assert.ThrowsAsync<InvalidOperationException>(async () => await _container.Resolve<IDispatchCommand>().Dispatch(new TestCommandForNoHandler()));
+        }
+
         private class TestCommand : Command
         {
             public bool ThrowException { get; }
@@ -64,6 +78,8 @@ namespace Acnys.Core.Tests
                 ThrowException = throwException;
             }
         }
+
+        private class TestCommandForNoHandler : Command { }
 
         private class TestCommandHandler : IHandleCommand<TestCommand>
         {
@@ -79,6 +95,11 @@ namespace Acnys.Core.Tests
 
                 return Task.CompletedTask;
             }
+        }
+
+        private class DuplicatedTestCommandHandler : IHandleCommand<TestCommand>
+        {
+            public async Task Handle(TestCommand command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) { }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Abstractions;
@@ -33,24 +34,30 @@ namespace Acnys.Core.Infrastructure.Request
             var queryName = query.GetType().Name;
 
             _log.Verbose("Dispatching query {queryName}", queryName);
-
             _log.Verbose("Query object: {@query}", query);
-
-            //using var scope = _scope.BeginLifetimeScope();
-
-            _log.Verbose("Lifetime scope {scopeId} created for query", _scope.GetHashCode());
 
             try
             {
                 var queryType = query.GetType();
                 var requestedHandlerType = typeof(IHandleQuery<,>).MakeGenericType(query.GetType(), typeof(TResult));
-                _log.Verbose("Looking handler with type {handlerType}", requestedHandlerType);
+                _log.Verbose("Looking for handler with type {handlerType}", requestedHandlerType);
 
-                var handler = (dynamic) _scope.Resolve(requestedHandlerType);
-                Type handlerType = handler.GetType();
+                var handlers = ((IEnumerable<dynamic>)_scope.Resolve(typeof(IEnumerable<>).MakeGenericType(requestedHandlerType))).ToList();
 
+                if (!handlers.Any())
+                {
+                    throw new InvalidOperationException($"No query handler registered for query {queryType.FullName}");
+                }
+
+                if (handlers.Count() > 1)
+                {
+                    throw new InvalidOperationException($"Multiple query handlers registered for query {queryType.FullName}. Registered query handlers: {string.Join(",", handlers.Select(x => x.GetType().FullName))}");
+                }
+
+                var handlerType = handlers.GetType();
+                
                 _log.Verbose("Handling {queryType} with {handlerType}", queryType.Name, handlerType.Name);
-                TResult result = await handler.Handle((dynamic) query, arguments, cancellationToken);
+                TResult result = await handlers.Single().Handle((dynamic)query, arguments, cancellationToken);
 
                 _log.Debug("Query dispatch completed successfully");
                 _log.Verbose("Query result object: {@queryResult}", result);

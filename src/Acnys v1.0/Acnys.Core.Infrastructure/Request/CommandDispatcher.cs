@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Abstractions;
@@ -36,19 +37,28 @@ namespace Acnys.Core.Infrastructure.Request
             return Task.Run(async() =>
             {
                 _log.Debug("Dispatching command {commandType}", typeof(T).Name);
-
                 _log.Verbose("Command object: {@command}", command);
-
-                _log.Verbose("Lifetime scope {scopeId} created for command", _scope.GetHashCode());
-
+                
                 try
                 {
                     var commandType = typeof(T);
                     var handlerType = typeof(IHandleCommand<>).MakeGenericType(commandType);
                     _log.Verbose("Looking handler with type {handlerType}", handlerType);
 
-                    var handler = (IHandleCommand<T>)_scope.Resolve(handlerType);
-                            
+                    var handlers = ((IEnumerable<IHandleCommand<T>>)_scope.Resolve(typeof(IEnumerable<>).MakeGenericType(handlerType))).ToList();
+
+                    if (!handlers.Any())
+                    {
+                        throw new InvalidOperationException($"No command handler registered for command {commandType.FullName}");
+                    }
+
+                    if (handlers.Count() > 1)
+                    {
+                        throw new InvalidOperationException($"Multiple command handlers registered for command {commandType.FullName}. Registered command handlers: {string.Join(",", handlers.Select(x => x.GetType().FullName))}");
+                    }
+
+                    var handler = handlers.Single();
+
                     _log.Verbose("Handling {commandType} with {handler}", commandType.Name, handler.GetType().Name);
                     await handler.Handle(command, arguments, cancellationToken);
 
