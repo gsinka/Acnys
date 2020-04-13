@@ -5,8 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Application.Abstractions;
 using Acnys.Core.Helper;
-using Acnys.Core.Infrastructure.Abstractions;
-using Acnys.Core.Infrastructure.Request;
+using Acnys.Core.Infrastructure;
+using Acnys.Core.Infrastructure.Dispatcher;
 using Autofac;
 using Serilog;
 using Xunit;
@@ -99,7 +99,10 @@ namespace Acnys.Core.Tests
 
         private class DuplicatedTestCommandHandler : IHandleCommand<TestCommand>
         {
-            public async Task Handle(TestCommand command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) { }
+            public Task Handle(TestCommand command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

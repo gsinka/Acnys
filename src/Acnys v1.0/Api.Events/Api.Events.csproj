@@ -5,8 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Acnys.Core.Domain\Acnys.Core.Domain.csproj" />
-    <ProjectReference Include="..\Api.Events\Api.Events.csproj" />
+    <ProjectReference Include="..\Acnys.Core\Acnys.Core.csproj" />
   </ItemGroup>
 
 </Project>

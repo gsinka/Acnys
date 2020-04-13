@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Abstractions;
 
-namespace Acnys.Core.Infrastructure.Abstractions
+namespace Acnys.Core.Infrastructure.Dispatcher
 {
     /// <summary>
     /// Command dispatcher interface

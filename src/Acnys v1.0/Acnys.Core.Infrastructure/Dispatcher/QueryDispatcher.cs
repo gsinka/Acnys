@@ -5,11 +5,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Abstractions;
 using Acnys.Core.Application.Abstractions;
-using Acnys.Core.Infrastructure.Abstractions;
 using Autofac;
 using Serilog;
 
-namespace Acnys.Core.Infrastructure.Request
+namespace Acnys.Core.Infrastructure.Dispatcher
 {
     public class QueryDispatcher : IDispatchQuery
     {
@@ -54,10 +53,11 @@ namespace Acnys.Core.Infrastructure.Request
                     throw new InvalidOperationException($"Multiple query handlers registered for query {queryType.FullName}. Registered query handlers: {string.Join(",", handlers.Select(x => x.GetType().FullName))}");
                 }
 
-                var handlerType = handlers.GetType();
+                var handler = handlers.Single();
+                var handlerType = handler.GetType();
                 
                 _log.Verbose("Handling {queryType} with {handlerType}", queryType.Name, handlerType.Name);
-                TResult result = await handlers.Single().Handle((dynamic)query, arguments, cancellationToken);
+                TResult result = await handler.Handle((dynamic)query, arguments, cancellationToken);
 
                 _log.Debug("Query dispatch completed successfully");
                 _log.Verbose("Query result object: {@queryResult}", result);
@@ -68,10 +68,6 @@ namespace Acnys.Core.Infrastructure.Request
             {
                 _log.Error(exception, "Query dispatch failed");
                 throw;
-            }
-            finally
-            {
-                _log.Verbose("Ending lifetime scope {scopeId}", _scope.GetHashCode());
             }
         }
     }

@@ -1,6 +1,6 @@
 ﻿using Acnys.Core;
 
-namespace Api
+namespace Api.Events
 {
     public class SampleEvent : Event
     {

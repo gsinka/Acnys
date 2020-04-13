@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Application.Abstractions;
 using Api;
+using Api.Events;
 
 namespace Application
 {

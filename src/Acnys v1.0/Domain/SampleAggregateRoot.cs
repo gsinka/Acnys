@@ -1,5 +1,5 @@
 ﻿using Acnys.Core.Domain;
-using Api;
+using Api.Events;
 
 namespace Domain
 {

@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Acnys.Core\Acnys.Core.csproj" />
+    <ProjectReference Include="..\Api.Events\Api.Events.csproj" />
   </ItemGroup>
 
 </Project>

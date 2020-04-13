@@ -5,11 +5,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Abstractions;
 using Acnys.Core.Application.Abstractions;
-using Acnys.Core.Infrastructure.Abstractions;
 using Autofac;
 using Serilog;
 
-namespace Acnys.Core.Infrastructure.Request
+namespace Acnys.Core.Infrastructure.Dispatcher
 {
     /// <summary>
     /// Autofac based command dispatcher
@@ -68,10 +67,6 @@ namespace Acnys.Core.Infrastructure.Request
                 {
                     _log.Error(exception, "Command dispatch failed");
                     throw;
-                }
-                finally
-                {
-                    _log.Verbose("Ending lifetime scope {scopeId}", _scope.GetHashCode());
                 }
             }, cancellationToken);
         }
