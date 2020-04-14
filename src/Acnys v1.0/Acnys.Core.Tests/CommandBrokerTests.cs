@@ -65,7 +65,12 @@ namespace Acnys.Core.Tests
             await Assert.ThrowsAsync<InvalidOperationException>(async () => await container.Resolve<ISendCommand>().Send(new TestCommand()));
         }
 
-        private class TestCommand : Command { }
+        private class TestCommand : Command
+        {
+            public TestCommand(Guid? requestId = null) : base(requestId ?? Guid.NewGuid())
+            {
+            }
+        }
 
         private class TestCommandHandler : IHandleCommand<TestCommand>
         {

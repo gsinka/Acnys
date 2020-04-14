@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Abstractions;
 using Acnys.Core.Application.Abstractions;
+using Acnys.Core.Infrastructure.Serilog;
 using Acnys.Core.ValueObjects;
 using Newtonsoft.Json;
 using Serilog;
@@ -15,13 +16,13 @@ namespace Acnys.Core.Infrastructure.Sender
     public class HttpCommandSender : ISendCommand
     {
         private readonly ILogger _log;
-        private readonly HttpClientHandler _httpHandler;
+        private readonly HttpClient _httpClient;
         private readonly Uri _uri;
         
-        public HttpCommandSender(ILogger log, HttpClientHandler httpHandler, string uri)
+        public HttpCommandSender(ILogger log, string uri, HttpClient httpClient = null)
         {
             _log = log;
-            _httpHandler = httpHandler;
+            _httpClient = httpClient ?? new HttpClient();
             _uri = new Uri(uri);
         }
 
@@ -36,23 +37,18 @@ namespace Acnys.Core.Infrastructure.Sender
             _log.Verbose("Command data: {@command}", command);
             _log.Verbose("Command arguments: {@arguments}", arguments);
 
-            using var httpClient = new HttpClient(_httpHandler, false)
-            {
-                Timeout = TimeSpan.FromSeconds(30),
-            };
-
             var commandJson = JsonConvert.SerializeObject(command);
 
-            httpClient.DefaultRequestHeaders.Add(RequestConstants.DomainType, _typeNameBuilder(command.GetType()));
-            httpClient.DefaultRequestHeaders.Add(RequestConstants.RequestId, command.RequestId.ToString());
+            _httpClient.DefaultRequestHeaders.Add(RequestConstants.DomainType, _typeNameBuilder(command.GetType()));
+            _httpClient.DefaultRequestHeaders.Add(RequestConstants.RequestId, command.RequestId.ToString());
 
             if (arguments != null)
                 foreach (var argument in arguments)
                 {
-                    httpClient.DefaultRequestHeaders.Add(argument.Key, argument.Value.ToString());
+                    _httpClient.DefaultRequestHeaders.Add(argument.Key, argument.Value.ToString());
                 }
 
-            var result = await httpClient.PostAsync(
+            var result = await _httpClient.PostAsync(
                 _uri,
                 new StringContent(commandJson, Encoding.UTF8, "application/json"),
                 cancellationToken);
@@ -60,10 +56,8 @@ namespace Acnys.Core.Infrastructure.Sender
             if (!result.IsSuccessStatusCode)
             {
                 _log.Error("Sending command to HTTP endpoint failed. Reason: {reason}, Response: {response}", result.ReasonPhrase, result.Content.ReadAsStringAsync());
-                result.EnsureSuccessStatusCode();
-                //throw new Exceptions.HttpRequestException(result.StatusCode, await result.Content.ReadAsByteArrayAsync());
+                throw new HttpRequestSenderException(result.StatusCode, await result.Content.ReadAsStringAsync());
             }
-
         }
     }
 }

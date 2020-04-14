@@ -53,7 +53,8 @@ namespace Acnys.Core.Tests
 
         private class TestQuery : Query<object>
         {
-            public TestQuery() { }
+            public TestQuery(Guid? requestId = null) : base(requestId ?? Guid.NewGuid())
+            { }
             public TestQuery(Guid requestId) : base(requestId) { }
         }
     }

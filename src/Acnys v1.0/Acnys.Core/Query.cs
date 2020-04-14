@@ -7,9 +7,9 @@ namespace Acnys.Core
     {
         public Guid RequestId { get; }
 
-        protected Query(Guid? requestId = default)
+        protected Query(Guid requestId)
         {
-            RequestId = requestId ?? Guid.NewGuid();
+            RequestId = requestId;
         }
 
         public override int GetHashCode()

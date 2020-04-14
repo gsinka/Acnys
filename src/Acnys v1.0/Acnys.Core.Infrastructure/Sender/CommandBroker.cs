@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Abstractions;
 using Acnys.Core.Application.Abstractions;
+using Acnys.Core.Infrastructure.Serilog;
 using Autofac.Features.Indexed;
 using Serilog;
 

@@ -75,7 +75,11 @@ namespace Acnys.Core.Tests
 
 
 
-        private class LocalCommand : Command { }
+        private class LocalCommand : Command {
+            public LocalCommand(Guid? requestId = null) : base(requestId ?? Guid.NewGuid())
+            {
+            }
+        }
 
         private class LocalCommandHandler : IHandleCommand<LocalCommand>
         {

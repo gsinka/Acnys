@@ -95,7 +95,14 @@ namespace Acnys.Core.Tests
             Assert.Equal(evnt.EventId, arguments.CausationId());
         }
 
-        private class TestCommand : Command {  }
-        private class TestEvent : Event { }
+        public class TestCommand : Command {
+            public TestCommand(Guid? requestId = null) : base(requestId ?? Guid.NewGuid()) { }
+        }
+
+        public class TestEvent : Event {
+            public TestEvent(Guid? eventId = null) : base(eventId ?? Guid.NewGuid())
+            {
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace Acnys.Core.Tests
@@ -21,10 +22,10 @@ namespace Acnys.Core.Tests
             var evnt = new TestCommand();
             Assert.NotEqual(Guid.Empty, evnt.RequestId);
         }
-
+        
         [Fact]
         [SuppressMessage("ReSharper", "EqualExpressionComparison")]
-        public void Events_are_equal_if_event_ids_are_equal_or_references_equal()
+        public void Commands_are_equal_if_command_ids_are_equal_or_references_equal()
         {
             var requestId = Guid.NewGuid();
             Assert.Equal(new TestCommand(requestId), new TestCommand(requestId));
@@ -42,13 +43,13 @@ namespace Acnys.Core.Tests
         }
 
         [Fact]
-        public void Event_compared_not_to_event_gives_false()
+        public void Command_compared_not_to_command_gives_false()
         {
             Assert.False(new TestCommand().Equals(null));
         }
 
         [Fact]
-        public void Event_hash_tests()
+        public void Command_hash_tests()
         {
             var requestId = Guid.NewGuid();
             Assert.Equal(new TestCommand(requestId).GetHashCode(), new TestCommand(requestId).GetHashCode());
@@ -56,10 +57,39 @@ namespace Acnys.Core.Tests
 
         }
 
-        private class TestCommand : Command
+        [Fact]
+        public void Command_with_constructor_serialized_and_deserialized_are_equal()
         {
-            public TestCommand() { }
-            public TestCommand(Guid requestId) : base(requestId) { }
+            var command = new TestCommand();
+            var commandJson = JsonConvert.SerializeObject(command);
+            var deserialized = JsonConvert.DeserializeObject(commandJson, typeof(TestCommand));
+
+            Assert.Equal(deserialized, command);
+        }
+
+        [Fact]
+        public void Command_wo_constructor_serialized_and_deserialized_are_equal()
+        {
+            var command = new TestCommandWithoutConstructor();
+            var commandJson = JsonConvert.SerializeObject(command);
+            var deserialized = JsonConvert.DeserializeObject<TestCommandWithoutConstructor>(commandJson, new JsonSerializerSettings()
+            {
+                
+            });
+
+            Assert.Equal(deserialized, command);
+        }
+
+        public class TestCommand : Command
+        {
+            public TestCommand(Guid? requestId = null) : base(requestId ?? Guid.NewGuid()) { }
+        }
+
+        public class TestCommandWithoutConstructor : Command
+        {
+            public TestCommandWithoutConstructor(Guid? requestId = null) : base(requestId ?? Guid.NewGuid())
+            {
+            }
         }
     }
 }

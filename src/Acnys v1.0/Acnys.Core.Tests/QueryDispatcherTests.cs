@@ -68,13 +68,18 @@ namespace Acnys.Core.Tests
         {
             public bool ThrowException { get; }
 
-            public TestQuery(bool throwException = false)
+            public TestQuery(bool throwException = false, Guid? requestId = null) : base(requestId ?? Guid.NewGuid())
             {
                 ThrowException = throwException;
             }
         }
 
-        public class TestQueryForNoHandler : Query<object> { }
+        public class TestQueryForNoHandler : Query<object> {
+
+            public TestQueryForNoHandler(Guid? requestId = null) : base(requestId ?? Guid.NewGuid())
+            {
+            }
+        }
 
         public class TestQueryHandler : IHandleQuery<TestQuery, IDictionary<string, object>>
         {

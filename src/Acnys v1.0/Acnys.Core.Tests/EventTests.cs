@@ -56,10 +56,9 @@ namespace Acnys.Core.Tests
 
         }
 
-        private class TestEvent : Event
+        public class TestEvent : Event
         {
-            public TestEvent() { }
-            public TestEvent(Guid eventId) : base(eventId) { }
+            public TestEvent(Guid? eventId = null) : base(eventId ?? Guid.NewGuid()) { }
         }
     }
 }

@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using Serilog;
 using Serilog.Context;
 
-namespace Acnys.Core.Infrastructure
+namespace Acnys.Core.Infrastructure.Serilog
 {
     public static class ArgumentExtensions
     {

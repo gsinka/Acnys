@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Acnys.Core.Abstractions;
 using Acnys.Core.Application.Abstractions;
 using Acnys.Core.Infrastructure.Dispatcher;
+using Acnys.Core.Infrastructure.Serilog;
 using Serilog;
 
 namespace Acnys.Core.Infrastructure.Sender

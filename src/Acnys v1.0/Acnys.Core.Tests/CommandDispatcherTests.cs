@@ -73,13 +73,17 @@ namespace Acnys.Core.Tests
         {
             public bool ThrowException { get; }
 
-            public TestCommand(bool throwException = false)
+            public TestCommand(bool throwException = false, Guid? requestId = null) : base(requestId ?? Guid.NewGuid())
             {
                 ThrowException = throwException;
             }
         }
 
-        private class TestCommandForNoHandler : Command { }
+        private class TestCommandForNoHandler : Command {
+            public TestCommandForNoHandler(Guid? requestId = null) : base(requestId ?? Guid.NewGuid())
+            {
+            }
+        }
 
         private class TestCommandHandler : IHandleCommand<TestCommand>
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using Acnys.Core.Abstractions;
 using Acnys.Core.Application.Abstractions;
 using Acnys.Core.Infrastructure.Dispatcher;
@@ -102,6 +103,24 @@ namespace Acnys.Core.Infrastructure
             
             return builder;
         }
+
+        public static ContainerBuilder RegisterHttpCommandSender(this ContainerBuilder builder, string uri, HttpClient httpClient = null, object key = null)
+        {
+            if (key != null)
+            {
+                builder.Register((context => new HttpCommandSender(context.Resolve<ILogger>().ForContext<HttpCommandSender>(), uri, httpClient)))
+                    .Keyed<ISendCommand>(key).SingleInstance();
+            }
+            else
+            {
+                builder.Register((context => new HttpCommandSender(context.Resolve<ILogger>().ForContext<HttpCommandSender>(), uri, httpClient)))
+                    .As<ISendCommand>().SingleInstance();
+            }
+            
+            return builder;
+        }
+
+
 
         public static ContainerBuilder RegisterLoopbackQuerySender(this ContainerBuilder builder, object key = null)
         {

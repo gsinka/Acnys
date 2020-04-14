@@ -10,14 +10,14 @@ namespace Acnys.Core
     {
         /// <inheritdoc />
         public Guid RequestId { get; }
-
+        
         /// <summary>
         /// Create new command
         /// </summary>
         /// <param name="requestId">Command id</param>
-        protected Command(Guid? requestId = null)
+        protected Command(Guid requestId)
         {
-            RequestId = requestId ?? Guid.NewGuid();
+            RequestId = requestId;
         }
 
         public override int GetHashCode()

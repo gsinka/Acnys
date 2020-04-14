@@ -64,7 +64,11 @@ namespace Acnys.Core.Tests
             await Assert.ThrowsAsync<InvalidOperationException>(async () => await container.Resolve<ISendQuery>().Send(new TestQuery()));
         }
 
-        public class TestQuery : Query<bool>{ }
+        public class TestQuery : Query<bool>{
+            public TestQuery(Guid? requestId = null) : base(requestId ?? Guid.NewGuid())
+            {
+            }
+        }
 
         public class TestQueryHandler : IHandleQuery<TestQuery, bool>
         {

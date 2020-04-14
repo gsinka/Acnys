@@ -18,9 +18,9 @@ namespace Acnys.Core
         /// Create new event
         /// </summary>
         /// <param name="eventId">Event id</param>
-        protected Event(Guid? eventId = null)
+        protected Event(Guid eventId)
         {
-            EventId = eventId ?? Guid.NewGuid();
+            EventId = eventId;
         }
 
         protected bool Equals(Event other)
