@@ -37,6 +37,8 @@ namespace Acnys.Core.Eventing.Infrastructure.Extensions
             return builder;
         }
 
+        // ReSharper disable once InconsistentNaming
+
         public static ContainerBuilder RegisterEventRecorderService(this ContainerBuilder builder, int eventTTL = 60000)
         {
             builder
