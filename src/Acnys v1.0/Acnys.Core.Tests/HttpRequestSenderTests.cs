@@ -7,6 +7,7 @@ using Acnys.Core.Application.Abstractions;
 using Acnys.Core.Helper;
 using Acnys.Core.Infrastructure;
 using Acnys.Core.Infrastructure.Hosting;
+using Acnys.Core.Tests.Helpers;
 using Autofac;
 using FluentValidation;
 using FluentValidation.Results;
@@ -151,7 +152,7 @@ namespace Acnys.Core.Tests
         {
             var testHost = new HostBuilder()
                 .AddAutofac()
-                .UseSerilog((context, configuration) => ConfigureLog(configuration))
+                .UseSerilog((context, configuration) => configuration.ConfigureLogForTesting(_testOutputHelper))
                 .AddHttpRequestHandler()
                 .ConfigureServices(services =>
                 {
@@ -185,7 +186,7 @@ namespace Acnys.Core.Tests
             var testServer = testHost.GetTestServer();
             var httpClient = testServer.CreateClient();
 
-            Log.Logger = ConfigureLog(new LoggerConfiguration()).CreateLogger();
+            Log.Logger = new LoggerConfiguration().ConfigureLogForTesting(_testOutputHelper).CreateLogger();
 
             var containerBuilder = new ContainerBuilder();
 
@@ -204,11 +205,11 @@ namespace Acnys.Core.Tests
             _badQuerySender = container.ResolveKeyed<ISendQuery>("bad_api");
         }
 
-        private Func<LoggerConfiguration, LoggerConfiguration> ConfigureLog => configuration => configuration
-            .WriteTo.TestOutput(
-                _testOutputHelper,
-                outputTemplate: "[{Timestamp:HH:mm:ss+fff}{EventType:x8} {Level:u3}][{Application}] {Message:lj} [{SourceContext}]{NewLine}{Exception}")
-            .MinimumLevel.Verbose();
+        //private Func<LoggerConfiguration, LoggerConfiguration> ConfigureLog => configuration => configuration
+        //    .WriteTo.TestOutput(
+        //        _testOutputHelper,
+        //        outputTemplate: "[{Timestamp:HH:mm:ss+fff}{EventType:x8} {Level:u3}][{Application}] {Message:lj} [{SourceContext}]{NewLine}{Exception}")
+        //    .MinimumLevel.Verbose();
 
         public class TestCommand : Command
         {

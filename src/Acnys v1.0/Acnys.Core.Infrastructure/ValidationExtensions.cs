@@ -27,6 +27,12 @@ namespace Acnys.Core.Infrastructure
             return RegisterValidatorsFromAssembly(builder, typeof(T).Assembly);
         }
 
+        public static ContainerBuilder RegisterValidator<T>(this ContainerBuilder builder) where T : IValidator
+        {
+            builder.RegisterType<T>().AsImplementedInterfaces().SingleInstance();
+            return builder;
+        }
+
         public static ContainerBuilder RegisterValidatorsFromAssembly(this ContainerBuilder builder, params Assembly[] assemblies)
         {
             builder.RegisterAssemblyTypes(assemblies)
@@ -34,5 +40,7 @@ namespace Acnys.Core.Infrastructure
                 .AsImplementedInterfaces().InstancePerLifetimeScope();
             return builder;
         }
+
+
     }
 }
