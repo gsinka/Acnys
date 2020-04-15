@@ -15,13 +15,13 @@ using Serilog;
 
 namespace Acnys.Core.Infrastructure.Sender
 {
-    public class HttpCommandSender : ISendCommand
+    public class HttpQuerySender : ISendQuery
     {
         private readonly ILogger _log;
         private readonly HttpClient _httpClient;
         private readonly Uri _uri;
 
-        public HttpCommandSender(ILogger log, string uri, HttpClient httpClient = null)
+        public HttpQuerySender(ILogger log, string uri, HttpClient httpClient = null)
         {
             _log = log;
             _httpClient = httpClient ?? new HttpClient();
@@ -29,20 +29,20 @@ namespace Acnys.Core.Infrastructure.Sender
         }
 
         private readonly Func<Type, string> _typeNameBuilder = type => $"{type.FullName}, {type.Assembly.GetName().Name}";
-
-        public async Task Send<T>(T command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : ICommand
+        
+        public async Task<T> Send<T>(IQuery<T> query, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
             arguments.EnrichLog();
 
-            _log.Debug("Sending command to HTTP endpoint {uri}", _uri.ToString());
+            _log.Debug("Sending query to HTTP endpoint {uri}", _uri.ToString());
 
-            _log.Verbose("Command data: {@command}", command);
-            _log.Verbose("Command arguments: {@arguments}", arguments);
+            _log.Verbose("Query data: {@query}", query);
+            _log.Verbose("Query arguments: {@arguments}", arguments);
 
-            var commandJson = JsonConvert.SerializeObject(command);
+            var queryJson = JsonConvert.SerializeObject(query);
 
-            _httpClient.DefaultRequestHeaders.Add(RequestConstants.DomainType, _typeNameBuilder(command.GetType()));
-            _httpClient.DefaultRequestHeaders.Add(RequestConstants.RequestId, command.RequestId.ToString());
+            _httpClient.DefaultRequestHeaders.Add(RequestConstants.DomainType, _typeNameBuilder(query.GetType()));
+            _httpClient.DefaultRequestHeaders.Add(RequestConstants.RequestId, query.RequestId.ToString());
 
             if (arguments != null)
                 foreach (var argument in arguments)
@@ -52,7 +52,7 @@ namespace Acnys.Core.Infrastructure.Sender
 
             var result = await _httpClient.PostAsync(
                 _uri,
-                new StringContent(commandJson, Encoding.UTF8, "application/json"),
+                new StringContent(queryJson, Encoding.UTF8, "application/json"),
                 cancellationToken);
 
             if (!result.IsSuccessStatusCode)
@@ -64,11 +64,14 @@ namespace Acnys.Core.Infrastructure.Sender
 
                 throw errorType switch
                 {
-                    HttpErrorConstants.BusinessError => (Exception) JsonConvert.DeserializeObject<BusinessException>(await result.Content.ReadAsStringAsync()),
+                    HttpErrorConstants.BusinessError => (Exception)JsonConvert.DeserializeObject<BusinessException>(await result.Content.ReadAsStringAsync()),
                     HttpErrorConstants.ValidationError => JsonConvert.DeserializeObject<ValidationException>(await result.Content.ReadAsStringAsync()),
                     _ => new InvalidOperationException($"{(int)result.StatusCode} - {result.ReasonPhrase}")
                 };
             }
+
+            var responseContent = await result.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<T>(responseContent);
         }
     }
 }

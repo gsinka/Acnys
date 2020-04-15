@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Application.Abstractions;
@@ -69,7 +70,7 @@ namespace Acnys.Core.Tests
             await Assert.ThrowsAsync<InvalidOperationException>(async () => await _container.Resolve<IDispatchCommand>().Dispatch(new TestCommandForNoHandler()));
         }
 
-        private class TestCommand : Command
+        public class TestCommand : Command
         {
             public bool ThrowException { get; }
 
@@ -79,13 +80,13 @@ namespace Acnys.Core.Tests
             }
         }
 
-        private class TestCommandForNoHandler : Command {
+        public class TestCommandForNoHandler : Command {
             public TestCommandForNoHandler(Guid? requestId = null) : base(requestId ?? Guid.NewGuid())
             {
             }
         }
 
-        private class TestCommandHandler : IHandleCommand<TestCommand>
+        public class TestCommandHandler : IHandleCommand<TestCommand>
         {
             public TestCommand Command;
             public IDictionary<string, object> Arguments;
@@ -101,7 +102,8 @@ namespace Acnys.Core.Tests
             }
         }
 
-        private class DuplicatedTestCommandHandler : IHandleCommand<TestCommand>
+        [ExcludeFromCodeCoverage]
+        public class DuplicatedTestCommandHandler : IHandleCommand<TestCommand>
         {
             public Task Handle(TestCommand command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
             {

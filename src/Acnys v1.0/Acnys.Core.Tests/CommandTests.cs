@@ -66,30 +66,10 @@ namespace Acnys.Core.Tests
 
             Assert.Equal(deserialized, command);
         }
-
-        [Fact]
-        public void Command_wo_constructor_serialized_and_deserialized_are_equal()
-        {
-            var command = new TestCommandWithoutConstructor();
-            var commandJson = JsonConvert.SerializeObject(command);
-            var deserialized = JsonConvert.DeserializeObject<TestCommandWithoutConstructor>(commandJson, new JsonSerializerSettings()
-            {
-                
-            });
-
-            Assert.Equal(deserialized, command);
-        }
-
+        
         public class TestCommand : Command
         {
             public TestCommand(Guid? requestId = null) : base(requestId ?? Guid.NewGuid()) { }
-        }
-
-        public class TestCommandWithoutConstructor : Command
-        {
-            public TestCommandWithoutConstructor(Guid? requestId = null) : base(requestId ?? Guid.NewGuid())
-            {
-            }
         }
     }
 }

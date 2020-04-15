@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Application.Abstractions;
@@ -90,6 +91,7 @@ namespace Acnys.Core.Tests
             }
         }
 
+        [ExcludeFromCodeCoverage]
         public class DuplicatedTestQueryHandler : IHandleQuery<TestQuery, IDictionary<string, object>>
         {
             public Task<IDictionary<string, object>> Handle(TestQuery query, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)

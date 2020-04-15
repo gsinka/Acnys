@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace Acnys.Core.Tests
@@ -51,11 +52,19 @@ namespace Acnys.Core.Tests
 
         }
 
-        private class TestQuery : Query<object>
+        [Fact]
+        public void Query_with_constructor_serialized_and_deserialized_are_equal()
         {
-            public TestQuery(Guid? requestId = null) : base(requestId ?? Guid.NewGuid())
-            { }
-            public TestQuery(Guid requestId) : base(requestId) { }
+            var query = new TestQuery();
+            var queryJson = JsonConvert.SerializeObject(query);
+            var deserialized = JsonConvert.DeserializeObject(queryJson, typeof(TestQuery));
+
+            Assert.Equal(deserialized, query);
+        }
+
+        public class TestQuery : Query<object>
+        {
+            public TestQuery(Guid? requestId = null) : base(requestId ?? Guid.NewGuid()) { }
         }
     }
 }

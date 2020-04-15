@@ -119,8 +119,22 @@ namespace Acnys.Core.Infrastructure
             
             return builder;
         }
-
-
+        
+        public static ContainerBuilder RegisterHttpQuerySender(this ContainerBuilder builder, string uri, HttpClient httpClient = null, object key = null)
+        {
+            if (key != null)
+            {
+                builder.Register((context => new HttpQuerySender(context.Resolve<ILogger>().ForContext<HttpQuerySender>(), uri, httpClient)))
+                    .Keyed<ISendQuery>(key).SingleInstance();
+            }
+            else
+            {
+                builder.Register((context => new HttpQuerySender(context.Resolve<ILogger>().ForContext<HttpQuerySender>(), uri, httpClient)))
+                    .As<ISendQuery>().SingleInstance();
+            }
+            
+            return builder;
+        }
 
         public static ContainerBuilder RegisterLoopbackQuerySender(this ContainerBuilder builder, object key = null)
         {
