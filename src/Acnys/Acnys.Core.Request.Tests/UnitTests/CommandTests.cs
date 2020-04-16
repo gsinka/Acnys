@@ -17,15 +17,15 @@ namespace Acnys.Core.Request.Tests.UnitTests
             Assert.Equal(requestId, command.RequestId);
         }
 
-        [Fact]
-        public void Query_base_id_check()
-        {
-            var query = new TestQuery();
-            Assert.NotEqual(Guid.Empty, query.RequestId);
+        //[Fact]
+        //public void Query_base_id_check()
+        //{
+        //    var query = new TestQuery();
+        //    Assert.NotEqual(Guid.Empty, query.RequestId);
 
-            var requestId = Guid.NewGuid();
-            query = new TestQuery(requestId);
-            Assert.Equal(requestId, query.RequestId);
-        }
+        //    var requestId = Guid.NewGuid();
+        //    query = new TestQuery(requestId);
+        //    Assert.Equal(requestId, query.RequestId);
+        //}
     }
 }

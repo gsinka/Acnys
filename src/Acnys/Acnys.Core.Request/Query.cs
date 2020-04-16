@@ -7,9 +7,13 @@ namespace Acnys.Core.Request
     {
         public Guid RequestId { get; }
 
-        protected Query(Guid? requestId = default)
+        protected Query() : this(Guid.NewGuid())
         {
-            RequestId = requestId ?? Guid.NewGuid();
+        }
+
+        protected Query(Guid requestId)
+        {
+            RequestId = requestId;
         }
     }
 }
