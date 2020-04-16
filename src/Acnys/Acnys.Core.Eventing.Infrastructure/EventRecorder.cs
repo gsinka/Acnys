@@ -70,19 +70,23 @@ namespace Acnys.Core.Eventing.Infrastructure
 
         public Task ClearRecordedEvents(CancellationToken cancellationToken = default)
         {
-            _events.Clear();
+            lock (_lockObj)
+            {
+                _events.Clear();
+            }
+            
             return Task.CompletedTask;
         }
 
-        public Task<T> WaitFor<T>(CancellationToken cancellationToken = default) where T : IEvent
-        {
-            throw new NotImplementedException();
-        }
+        //public Task<T> WaitFor<T>(CancellationToken cancellationToken = default) where T : IEvent
+        //{
+        //    throw new NotImplementedException();
+        //}
 
-        public Task<T> WaitFor<T>(Func<T, bool> filter, CancellationToken cancellationToken = default) where T : IEvent
-        {
-            throw new NotImplementedException();
-        }
+        //public Task<T> WaitFor<T>(Func<T, bool> filter, CancellationToken cancellationToken = default) where T : IEvent
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         public async Task<T> WaitFor<T>(Func<T, IDictionary<string, object>, bool> filter, TimeSpan timeOut) where T : IEvent
         {
@@ -93,14 +97,17 @@ namespace Acnys.Core.Eventing.Infrastructure
         {
             RemoveExpiredEvents();
 
-            var matchingRecordedEvent = _events
-                .Where(x => x.Event is T)
-                .FirstOrDefault(recordedEvent => filter((T)recordedEvent.Event, recordedEvent.Arguments));
-
-            if (matchingRecordedEvent != null)
+            lock (_lockObj)
             {
-                _log.Debug("Matching event for {eventType} returned from event store with age of {eventAge} ms", typeof(T).FullName, (_clock.UtcNow - matchingRecordedEvent.TimeStamp).TotalMilliseconds);
-                return Task.FromResult((T)matchingRecordedEvent.Event);
+                var matchingRecordedEvent = _events
+                    .Where(x => x.Event is T)
+                    .FirstOrDefault(recordedEvent => filter((T)recordedEvent.Event, recordedEvent.Arguments));
+
+                if (matchingRecordedEvent != null)
+                {
+                    _log.Debug("Matching event for {eventType} returned from event store with age of {eventAge} ms", typeof(T).FullName, (_clock.UtcNow - matchingRecordedEvent.TimeStamp).TotalMilliseconds);
+                    return Task.FromResult((T)matchingRecordedEvent.Event);
+                }
             }
 
             var task = new WaitTask((evnt, args) => filter((T)evnt, args), typeof(T));
