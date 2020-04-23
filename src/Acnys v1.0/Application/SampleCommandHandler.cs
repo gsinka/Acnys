@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Application.Abstractions;
 using Acnys.Core.Domain;
-using Acnys.Core.Helper;
 using Api;
 using Domain;
 
@@ -24,6 +22,14 @@ namespace Application
         public async Task Handle(SampleCommand command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
             await _repository.Execute(command.Id, aggregate => aggregate.DoSomething());
+        }
+    }
+
+    public class SampleQueryHandler : IHandleQuery<SampleQuery, SampleQuery.Result>
+    {
+        public Task<SampleQuery.Result> Handle(SampleQuery query, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

@@ -68,8 +68,7 @@ namespace Acnys.AspNet
                 return Ok();
             }
 
-            if (requestType.GetInterfaces()
-                .Any(type => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IQuery<>)))
+            if (requestType.GetInterfaces().Any(type => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IQuery<>)))
             {
                 var result = await _queryDispatcher.Dispatch(request, arguments, cancellationToken);
                 return Ok(result);

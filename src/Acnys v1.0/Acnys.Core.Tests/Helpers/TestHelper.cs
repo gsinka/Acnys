@@ -1,5 +1,6 @@
 ﻿using System;
 using Serilog;
+using Serilog.Events;
 using Xunit.Abstractions;
 
 namespace Acnys.Core.Tests.Helpers
@@ -12,7 +13,9 @@ namespace Acnys.Core.Tests.Helpers
                 testOutputHelper,
                 outputTemplate:
                 "[{Timestamp:HH:mm:ss+fff}{EventType:x8} {Level:u3}][{Application}] {Message:lj} [{SourceContext}]{NewLine}{Exception}")
-            .MinimumLevel.Verbose();
+                .MinimumLevel.Verbose()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                ;
 
             return config;
         }

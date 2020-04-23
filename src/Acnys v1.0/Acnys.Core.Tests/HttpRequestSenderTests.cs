@@ -205,12 +205,6 @@ namespace Acnys.Core.Tests
             _badQuerySender = container.ResolveKeyed<ISendQuery>("bad_api");
         }
 
-        //private Func<LoggerConfiguration, LoggerConfiguration> ConfigureLog => configuration => configuration
-        //    .WriteTo.TestOutput(
-        //        _testOutputHelper,
-        //        outputTemplate: "[{Timestamp:HH:mm:ss+fff}{EventType:x8} {Level:u3}][{Application}] {Message:lj} [{SourceContext}]{NewLine}{Exception}")
-        //    .MinimumLevel.Verbose();
-
         public class TestCommand : Command
         {
             public string Type { get; }

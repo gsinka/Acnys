@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using Acnys.Core.Abstractions;
 using Acnys.Core.Application.Abstractions;
@@ -17,6 +18,18 @@ namespace Acnys.Core.Infrastructure
 
         public static ContainerBuilder RegisterCommandHandler<T>(this ContainerBuilder builder)
         {
+            if (typeof(T).GetInterfaces().All(type => type.GetGenericTypeDefinition() != typeof(IHandleCommand<>))) 
+                throw new InvalidOperationException("The given type cannot be registered as command handler");
+
+            builder.RegisterType<T>().AsImplementedInterfaces().InstancePerLifetimeScope();
+            return builder;
+        }
+        
+        public static ContainerBuilder RegisterQueryHandler<T>(this ContainerBuilder builder)
+        {
+            if (typeof(T).GetInterfaces().All(type => type.GetGenericTypeDefinition() != typeof(IHandleQuery<,>)))
+                throw new InvalidOperationException("The given type cannot be registered as query handler");
+
             builder.RegisterType<T>().AsImplementedInterfaces().InstancePerLifetimeScope();
             return builder;
         }

@@ -38,7 +38,7 @@ namespace Acnys.Core.Tests
             builder.RegisterCommandHandler<TestCommandHandler>();
 
             builder.RegisterValidator<TestQueryValidator>();
-            builder.RegisterCommandHandler<TestQueryHandler>();
+            builder.RegisterQueryHandler<TestQueryHandler>();
 
             var container = builder.Build();
             
