@@ -65,7 +65,7 @@ namespace Acnys.Core.Tests
             _host = new HostBuilder()
                 .AddAutofac()
                 .UseSerilog((context, configuration) => configuration.ConfigureLogForTesting(_testOutputHelper))
-                .AddHttpRequestHandler()
+                .AddAspNetControllers()
                 .ConfigureServices(services =>
                 {
                     services.AddControllers().AddApplicationPart(typeof(HttpRequestSenderTests).Assembly).AddControllersAsServices();

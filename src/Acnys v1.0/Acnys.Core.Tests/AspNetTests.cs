@@ -74,7 +74,7 @@ namespace Acnys.Core.Tests
                 .AddAutofac()
                 .AddSerilog((context, configuration) => configuration.ConfigureLogForTesting(_testOutputHelper))
                 .AddClock<ComputerClock>()
-                .AddHttpRequestHandler()
+                .AddAspNetControllers()
                 .ConfigureContainer<ContainerBuilder>((context, builder) =>
                 {
                     builder.RegisterType<ComputerClock>().AsImplementedInterfaces();
