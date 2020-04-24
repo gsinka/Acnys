@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Serilog;
 
 namespace Acnys.Core.Infrastructure.Serilog
 {
+    [ExcludeFromCodeCoverage]
     internal class LoggerProvider
     {
         readonly ILogger _logger;

@@ -52,10 +52,26 @@ namespace Acnys.Core.Infrastructure
             return builder;
         }
 
+        public static ContainerBuilder RegisterEventHandler<T>(this ContainerBuilder builder)
+        {
+            if (!(
+                typeof(IHandleEvent).IsAssignableFrom(typeof(T)) 
+                || typeof(T).GetInterfaces().Any(type => type.GetGenericTypeDefinition() == typeof(IHandleEvent<>)))
+            )
+                throw new InvalidOperationException("The given type cannot be registered as command handler");
+
+            builder.RegisterType<T>().AsImplementedInterfaces().InstancePerLifetimeScope();
+            return builder;
+        }
+
         public static ContainerBuilder RegisterEventHandlersFromAssemblyOf<T>(this ContainerBuilder builder)
         {
             builder.RegisterAssemblyTypes(typeof(T).Assembly)
                 .AsClosedTypesOf(typeof(IHandleEvent<>))
+                .AsImplementedInterfaces();
+
+            builder.RegisterAssemblyTypes(typeof(T).Assembly)
+                .Where(type => typeof(IHandleEvent).IsAssignableFrom(type))
                 .AsImplementedInterfaces();
 
             return builder;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using Autofac;
@@ -10,6 +11,7 @@ using Module = Autofac.Module;
 
 namespace Acnys.Core.Infrastructure.Serilog
 {
+    [ExcludeFromCodeCoverage]
     internal class ContextualLoggingModule : Module
     {
         const string TargetTypeParameterName = "Autofac.AutowiringPropertyInjector.InstanceType";

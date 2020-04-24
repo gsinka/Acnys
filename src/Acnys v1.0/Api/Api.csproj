@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="8.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Acnys.Core\Acnys.Core.csproj" />
     <ProjectReference Include="..\Api.Events\Api.Events.csproj" />
   </ItemGroup>

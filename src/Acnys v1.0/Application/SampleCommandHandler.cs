@@ -25,11 +25,11 @@ namespace Application
         }
     }
 
-    public class SampleQueryHandler : IHandleQuery<SampleQuery, SampleQuery.Result>
+    public class SampleCommandForValidationCommandHandler : IHandleCommand<SampleCommandForValidation>
     {
-        public Task<SampleQuery.Result> Handle(SampleQuery query, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
+        public Task Handle(SampleCommandForValidation command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
-            throw new System.NotImplementedException();
+            return Task.CompletedTask;
         }
     }
 }

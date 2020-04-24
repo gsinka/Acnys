@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Acnys.Core.Application.Abstractions;
 using Acnys.Core.Infrastructure;
 using Acnys.Core.Tests.Helpers;
+using Api;
+using Application;
 using Autofac;
 using FluentValidation;
 using Serilog;
@@ -40,6 +42,10 @@ namespace Acnys.Core.Tests
             builder.RegisterValidator<TestQueryValidator>();
             builder.RegisterQueryHandler<TestQueryHandler>();
 
+            builder.RegisterValidatorsFromAssemblyOf<SampleCommand>();
+            builder.RegisterCommandHandler<SampleCommandForValidationCommandHandler>();
+
+
             var container = builder.Build();
             
             _commandSender = container.Resolve<ISendCommand>();
@@ -50,6 +56,7 @@ namespace Acnys.Core.Tests
         public async Task Test_command_validation_succeeds()
         {
             await _commandSender.Send(new TestCommand("has data"));
+            await _commandSender.Send(new SampleCommandForValidation("has data"));
         }
         
         [Fact]
@@ -62,6 +69,9 @@ namespace Acnys.Core.Tests
         public async Task Test_command_validation_fails()
         {
             var exception = await Assert.ThrowsAsync<ValidationException>( async () => await _commandSender.Send(new TestCommand(string.Empty)));
+            Assert.NotEmpty(exception.Message);
+
+            exception = await Assert.ThrowsAsync<ValidationException>(async () => await _commandSender.Send(new SampleCommandForValidation(string.Empty)));
             Assert.NotEmpty(exception.Message);
         }
 
@@ -85,7 +95,7 @@ namespace Acnys.Core.Tests
             var exception = await Assert.ThrowsAsync<ValidationException>( async () => await _querySender.Send(new TestQuery(string.Empty)));
             Assert.NotEmpty(exception.Message);
         }
-
+        
         public class TestCommand : Command
         {
             public string Data { get; }
