@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Serilog;
 
 namespace Acnys.AspNet
@@ -14,18 +12,6 @@ namespace Acnys.AspNet
 
             path ??= "";
             app.MapControllerRoute("generic", $"{((path ?? "").EndsWith("/") ? path : path + "/")}{{controller=GenericRequestHandler}}/{{action=post}}");
-        }
-    }
-
-    public static class AspNetExtensions
-    {
-        public static IHostBuilder AddAspNetControllers(this IHostBuilder hostBuilder)
-        {
-            return hostBuilder.ConfigureServices((context, services) =>
-            {
-                Log.Verbose("Adding HTTP request handler");
-                services.AddControllers().AddApplicationPart(typeof(GenericRequestHandlerController).Assembly);
-            });
         }
     }
 }
