@@ -34,10 +34,7 @@ namespace Acnys.Core.Request.Infrastructure.Dispatchers
             return Task.Run(async() =>
             {
                 _log.Debug("Dispatching command {commandType}", typeof(T).Name);
-
                 _log.Verbose("Command object: {@command}", command);
-
-                _log.Verbose("Lifetime scope {scopeId} created for command", _scope.GetHashCode());
 
                 try
                 {
@@ -47,7 +44,7 @@ namespace Acnys.Core.Request.Infrastructure.Dispatchers
 
                     var handler = (IHandleCommand<T>)_scope.Resolve(handlerType);
                             
-                    _log.Verbose("Handling {commandType} with {handler}", commandType.Name, handler.GetType().Name);
+                    _log.Verbose("Handling {commandType} with {handler} ({handlerId})", commandType, handler.GetType().Name, handler.GetHashCode());
                     await handler.Handle(command, arguments, cancellationToken);
 
                     _log.Debug("Command dispatch completed successfully");
@@ -56,10 +53,6 @@ namespace Acnys.Core.Request.Infrastructure.Dispatchers
                 {
                     _log.Error(exception, "Command dispatch failed");
                     throw;
-                }
-                finally
-                {
-                    _log.Verbose("Ending lifetime scope {scopeId}", _scope.GetHashCode());
                 }
             }, cancellationToken);
         }

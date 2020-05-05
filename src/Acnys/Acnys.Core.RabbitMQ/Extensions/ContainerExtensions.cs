@@ -37,7 +37,7 @@ namespace Acnys.Core.RabbitMQ.Extensions
                     new RabbitEventListener(
                         context.Resolve<ILogger>().ForContext<RabbitEventListener>(),
                         context.Resolve<IConnection>(),
-                        context.Resolve<IDispatchEvent>(),
+                        context.Resolve<ILifetimeScope>(),
                         queue,
                         string.Empty,
                         null,

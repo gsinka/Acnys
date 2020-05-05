@@ -7,6 +7,7 @@ using Acnys.Core.Eventing.Abstractions;
 using Acnys.Core.Extensions;
 using Acnys.Core.RabbitMQ.Extensions;
 using Acnys.Core.ValueObjects;
+using Autofac;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -19,7 +20,7 @@ namespace Acnys.Core.RabbitMQ
     {
         private readonly ILogger _log;
         private readonly IConnection _connection;
-        private readonly IDispatchEvent _eventDispatcher;
+        private readonly ILifetimeScope _scope;
         public readonly string Queue;
         public readonly string ConsumerTag;
         private readonly IDictionary<string, object> _consumerArgs;
@@ -29,7 +30,7 @@ namespace Acnys.Core.RabbitMQ
         public RabbitEventListener(
             ILogger log,
             IConnection connection,
-            IDispatchEvent eventDispatcher,
+            ILifetimeScope scope,
             string queue,
             string consumerTag,
             IDictionary<string, object> consumerArgs,
@@ -37,7 +38,7 @@ namespace Acnys.Core.RabbitMQ
         {
             _log = log;
             _connection = connection;
-            _eventDispatcher = eventDispatcher;
+            _scope = scope;
             Queue = queue;
             ConsumerTag = consumerTag;
             _consumerArgs = consumerArgs;
@@ -69,23 +70,33 @@ namespace Acnys.Core.RabbitMQ
 
         private void OnReceived(object sender, BasicDeliverEventArgs e)
         {
+            using var scope = _scope.BeginLifetimeScope();
+            _log.Debug("New lifetime scope created for event dispatcher ({scopeId})", scope.GetHashCode());
+
             try
             {
-                _log.Debug("Receiving new message from exchange '{exchange}' with routing key '{routingKey}'", e.Exchange, e.RoutingKey);
+                _log.Debug("Receiving new message from exchange '{exchange}' with routing key '{routingKey}'",
+                    e.Exchange, e.RoutingKey);
 
                 var (evnt, args) = _eventMapper(_log, Consumer, e);
                 args.EnrichLogContextWithCorrelation();
 
-                _eventDispatcher.Dispatch(evnt, args, CancellationToken.None);
+                scope.Resolve<IDispatchEvent>().Dispatch(evnt, args, CancellationToken.None);
 
                 _log.Debug("Sending ACK to message queue for delivery tag '{deliveryTag}'", e.DeliveryTag);
                 Consumer.Model.BasicAck(e.DeliveryTag, false);
+
 
             }
             catch (Exception exception)
             {
                 _log.Error(exception, "Message delivery failed");
                 Consumer.Model.BasicNack(e.DeliveryTag, false, false);
+            }
+            finally
+            {
+                _log.Debug("Ending lifetime scope ({scopeId})", scope.GetHashCode());
+
             }
         }
 
