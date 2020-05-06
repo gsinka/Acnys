@@ -74,7 +74,7 @@ namespace WebApplication1
                             factory.Uri = new Uri(context.Configuration["Rabbit:Uri"]);
                             factory.AutomaticRecoveryEnabled = true;
 
-                        }, "test", "test")
+                        }, "test", "test", consumerCount:5, consumerTag: "test-tag")
 
                         .ConfigureContainer<ContainerBuilder>((context, builder) =>
                         {

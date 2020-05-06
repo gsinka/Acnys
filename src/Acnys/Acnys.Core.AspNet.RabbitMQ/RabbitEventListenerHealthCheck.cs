@@ -17,7 +17,7 @@ namespace Acnys.Core.AspNet.RabbitMQ
         }
         public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = new CancellationToken())
         {
-            var consumerState = _listeners.ToDictionary(listener => listener.ConsumerTag, listener => listener.Consumer.IsRunning);
+            var consumerState = _listeners.ToDictionary(listener => listener.ConsumerTag, listener => listener._consumers.All(c => c.IsRunning));
 
             return Task.FromResult(new HealthCheckResult(
                 consumerState.Values.All(x => x) ? HealthStatus.Healthy : HealthStatus.Unhealthy,
