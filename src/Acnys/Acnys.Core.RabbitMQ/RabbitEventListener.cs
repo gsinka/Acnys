@@ -84,12 +84,11 @@ namespace Acnys.Core.RabbitMQ
                 var (evnt, args) = _eventMapper(_log, Consumer, e);
                 args.EnrichLogContextWithCorrelation();
 
-                scope.Resolve<IDispatchEvent>().Dispatch(evnt, args, CancellationToken.None);
+                var dispatchTask = scope.Resolve<IDispatchEvent>().Dispatch(evnt, args, CancellationToken.None);
+                dispatchTask.Wait();
 
                 _log.Debug("Sending ACK to message queue for delivery tag '{deliveryTag}'", e.DeliveryTag);
                 Consumer.Model.BasicAck(e.DeliveryTag, false);
-
-
             }
             catch (Exception exception)
             {
