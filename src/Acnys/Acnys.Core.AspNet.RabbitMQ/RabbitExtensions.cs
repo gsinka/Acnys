@@ -10,13 +10,13 @@ namespace Acnys.Core.AspNet.RabbitMQ
 {
     public static class RabbitExtensions
     {
-        public static IHostBuilder AddRabbit(this IHostBuilder hostBuilder, Action<HostBuilderContext, ConnectionFactory> connectionBuilder, string exchange, string queue, bool autoStartListener = true)
+        public static IHostBuilder AddRabbit(this IHostBuilder hostBuilder, Action<HostBuilderContext, ConnectionFactory> connectionBuilder, string exchange, string queue, bool requeueOnNack = false, bool autoStartListener = true)
         {
             return hostBuilder.ConfigureContainer<ContainerBuilder>((context, builder) =>
                 {
                     builder.AddRabbitConnection(factory => connectionBuilder(context, factory));
                     builder.AddRabbitEventPublisher(exchange);
-                    builder.AddRabbitEventListener(queue);
+                    builder.AddRabbitEventListener(queue, requeueOnNack);
                     builder.RegisterType<RabbitService>().AsImplementedInterfaces().SingleInstance();
 
                     if (autoStartListener) builder.AutoStartRabbitEventListeners();
@@ -36,6 +36,25 @@ namespace Acnys.Core.AspNet.RabbitMQ
                         builder.AddRabbitConnection(factory => connectionBuilder(context, factory));
                         builder.AddRabbitEventPublisher(exchange);
                         builder.AddRabbitEventListener(queue);
+                        builder.RegisterType<RabbitService>().AsImplementedInterfaces().SingleInstance();
+
+                        if (autoStartListener) builder.AutoStartRabbitEventListeners();
+                    })
+
+                    .ConfigureServices((context, services) => services
+                        .AddHealthChecks()
+                        .AddCheck<RabbitEventListenerHealthCheck>("RabbitMQ event listener", tags: new[] { "Readiness" }))
+                ;
+        }
+
+        public static IHostBuilder AddRabbit(this IHostBuilder hostBuilder, Action<HostBuilderContext, ConnectionFactory> connectionBuilder, Func<HostBuilderContext, (string exchange, string queue, bool requeueOnNack, bool autoStartListener)> properties)
+        {
+            return hostBuilder.ConfigureContainer<ContainerBuilder>((context, builder) =>
+                    {
+                        var (exchange, queue, requeueOnNack, autoStartListener) = properties(context);
+                        builder.AddRabbitConnection(factory => connectionBuilder(context, factory));
+                        builder.AddRabbitEventPublisher(exchange);
+                        builder.AddRabbitEventListener(queue, requeueOnNack);
                         builder.RegisterType<RabbitService>().AsImplementedInterfaces().SingleInstance();
 
                         if (autoStartListener) builder.AutoStartRabbitEventListeners();

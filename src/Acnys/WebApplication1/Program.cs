@@ -68,7 +68,7 @@ namespace WebApplication1
 
                         .AddRequestSender(request => "http")
                         .AddHttpRequestSender(context => "http://localhost:5000/api", "http")
-
+                        
                         .AddRabbit((context, factory) =>
                         {
                             factory.Uri = new Uri(context.Configuration["Rabbit:Uri"]);
