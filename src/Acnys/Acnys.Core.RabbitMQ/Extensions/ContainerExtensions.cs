@@ -29,7 +29,7 @@ namespace Acnys.Core.RabbitMQ.Extensions
             return builder;
         }
 
-        public static ContainerBuilder AddRabbitEventListener(this ContainerBuilder builder, string queue)
+        public static ContainerBuilder AddRabbitEventListener(this ContainerBuilder builder, string queue, bool requeueOnNack = false)
         {
             Log.Debug("Adding RabbitMQ event listener for queue {queue}", queue);
 
@@ -40,6 +40,7 @@ namespace Acnys.Core.RabbitMQ.Extensions
                         context.Resolve<ILifetimeScope>(),
                         queue,
                         string.Empty,
+                        requeueOnNack,
                         null,
                         RabbitEventListener.Default
                     )

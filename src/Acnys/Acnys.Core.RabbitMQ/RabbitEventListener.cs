@@ -23,6 +23,7 @@ namespace Acnys.Core.RabbitMQ
         private readonly ILifetimeScope _scope;
         public readonly string Queue;
         public readonly string ConsumerTag;
+        private readonly bool _requeueOnNack;
         private readonly IDictionary<string, object> _consumerArgs;
         private readonly Func<ILogger, EventingBasicConsumer, BasicDeliverEventArgs, (IEvent evnt, IDictionary<string, object> args)> _eventMapper;
         public EventingBasicConsumer Consumer;
@@ -33,6 +34,7 @@ namespace Acnys.Core.RabbitMQ
             ILifetimeScope scope,
             string queue,
             string consumerTag,
+            bool requeueOnNack,
             IDictionary<string, object> consumerArgs,
             Func<ILogger, EventingBasicConsumer, BasicDeliverEventArgs, (IEvent evnt, IDictionary<string, object> args)> eventMapper)
         {
@@ -41,6 +43,7 @@ namespace Acnys.Core.RabbitMQ
             _scope = scope;
             Queue = queue;
             ConsumerTag = consumerTag;
+            _requeueOnNack = requeueOnNack;
             _consumerArgs = consumerArgs;
             _eventMapper = eventMapper;
         }
@@ -91,7 +94,7 @@ namespace Acnys.Core.RabbitMQ
             catch (Exception exception)
             {
                 _log.Error(exception, "Message delivery failed");
-                Consumer.Model.BasicNack(e.DeliveryTag, false, false);
+                Consumer.Model.BasicNack(e.DeliveryTag, false, _requeueOnNack);
             }
             finally
             {
