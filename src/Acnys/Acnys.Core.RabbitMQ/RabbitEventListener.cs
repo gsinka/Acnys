@@ -27,7 +27,7 @@ namespace Acnys.Core.RabbitMQ
         private readonly Func<ILogger, EventingBasicConsumer, BasicDeliverEventArgs, (IEvent evnt, IDictionary<string, object> args)> _eventMapper;
         //public EventingBasicConsumer Consumer;
 
-        public IList<EventingBasicConsumer> _consumers = new List<EventingBasicConsumer>();
+        public IList<EventingBasicConsumer> Consumers = new List<EventingBasicConsumer>();
 
         public RabbitEventListener(
             ILogger log,
@@ -53,10 +53,10 @@ namespace Acnys.Core.RabbitMQ
 
         public void Start()
         {
-            var channel = _connection.CreateModel();
-            
+
             for (var i = 0; i < _consumerCount; i++)
             {
+                var channel = _connection.CreateModel();
                 var consumer = new EventingBasicConsumer(channel);
 
                 consumer.Received += OnReceived;
@@ -78,6 +78,8 @@ namespace Acnys.Core.RabbitMQ
                 {
                     _log.Error(exception, "RabbitMQ consumer failed to create for {queue}", Queue);
                 }
+
+                Consumers.Add(consumer);
             }
         }
 

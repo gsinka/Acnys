@@ -7,9 +7,9 @@ namespace WebApplication1
 {
     public class TestEventHandler : IHandleEvent<TestEvent>
     {
-        public Task Handle(TestEvent @event, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
+        public async Task Handle(TestEvent @event, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
-            return Task.CompletedTask;
+            await Task.Delay(500, cancellationToken);
         }
     }
 }
