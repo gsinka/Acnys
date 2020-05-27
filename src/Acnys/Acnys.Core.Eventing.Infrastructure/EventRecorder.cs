@@ -40,7 +40,7 @@ namespace Acnys.Core.Eventing.Infrastructure
                 foreach (var oldEvent in _events.Where(recordedEvent => recordedEvent.TimeStamp < maxTime).ToList())
                 {
                     _log.Debug("Removing expired event {eventType} with age of {eventAge} from event store", oldEvent.Event.GetType().FullName, (_clock.UtcNow - oldEvent.TimeStamp).TotalMilliseconds);
-                    _events.RemoveAll(recordedEvent => recordedEvent.TimeStamp < maxTime);
+                    _events.Remove(oldEvent);
                 }
             }
         }
@@ -50,7 +50,11 @@ namespace Acnys.Core.Eventing.Infrastructure
             RemoveExpiredEvents();
 
             _log.Debug("Recording event {eventType} in event store", @event.GetType().FullName);
-            _events.Add(new RecordedEvent(_clock.UtcNow, @event, arguments));
+
+            lock (_lockObj)
+            {
+                _events.Add(new RecordedEvent(_clock.UtcNow, @event, arguments));
+            }
 
             return Task.Run(() =>
             {
