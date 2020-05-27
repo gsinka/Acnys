@@ -34,6 +34,7 @@ namespace WebApplication1
                     hostBuilder
 
                         .AddAutofac()
+                        .AddComputerClock()
                         .AddSerilog((context, config) =>
                         {
                             config
@@ -93,7 +94,7 @@ namespace WebApplication1
                         .ConfigureServices((context, services) => {
 
                             //services.AddTransient<TestMiddleware>();
-                            services.AddControllers().AddApplicationPart(Assembly.GetEntryAssembly()).AddControllersAsServices();
+                            services.AddControllers(options => { options.UseRequestBinder(); }).AddApplicationPart(Assembly.GetEntryAssembly()).AddControllersAsServices();
 
                             services.AddAuthorization(options => 
                             {
