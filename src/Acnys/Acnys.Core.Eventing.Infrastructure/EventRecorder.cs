@@ -18,7 +18,10 @@ namespace Acnys.Core.Eventing.Infrastructure
         private readonly IList<WaitTask> _tasks = new List<WaitTask>();
         private readonly object _lockObj = new object();
 
-        public IEnumerable<RecordedEvent> RecordedEvents => _events;
+        public IEnumerable<RecordedEvent> RecordedEvents
+        {
+            get { lock (_lockObj) { return _events.ToArray();} }
+        }
 
         // ReSharper disable once InconsistentNaming
 
@@ -29,7 +32,7 @@ namespace Acnys.Core.Eventing.Infrastructure
             _eventTtl = eventTTL;
         }
 
-        void RemoveExpiredEvents()
+        private void RemoveExpiredEvents()
         {
             lock (_lockObj)
             {
@@ -77,16 +80,6 @@ namespace Acnys.Core.Eventing.Infrastructure
             
             return Task.CompletedTask;
         }
-
-        //public Task<T> WaitFor<T>(CancellationToken cancellationToken = default) where T : IEvent
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //public Task<T> WaitFor<T>(Func<T, bool> filter, CancellationToken cancellationToken = default) where T : IEvent
-        //{
-        //    throw new NotImplementedException();
-        //}
 
         public async Task<T> WaitFor<T>(Func<T, IDictionary<string, object>, bool> filter, TimeSpan timeOut) where T : IEvent
         {
