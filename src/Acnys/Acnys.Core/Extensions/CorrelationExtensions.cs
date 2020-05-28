@@ -51,8 +51,11 @@ namespace Acnys.Core.Extensions
 
         public static void EnrichLogContextWithCorrelation(this IDictionary<string, object> args)
         {
-            LogContext.PushProperty(RequestConstants.CorrelationId, args.CorrelationId());
-            LogContext.PushProperty(RequestConstants.CausationId, args.CausationId());
+            var correlationId = args?.CorrelationId();
+            if (correlationId != null) LogContext.PushProperty(RequestConstants.CorrelationId, correlationId);
+
+            var causationId = args?.CausationId();
+            if (causationId != null) LogContext.PushProperty(RequestConstants.CausationId, causationId);
         }
     }
 }
