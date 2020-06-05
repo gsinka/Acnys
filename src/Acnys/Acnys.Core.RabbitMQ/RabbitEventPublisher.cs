@@ -44,17 +44,22 @@ namespace Acnys.Core.RabbitMQ
             _publishContext = publishContext;
         }
 
-        public Task Publish<T>(T @event, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : IEvent
+        public Task Publish<T>(T @event, string routingKey, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : IEvent
         {
             arguments.EnrichLogContextWithCorrelation();
 
             _log.Debug("Publishing event {eventType} to exchange {exchangeName}", typeof(T).Name, _exchange);
-            var (routingKey, mandatory, props, body) = _publishContext(@event, arguments);
+            var (contextRoutingKey, mandatory, props, body) = _publishContext(@event, arguments);
             _log.Verbose("Event data: {@event}", @event);
-            _log.Verbose("Routing key: {routingKey}, mandatory: {mandatory}, event arguments: {@eventProps}", routingKey, mandatory, props);
+            _log.Verbose("Routing key: {routingKey}, mandatory: {mandatory}, event arguments: {@eventProps}", routingKey ?? contextRoutingKey, mandatory, props);
 
-            _model.BasicPublish(_exchange, routingKey, mandatory, props, body);
+            _model.BasicPublish(_exchange, routingKey ?? contextRoutingKey, mandatory, props, body);
             return Task.CompletedTask;
+        }
+
+        public Task Publish<T>(T @event, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : IEvent
+        {
+            return Publish(@event, null, arguments, cancellationToken);
         }
 
         private static readonly Func<Type, string> TypeNameBuilder = type => $"{type.FullName}, {type.Assembly.GetName().Name}";
