@@ -36,11 +36,5 @@ namespace Acnys.Core.RabbitMQ
             _log.Debug("Binding queue {queue} with exchange {exchange} with routing key '{routingKey}'", queue, exchange, routingKey);
             Model.QueueBind(queue, exchange, routingKey, arguments);
         }
-
-        public void ExchangeBind(string destination, string source, string routingKey = "", IDictionary<string, object> arguments = null)
-        {
-            _log.Debug("Binding exchange {destination} with exchange {source} with routing key '{routingKey}'", destination, source, routingKey);
-            Model.ExchangeBind(destination, source, routingKey, arguments);
-        }
     }
 }
