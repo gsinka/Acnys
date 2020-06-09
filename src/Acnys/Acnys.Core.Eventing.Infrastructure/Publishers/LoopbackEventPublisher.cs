@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using Acnys.Core.Eventing.Abstractions;
+﻿using Acnys.Core.Eventing.Abstractions;
 using Acnys.Core.Extensions;
 using Serilog;
-using Serilog.Context;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Acnys.Core.Eventing.Infrastructure.Publishers
 {
@@ -21,8 +20,13 @@ namespace Acnys.Core.Eventing.Infrastructure.Publishers
 
         public async Task Publish<T>(T @event, IDictionary<string, object> arguments, CancellationToken cancellationToken = default) where T : IEvent
         {
+            await Publish(@event, null, arguments, cancellationToken);
+        }
+
+        public async Task Publish<T>(T @event, string routingKey, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : IEvent
+        {
             arguments.EnrichLogContextWithCorrelation();
-            
+
             await _eventDispatcher.Dispatch(@event, arguments, cancellationToken);
         }
     }
