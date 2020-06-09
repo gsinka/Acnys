@@ -9,6 +9,7 @@ namespace Acnys.Core.Eventing.Abstractions
     /// </summary>
     public interface IDispatchEvent
     {
+
         /// <summary>
         /// Dispatch event to the registred handlers
         /// </summary>
