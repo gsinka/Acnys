@@ -18,7 +18,10 @@ namespace Acnys.Core.Eventing.Infrastructure
         private readonly IList<WaitTask> _tasks = new List<WaitTask>();
         private readonly object _lockObj = new object();
 
-        public IEnumerable<RecordedEvent> RecordedEvents => _events;
+        public IEnumerable<RecordedEvent> RecordedEvents
+        {
+            get { lock (_lockObj) { return _events.ToArray();} }
+        }
 
         // ReSharper disable once InconsistentNaming
 
@@ -29,7 +32,7 @@ namespace Acnys.Core.Eventing.Infrastructure
             _eventTtl = eventTTL;
         }
 
-        void RemoveExpiredEvents()
+        private void RemoveExpiredEvents()
         {
             lock (_lockObj)
             {
@@ -37,7 +40,7 @@ namespace Acnys.Core.Eventing.Infrastructure
                 foreach (var oldEvent in _events.Where(recordedEvent => recordedEvent.TimeStamp < maxTime).ToList())
                 {
                     _log.Debug("Removing expired event {eventType} with age of {eventAge} from event store", oldEvent.Event.GetType().FullName, (_clock.UtcNow - oldEvent.TimeStamp).TotalMilliseconds);
-                    _events.RemoveAll(recordedEvent => recordedEvent.TimeStamp < maxTime);
+                    _events.Remove(oldEvent);
                 }
             }
         }
@@ -47,7 +50,11 @@ namespace Acnys.Core.Eventing.Infrastructure
             RemoveExpiredEvents();
 
             _log.Debug("Recording event {eventType} in event store", @event.GetType().FullName);
-            _events.Add(new RecordedEvent(_clock.UtcNow, @event, arguments));
+
+            lock (_lockObj)
+            {
+                _events.Add(new RecordedEvent(_clock.UtcNow, @event, arguments));
+            }
 
             return Task.Run(() =>
             {
@@ -77,16 +84,6 @@ namespace Acnys.Core.Eventing.Infrastructure
             
             return Task.CompletedTask;
         }
-
-        //public Task<T> WaitFor<T>(CancellationToken cancellationToken = default) where T : IEvent
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //public Task<T> WaitFor<T>(Func<T, bool> filter, CancellationToken cancellationToken = default) where T : IEvent
-        //{
-        //    throw new NotImplementedException();
-        //}
 
         public async Task<T> WaitFor<T>(Func<T, IDictionary<string, object>, bool> filter, TimeSpan timeOut) where T : IEvent
         {

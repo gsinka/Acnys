@@ -40,7 +40,8 @@ namespace Acnys.Core.Request.Infrastructure.Validation
             {
                 _log.Debug("No validator found for command {commandType}", command.GetType());
             }
-            
+
+            _log.Verbose("Handling {commandType} with {handler} ({handlerId})", typeof(TCommand), _commandHandler.GetType().Name, _commandHandler.GetHashCode());
             await _commandHandler.Handle(command, arguments, cancellationToken);
         }
     }

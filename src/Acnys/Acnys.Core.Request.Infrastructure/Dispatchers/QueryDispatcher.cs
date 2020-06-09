@@ -31,12 +31,8 @@ namespace Acnys.Core.Request.Infrastructure.Dispatchers
             var queryName = query.GetType().Name;
 
             _log.Verbose("Dispatching query {queryName}", queryName);
-
             _log.Verbose("Query object: {@query}", query);
 
-            //using var scope = _scope.BeginLifetimeScope();
-
-            _log.Verbose("Lifetime scope {scopeId} created for query", _scope.GetHashCode());
 
             try
             {
@@ -47,7 +43,7 @@ namespace Acnys.Core.Request.Infrastructure.Dispatchers
                 var handler = (dynamic) _scope.Resolve(requestedHandlerType);
                 Type handlerType = handler.GetType();
 
-                _log.Verbose("Handling {queryType} with {handlerType}", queryType.Name, handlerType.Name);
+                _log.Verbose("Handling {queryType} with {handlerType} ({handlerId})", queryType, handlerType, handler.GetHashCode());
                 TResult result = await handler.Handle((dynamic) query, arguments, cancellationToken);
 
                 _log.Debug("Query dispatch completed successfully");
@@ -59,10 +55,6 @@ namespace Acnys.Core.Request.Infrastructure.Dispatchers
             {
                 _log.Error(exception, "Query dispatch failed");
                 throw;
-            }
-            finally
-            {
-                _log.Verbose("Ending lifetime scope {scopeId}", _scope.GetHashCode());
             }
         }
     }

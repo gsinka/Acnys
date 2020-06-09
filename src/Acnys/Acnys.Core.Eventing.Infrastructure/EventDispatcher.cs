@@ -33,20 +33,16 @@ namespace Acnys.Core.Eventing.Infrastructure
 
             var handlerType = typeof(IHandleEvent<>).MakeGenericType(@event.GetType());
 
-            await using var scope = _scope.BeginLifetimeScope();
-
             try
             {
-                _log.Verbose("Lifetime scope {scopeId} created for event", scope.GetHashCode());
-                    
-                var handlers = (IEnumerable<dynamic>)scope.Resolve(typeof(IEnumerable<>).MakeGenericType(handlerType));
-                var allHandlers = scope.Resolve<IEnumerable<IHandleEvent>>();
+                var handlers = (IEnumerable<dynamic>)_scope.Resolve(typeof(IEnumerable<>).MakeGenericType(handlerType));
+                var allHandlers = _scope.Resolve<IEnumerable<IHandleEvent>>();
 
                 foreach (var handler in handlers.Union(allHandlers))
                 {
-                    _log.Debug("Handling event {eventName} with handler {handlerName}", eventName, (string)handler.GetType().Name);
+                    _log.Debug("Handling event {eventName} with handler {handlerName} ({handlerId})", eventName, (string)handler.GetType().Name, handler.GetHashCode());
                     await handler.Handle((dynamic)@event, arguments, cancellationToken);
-                    _log.Debug("Finished handling event {eventName} with handler {handlerName}", eventName, (string)handler.GetType().Name);
+                    _log.Debug("Finished handling event {eventName} with handler {handlerName} ({handlerId})", eventName, (string)handler.GetType().Name, handler.GetHashCode());
                 }
 
                 //TODO: obsolate, remove in version 1.0
@@ -61,10 +57,6 @@ namespace Acnys.Core.Eventing.Infrastructure
             {
                 _log.Error(exception, "Event handling failed: {error} ", exception.Message);
                 throw;
-            }
-            finally
-            {
-                _log.Debug($"Ending lifetime scope: {scope.GetHashCode()}");
             }
         }
     }

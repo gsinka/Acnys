@@ -32,7 +32,17 @@ namespace WebApplication1
                 { "RoutingKey", "test.level" }
             }.EnrichWithCorrelation(command, arguments);
 
+            var testEvent2= new TestEvent(command.Data);
+
+            var args2 = new Dictionary<string, object>()
+            {
+                { "test", "test2" },
+                { "int", 2 },
+                { "RoutingKey", "test.level" }
+            }.EnrichWithCorrelation(command, arguments);
+
             await _eventPublisher.Publish(testEvent, args, cancellationToken);
+            await _eventPublisher.Publish(testEvent2, args2, cancellationToken);
         }
     }
 }

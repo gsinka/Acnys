@@ -56,5 +56,12 @@ namespace WebApplication1.Controllers
             })
             .ToArray();
         }
+
+        [HttpGet("query")]
+        public async Task<IActionResult> Query()
+        {
+            var result = await _sender.Send(new TestQuery("test data"));
+            return Ok(result);
+        }
     }
 }

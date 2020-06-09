@@ -5,13 +5,12 @@ using System.Text;
 using System.Threading;
 using Acnys.Core.Eventing.Abstractions;
 using Acnys.Core.Extensions;
-using Acnys.Core.RabbitMQ.Extensions;
 using Acnys.Core.ValueObjects;
+using Autofac;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Serilog;
-using Serilog.Context;
 
 namespace Acnys.Core.RabbitMQ
 {
@@ -19,73 +18,101 @@ namespace Acnys.Core.RabbitMQ
     {
         private readonly ILogger _log;
         private readonly IConnection _connection;
-        private readonly IDispatchEvent _eventDispatcher;
+        private readonly ILifetimeScope _scope;
         public readonly string Queue;
         public readonly string ConsumerTag;
+        private readonly int _consumerCount;
+        private readonly bool _requeueOnNack;
         private readonly IDictionary<string, object> _consumerArgs;
         private readonly Func<ILogger, EventingBasicConsumer, BasicDeliverEventArgs, (IEvent evnt, IDictionary<string, object> args)> _eventMapper;
-        public EventingBasicConsumer Consumer;
+        //public EventingBasicConsumer Consumer;
+
+        public IList<EventingBasicConsumer> Consumers = new List<EventingBasicConsumer>();
 
         public RabbitEventListener(
             ILogger log,
             IConnection connection,
-            IDispatchEvent eventDispatcher,
+            ILifetimeScope scope,
             string queue,
             string consumerTag,
+            int consumerCount,
+            bool requeueOnNack,
             IDictionary<string, object> consumerArgs,
             Func<ILogger, EventingBasicConsumer, BasicDeliverEventArgs, (IEvent evnt, IDictionary<string, object> args)> eventMapper)
         {
             _log = log;
             _connection = connection;
-            _eventDispatcher = eventDispatcher;
+            _scope = scope;
             Queue = queue;
             ConsumerTag = consumerTag;
+            _consumerCount = consumerCount;
+            _requeueOnNack = requeueOnNack;
             _consumerArgs = consumerArgs;
             _eventMapper = eventMapper;
         }
 
         public void Start()
         {
-            var channel = _connection.CreateModel();
 
-            Consumer = new EventingBasicConsumer(channel);
-
-            Consumer.Received += OnReceived;
-            Consumer.Shutdown += OnConsumerShutdown;
-            Consumer.Registered += OnConsumerRegistered;
-            Consumer.Unregistered += OnConsumerUnregistered;
-            Consumer.ConsumerCancelled += OnConsumerConsumerCancelled;
-
-            try
+            for (var i = 0; i < _consumerCount; i++)
             {
-                var tagReceived = channel.BasicConsume(Queue, false, ConsumerTag, _consumerArgs, Consumer);
-                _log.Debug("RabbitMQ consumer with tag '{consumerTag}' created for event listener", tagReceived);
-            }
-            catch (Exception exception)
-            {
-                _log.Error(exception, "RabbitMQ consumer failed to create for {queue}", Queue);
+                var channel = _connection.CreateModel();
+                var consumer = new EventingBasicConsumer(channel);
+
+                consumer.Received += OnReceived;
+                consumer.Shutdown += OnConsumerShutdown;
+                consumer.Registered += OnConsumerRegistered;
+                consumer.Unregistered += OnConsumerUnregistered;
+                consumer.ConsumerCancelled += OnConsumerConsumerCancelled;
+
+                try
+                {
+                    var tag = !string.IsNullOrWhiteSpace(ConsumerTag)
+                        ? _consumerCount > 1 ? $"{ConsumerTag}-{i + 1}" : ConsumerTag
+                        : "";
+
+                    var tagReceived = channel.BasicConsume(Queue, false, tag, _consumerArgs, consumer);
+                    _log.Debug("RabbitMQ consumer with tag '{consumerTag}' created for event listener", tagReceived);
+                }
+                catch (Exception exception)
+                {
+                    _log.Error(exception, "RabbitMQ consumer failed to create for {queue}", Queue);
+                }
+
+                Consumers.Add(consumer);
             }
         }
 
         private void OnReceived(object sender, BasicDeliverEventArgs e)
         {
+            using var scope = _scope.BeginLifetimeScope();
+            var consumer = sender as EventingBasicConsumer;
+
+            _log.Debug("New lifetime scope created for event dispatcher ({scopeId})", scope.GetHashCode());
+
             try
             {
-                _log.Debug("Receiving new message from exchange '{exchange}' with routing key '{routingKey}'", e.Exchange, e.RoutingKey);
+                _log.Debug("Receiving new message from exchange '{exchange}' with routing key '{routingKey}' by consumer '{consumerTag}'",
+                    e.Exchange, e.RoutingKey, consumer.ConsumerTag);
 
-                var (evnt, args) = _eventMapper(_log, Consumer, e);
+                var (evnt, args) = _eventMapper(_log, consumer, e);
                 args.EnrichLogContextWithCorrelation();
 
-                _eventDispatcher.Dispatch(evnt, args, CancellationToken.None);
+                var dispatchTask = scope.Resolve<IDispatchEvent>().Dispatch(evnt, args, CancellationToken.None);
+                dispatchTask.Wait();
 
                 _log.Debug("Sending ACK to message queue for delivery tag '{deliveryTag}'", e.DeliveryTag);
-                Consumer.Model.BasicAck(e.DeliveryTag, false);
-
+                consumer.Model.BasicAck(e.DeliveryTag, false);
             }
             catch (Exception exception)
             {
                 _log.Error(exception, "Message delivery failed");
-                Consumer.Model.BasicNack(e.DeliveryTag, false, false);
+                consumer.Model.BasicNack(e.DeliveryTag, false, _requeueOnNack);
+            }
+            finally
+            {
+                _log.Debug("Ending lifetime scope ({scopeId})", scope.GetHashCode());
+
             }
         }
 

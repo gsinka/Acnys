@@ -41,6 +41,7 @@ namespace Acnys.Core.Request.Infrastructure.Validation
                 _log.Debug("No validator found for query {queryType}", query.GetType());
             }
 
+            _log.Verbose("Handling {queryType} with {handlerType} ({handlerId})", typeof(TQuery), _queryHandler.GetType(), _queryHandler.GetHashCode());
             return await _queryHandler.Handle(query, arguments, cancellationToken);
         }
     }
