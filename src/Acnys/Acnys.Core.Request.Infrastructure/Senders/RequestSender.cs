@@ -13,9 +13,9 @@ namespace Acnys.Core.Request.Infrastructure.Senders
     {
         private readonly ILogger _log;
         private readonly IIndex<object, ISendRequest> _requestSenderSelector;
-        private readonly Func<IRequest, object> _senderKeySelector;
-
-        public RequestSender(ILogger log, IIndex<object, ISendRequest> requestSenderSelector, Func<IRequest, object> senderKeySelector)
+        private readonly Func<IRequest, IDictionary<string, object>, object> _senderKeySelector;
+        
+        public RequestSender(ILogger log, IIndex<object, ISendRequest> requestSenderSelector, Func<IRequest, IDictionary<string, object>, object> senderKeySelector)
         {
             _log = log;
             _requestSenderSelector = requestSenderSelector;
@@ -26,7 +26,7 @@ namespace Acnys.Core.Request.Infrastructure.Senders
         {
             arguments.EnrichLogContextWithCorrelation();
 
-            var senderKey = _senderKeySelector(command);
+            var senderKey = _senderKeySelector(command, arguments);
             _log.Verbose("Sender key {senderKey} resolved for command {commandType}", senderKey, command.GetType().Name);
 
             var sender = _requestSenderSelector[senderKey];
@@ -39,7 +39,7 @@ namespace Acnys.Core.Request.Infrastructure.Senders
         {
             arguments.EnrichLogContextWithCorrelation();
 
-            var senderKey = _senderKeySelector(query);
+            var senderKey = _senderKeySelector(query, arguments);
             _log.Verbose("Sender key {senderKey} resolved for query {queryType}", senderKey, query.GetType().Name);
 
             var sender = _requestSenderSelector[senderKey];

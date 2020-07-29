@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using Acnys.Core.Request.Abstractions;
 using Acnys.Core.Request.Infrastructure.Senders;
@@ -16,7 +17,7 @@ namespace Acnys.Core.Request.Infrastructure.Extensions
         /// <param name="builder"></param>
         /// <param name="keySelector">Key selector to select the request sender to use for the given request</param>
         /// <returns></returns>
-        public static ContainerBuilder RegisterRequestSender(this ContainerBuilder builder, Func<IRequest, object> keySelector)
+        public static ContainerBuilder RegisterRequestSender(this ContainerBuilder builder, Func<IRequest, IDictionary<string, object>, object> keySelector)
         {
             builder.Register(context => new RequestSender(
                 context.Resolve<ILogger>().ForContext<RequestSender>(),

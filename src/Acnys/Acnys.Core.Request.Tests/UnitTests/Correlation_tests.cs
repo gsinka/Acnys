@@ -26,7 +26,7 @@ namespace Acnys.Core.Request.Tests.UnitTests
             builder.RegisterInstance(Log.Logger).As<ILogger>().SingleInstance();
             builder.RegisterCommandDispatcher();
             builder.RegisterQueryDispatcher();
-            builder.RegisterRequestSender(request => "loopback");
+            builder.RegisterRequestSender((request, args) => "loopback");
             builder.RegisterLoopbackRequestSender("loopback");
             builder.RegisterInstance(_testCommandHandler).AsImplementedInterfaces().SingleInstance();
             builder.RegisterInstance(new TestQueryHandler()).AsImplementedInterfaces().SingleInstance();

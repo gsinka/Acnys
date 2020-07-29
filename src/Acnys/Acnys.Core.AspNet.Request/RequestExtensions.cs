@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Acnys.Core.Request.Abstractions;
 using Acnys.Core.Request.Infrastructure.Extensions;
 using Autofac;
@@ -74,6 +75,11 @@ namespace Acnys.Core.AspNet.Request
         }
 
         public static IHostBuilder AddRequestSender(this IHostBuilder builder, Func<IRequest, object> keySelector)
+        {
+            return AddRequestSender(builder, (request, arguments) => keySelector(request));
+        }
+        
+        public static IHostBuilder AddRequestSender(this IHostBuilder builder, Func<IRequest, IDictionary<string, object>, object> keySelector)
         {
             return builder.ConfigureContainer<ContainerBuilder>((context, containerBuilder) =>
             {
