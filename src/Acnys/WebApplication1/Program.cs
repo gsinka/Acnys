@@ -43,7 +43,7 @@ namespace WebApplication1
                                     "[{Timestamp:HH:mm:ss+fff}{EventType:x8} {Level:u3}][{App}] {Message:lj} <-- [{SourceContext}]{NewLine}{Exception}",
                                     theme: AnsiConsoleTheme.Code)
                                 .WriteTo.Seq(context.Configuration["Seq:Url"])
-                                .MinimumLevel.Verbose()
+                                .MinimumLevel.Information()
                                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                                 .Enrich.FromLogContext()
                                 .Enrich.WithProperty("Application", "TEST");
@@ -58,6 +58,7 @@ namespace WebApplication1
                             (context, sso) => context.Configuration.Bind("SingleSignOn", sso))
                         .AddRequests()
                         .AddRequestValidation()
+                        .AddRequestMetrics()
 
                         .AddHttpRequestHandler()
                         .AddEventing()
