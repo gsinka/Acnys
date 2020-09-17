@@ -50,7 +50,7 @@ namespace WebApplication1
                         })
 
                         .AddHealthChecks((context, builder) => builder
-                            .AddCheck("Self", () => HealthCheckResult.Healthy(), new List<string> {"Liveness"})
+                            .AddCheck("Self", () => HealthCheckResult.Healthy(), new List<string> { "Liveness" })
                         )
                         .AddHttpMetrics()
                         .AddOpenApiDocumentation(
@@ -59,6 +59,7 @@ namespace WebApplication1
                         .AddRequests()
                         .AddRequestValidation()
                         .AddFullRequestMetrics()
+                        .AddFullEventingMetrics()
 
                         .AddHttpRequestHandler()
                         .AddEventing()
