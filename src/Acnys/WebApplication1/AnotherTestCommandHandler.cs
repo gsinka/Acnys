@@ -9,20 +9,20 @@ using WebApplication1.Commands;
 
 namespace WebApplication1
 {
-    public class TestCommandHandler : IHandleCommand<TestCommand>
+    public class AnotherTestCommandHandler : IHandleCommand<AnotherTestCommand>
     {
         private readonly IPublishEvent _eventPublisher;
         private readonly ILogger _log;
         private readonly UserContext _context;
 
-        public TestCommandHandler(IPublishEvent eventPublisher, ILogger log, UserContext context)
+        public AnotherTestCommandHandler(IPublishEvent eventPublisher, ILogger log, UserContext context)
         {
             _eventPublisher = eventPublisher;
             _log = log;
             _context = context;
         }
 
-        public async Task Handle(TestCommand command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
+        public async Task Handle(AnotherTestCommand command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
             _log.Information("Test command handler");
             var testEvent = new TestEvent(command.Data);
