@@ -1,6 +1,6 @@
 ﻿using Acnys.Core.Request.Abstractions;
 using Acnys.Core.Request.Infrastructure.Metrics;
-using Acnys.Core.Request.Infrastructure.Services;
+using Acnys.Core.Services;
 using Autofac;
 
 namespace Acnys.Core.Request.Infrastructure.Extensions

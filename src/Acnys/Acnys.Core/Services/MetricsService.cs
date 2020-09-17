@@ -6,7 +6,7 @@ using System.Linq;
  Not using quantiles: https://www.robustperception.io/how-does-a-prometheus-summary-work
  */
 
-namespace Acnys.Core.Request.Infrastructure.Services
+namespace Acnys.Core.Services
 {
     public class MetricsService
     {

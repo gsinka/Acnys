@@ -17,7 +17,18 @@ namespace Acnys.Core.AspNet.Eventing
 
             return builder;
         }
+        public static IHostBuilder AddFullEventingMetrics(this IHostBuilder builder)
+        {
+            builder.ConfigureContainer<ContainerBuilder>((context, containerBuilder) =>
+            {
+                Log.Verbose("Registering eventing metrics");
+                containerBuilder.AddMetricsService();
+                containerBuilder.AddEventCountMetricsBehaviour();
+                containerBuilder.AddEventDurationMetricsBehaviour();
+            });
 
+            return builder;
+        }
         public static IHostBuilder RegisterEventHandlersFromAssemblyOf<T>(this IHostBuilder builder)
         {
             builder.ConfigureContainer<ContainerBuilder>((context, containerBuilder) =>
