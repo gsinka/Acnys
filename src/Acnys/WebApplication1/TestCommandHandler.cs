@@ -24,7 +24,6 @@ namespace WebApplication1
 
         public async Task Handle(TestCommand command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
-            _log.Information("Test command handler");
             var testEvent = new TestEvent(command.Data);
             
             var args = new Dictionary<string, object>()

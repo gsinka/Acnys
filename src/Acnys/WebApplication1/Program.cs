@@ -44,7 +44,7 @@ namespace WebApplication1
                                     "[{Timestamp:HH:mm:ss+fff}{EventType:x8} {Level:u3}][{App}] {Message:lj} <-- [{SourceContext}]{NewLine}{Exception}",
                                     theme: AnsiConsoleTheme.Code)
                                 .WriteTo.Seq(context.Configuration["Seq:Url"])
-                                .MinimumLevel.Information()
+                                .MinimumLevel.Debug()
                                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                                 .Enrich.FromLogContext()
                                 .Enrich.WithProperty("Application", "TEST");
