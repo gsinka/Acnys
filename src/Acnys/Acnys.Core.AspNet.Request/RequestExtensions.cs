@@ -34,12 +34,14 @@ namespace Acnys.Core.AspNet.Request
             });
         }
 
-        public static IHostBuilder AddRequestMetrics(this IHostBuilder builder)
+        public static IHostBuilder AddFullRequestMetrics(this IHostBuilder builder)
         {
             return builder.ConfigureContainer<ContainerBuilder>((context, containerBuilder) =>
             {
-                Log.Verbose("Adding request Matrics");
-                containerBuilder.AddCommandMetricsBehaviour();
+                Log.Verbose("Adding all metrics");
+                containerBuilder.AddMetricsService();
+                containerBuilder.AddCommandCountMetricsBehaviour();
+                containerBuilder.AddCommandDurationMetricsBehaviour();
             });
         }
 

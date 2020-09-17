@@ -68,7 +68,7 @@ namespace WebApplication1
                             (context, sso) => context.Configuration.Bind("SingleSignOn", sso))
                         .AddRequests()
                         .AddRequestValidation()
-                        .AddRequestMetrics()
+                        .AddFullRequestMetrics()
 
                         .AddHttpRequestHandler()
                         .AddEventing()

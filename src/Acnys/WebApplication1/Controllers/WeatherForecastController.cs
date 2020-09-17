@@ -7,6 +7,7 @@ using Acnys.Core.Extensions;
 using Acnys.Core.Request.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using WebApplication1.Commands;
 
 namespace WebApplication1.Controllers
 {
@@ -37,6 +38,7 @@ namespace WebApplication1.Controllers
 
             //_eventPublisher.Publish(new TestEvent("test"));
             await _sender.Send(new TestCommand("data"), arguments: new Dictionary<string, object>{ { "source", "weather forecast"} }.UseCorrelationId(correlationId));
+            await _sender.Send(new AnotherTestCommand("data"), arguments: new Dictionary<string, object> { { "source", "weather forecast" } }.UseCorrelationId(correlationId));
 
             await Task.Delay(50);
 
