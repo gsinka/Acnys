@@ -4,6 +4,7 @@ using Acnys.Core.Request.Abstractions;
 using Acnys.Core.Request.Infrastructure.Extensions;
 using Autofac;
 using Microsoft.Extensions.Hosting;
+using Prometheus;
 using Serilog;
 
 namespace Acnys.Core.AspNet.Request
@@ -14,6 +15,14 @@ namespace Acnys.Core.AspNet.Request
         {
             return builder.ConfigureContainer<ContainerBuilder>((context, containerBuilder) =>
             {
+                var pusher = new MetricPusher(new MetricPusherOptions
+                {
+                    Endpoint = "http://localhost:9091/metrics",
+                    Job = "some_job"
+                });
+
+                pusher.Start();
+
                 Log.Verbose("Registering command dispatcher");
                 containerBuilder.RegisterCommandDispatcher();
 
