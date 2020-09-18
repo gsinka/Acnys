@@ -10,13 +10,31 @@ namespace Acnys.Core.Services
 {
     public class MetricsService
     {
-        private readonly Summary _summary = Metrics.CreateSummary("microservice_summaries", "Auto-generated summary metrics", new SummaryConfiguration() { LabelNames = new[] { "namespace", "method", "metric_type" } });
+        private Summary _summary;
+        private Summary Summary
+        {
+            get
+            {
+                if (_summary == null)
+                    _summary = Metrics.CreateSummary("microservice_summaries", "Auto-generated summary metrics", new SummaryConfiguration() { LabelNames = new[] { "namespace", "name", "metric_type" } });
+                return _summary;
+            }
+        }
 
-        private readonly Counter _counter = Metrics.CreateCounter("microservice_counters", "Auto-generated counter metrics", new CounterConfiguration() { LabelNames = new[] { "namespace", "method", "metric_type" } });
+        private Counter _counter;
+
+        private Counter Counter
+        {
+            get
+            {
+                if (_counter == null) _counter = Metrics.CreateCounter("microservice_counters", "Auto-generated counter metrics", new CounterConfiguration() { LabelNames = new[] { "namespace", "name", "metric_type" } });
+                return _counter;
+            }
+        }
 
         public void ObserveInSummary<T>(double val, string type = "")
         {
-            _summary.
+            Summary.
                 WithLabels(
                 typeof(T).Namespace,
                 typeof(T).Name,
@@ -26,7 +44,7 @@ namespace Acnys.Core.Services
 
         public void IncrementCounter<T>(double increment = 1, string type = "")
         {
-            _counter.
+            Counter.
                 WithLabels(
                 typeof(T).Namespace,
                 typeof(T).Name,

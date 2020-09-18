@@ -49,7 +49,7 @@ namespace Acnys.Core.AspNet.Request
             {
                 Log.Verbose("Adding all metrics");
                 containerBuilder.AddMetricsService();
-                containerBuilder.AddCommandCountMetricsBehaviour();
+                //containerBuilder.AddCommandCountMetricsBehaviour();
                 containerBuilder.AddCommandDurationMetricsBehaviour();
             });
         }
