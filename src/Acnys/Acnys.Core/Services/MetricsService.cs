@@ -31,7 +31,15 @@ namespace Acnys.Core.Services
                 return _counter;
             }
         }
-
+        private Counter _exceptionCounter;
+        private Counter ExceptionCounter
+        {
+            get
+            {
+                if (_exceptionCounter == null) _exceptionCounter = Metrics.CreateCounter("microservice_exceptions", "Auto-generated exception counter metrics", new CounterConfiguration() { LabelNames = new[] { "file", "line", "exception" } });
+                return _exceptionCounter;
+            }
+        }
         public void ObserveInSummary<T>(double val, string type = "")
         {
             Summary.
@@ -50,6 +58,15 @@ namespace Acnys.Core.Services
                 typeof(T).Name,
                 type).
                 Inc(increment);
+        }
+        public void AddException(string file, string line, string exception)
+        {
+            ExceptionCounter.
+                WithLabels(
+                file,
+                line,
+                exception).
+                Inc();
         }
     }
 }

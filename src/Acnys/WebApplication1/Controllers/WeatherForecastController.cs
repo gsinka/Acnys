@@ -31,6 +31,16 @@ namespace WebApplication1.Controllers
             _eventRecorder = eventRecorder;
         }
 
+        [HttpGet("Generate exception")]
+        public async Task GenerateException()
+        {
+            var correlationId = Guid.NewGuid();
+
+            //_eventPublisher.Publish(new TestEvent("test"));
+            await _sender.Send(new AnotherTestCommand("data"), arguments: new Dictionary<string, object> { { "source", "weather forecast" } }.UseCorrelationId(correlationId));
+
+        }
+
         [HttpGet]
         public async Task<IEnumerable<WeatherForecast>> Get()
         {
@@ -38,8 +48,7 @@ namespace WebApplication1.Controllers
 
             //_eventPublisher.Publish(new TestEvent("test"));
             await _sender.Send(new TestCommand("data"), arguments: new Dictionary<string, object>{ { "source", "weather forecast"} }.UseCorrelationId(correlationId));
-            await _sender.Send(new AnotherTestCommand("data"), arguments: new Dictionary<string, object> { { "source", "weather forecast" } }.UseCorrelationId(correlationId));
-
+            
             await Task.Delay(50);
 
             var testEventAwaiter = _eventRecorder

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,27 +25,7 @@ namespace WebApplication1
 
         public async Task Handle(AnotherTestCommand command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
-            _log.Information("Test command handler");
-            var testEvent = new TestEvent(command.Data);
-            
-            var args = new Dictionary<string, object>()
-            {
-                { "test", "test" }, 
-                { "int", 1 },
-                { "RoutingKey", "test.level" }
-            }.EnrichWithCorrelation(command, arguments);
-
-            var testEvent2= new TestEvent(command.Data);
-
-            var args2 = new Dictionary<string, object>()
-            {
-                { "test", "test2" },
-                { "int", 2 },
-                { "RoutingKey", "test.level" }
-            }.EnrichWithCorrelation(command, arguments);
-
-            await _eventPublisher.Publish(testEvent, args, cancellationToken);
-            await _eventPublisher.Publish(testEvent2, args2, cancellationToken);
+            throw new NotImplementedException();
         }
     }
 }

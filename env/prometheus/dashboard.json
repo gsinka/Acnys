@@ -15,168 +15,29 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 1,
+  "iteration": 1600428231498,
   "links": [],
   "panels": [
-    {
-      "datasource": null,
-      "fieldConfig": {
-        "defaults": {
-          "custom": {},
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 0
-      },
-      "id": 8,
-      "options": {
-        "displayMode": "basic",
-        "orientation": "vertical",
-        "reduceOptions": {
-          "calcs": [
-            "mean"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showUnfilled": true
-      },
-      "pluginVersion": "7.0.6",
-      "targets": [
-        {
-          "expr": "sum(increase(transport_order_poll_latency_bucket[5m])) by (le)",
-          "interval": "",
-          "legendFormat": "{{le}}",
-          "refId": "A"
-        }
-      ],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Panel Title",
-      "type": "bargauge"
-    },
-    {
-      "cards": {
-        "cardPadding": null,
-        "cardRound": null
-      },
-      "color": {
-        "cardColor": "#b4ff00",
-        "colorScale": "sqrt",
-        "colorScheme": "interpolateOranges",
-        "exponent": 0.5,
-        "mode": "spectrum"
-      },
-      "dataFormat": "tsbuckets",
-      "datasource": null,
-      "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 9,
-        "w": 12,
-        "x": 12,
-        "y": 0
-      },
-      "heatmap": {},
-      "hideZeroBuckets": true,
-      "highlightCards": true,
-      "id": 3,
-      "legend": {
-        "show": false
-      },
-      "reverseYBuckets": false,
-      "targets": [
-        {
-          "expr": "sum(increase(to_completion_time_bucket[5m])) by (le)",
-          "format": "heatmap",
-          "instant": false,
-          "interval": "",
-          "legendFormat": "{{le}}",
-          "refId": "A"
-        }
-      ],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Panel Title",
-      "tooltip": {
-        "show": true,
-        "showHistogram": false
-      },
-      "transformations": [],
-      "type": "heatmap",
-      "xAxis": {
-        "show": true
-      },
-      "xBucketNumber": null,
-      "xBucketSize": null,
-      "yAxis": {
-        "decimals": 0,
-        "format": "ms",
-        "logBase": 1,
-        "max": null,
-        "min": null,
-        "show": true,
-        "splitFactor": null
-      },
-      "yBucketBound": "auto",
-      "yBucketNumber": null,
-      "yBucketSize": null
-    },
     {
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": null,
+      "datasource": "Prometheus-test",
       "fieldConfig": {
         "defaults": {
           "custom": {},
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
+          "links": []
         },
         "overrides": []
       },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 8,
-        "w": 12,
+        "h": 7,
+        "w": 17,
         "x": 0,
-        "y": 8
+        "y": 0
       },
       "hiddenSeries": false,
       "id": 5,
@@ -192,11 +53,8 @@
       "lines": true,
       "linewidth": 1,
       "nullPointMode": "null",
-      "options": {
-        "dataLinks": []
-      },
       "percentage": false,
-      "pluginVersion": "7.0.6",
+      "pluginVersion": "7.1.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -206,31 +64,17 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(transport_order_count[1m])",
-          "instant": false,
+          "expr": "rate(microservice_summaries_count{namespace=~\"$namespace\",name=~\"$name\"}[$interval])",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
-        },
-        {
-          "expr": "rate(transport_order_completed_count[1m])",
-          "instant": false,
-          "interval": "",
-          "legendFormat": "",
-          "refId": "B"
-        },
-        {
-          "expr": "rate(transport_order_failed_count[1m])",
-          "interval": "",
-          "legendFormat": "",
-          "refId": "C"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "transport_order_count",
+      "title": "Counter rates",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -268,94 +112,84 @@
       }
     },
     {
-      "cards": {
-        "cardPadding": null,
-        "cardRound": null
-      },
-      "color": {
-        "cardColor": "#b4ff00",
-        "colorScale": "sqrt",
-        "colorScheme": "interpolateOranges",
-        "exponent": 0.5,
-        "mode": "spectrum"
-      },
-      "dataFormat": "tsbuckets",
-      "datasource": null,
+      "datasource": "Prometheus-test",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
-        "w": 12,
-        "x": 12,
-        "y": 9
+        "h": 14,
+        "w": 7,
+        "x": 17,
+        "y": 0
       },
-      "heatmap": {},
-      "hideZeroBuckets": true,
-      "highlightCards": true,
-      "id": 2,
-      "legend": {
-        "show": false
+      "id": 8,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
       },
-      "reverseYBuckets": false,
+      "pluginVersion": "7.1.5",
       "targets": [
         {
-          "expr": "sum(increase(transport_order_poll_latency_bucket[5m])) by (le)",
-          "format": "heatmap",
+          "expr": "microservice_exceptions",
+          "format": "time_series",
           "instant": false,
           "interval": "",
-          "legendFormat": "{{le}}",
+          "legendFormat": "{{exception}}",
           "refId": "A"
         }
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "transport_order_poll_latency",
-      "tooltip": {
-        "show": true,
-        "showHistogram": false
-      },
-      "type": "heatmap",
-      "xAxis": {
-        "show": true
-      },
-      "xBucketNumber": null,
-      "xBucketSize": null,
-      "yAxis": {
-        "decimals": 0,
-        "format": "ms",
-        "logBase": 1,
-        "max": null,
-        "min": null,
-        "show": true,
-        "splitFactor": null
-      },
-      "yBucketBound": "auto",
-      "yBucketNumber": null,
-      "yBucketSize": null
+      "title": "Exceptions",
+      "type": "stat"
     },
     {
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": null,
+      "datasource": "Prometheus-test",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "custom": {},
+          "links": []
         },
         "overrides": []
       },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 8,
-        "w": 12,
+        "h": 7,
+        "w": 17,
         "x": 0,
-        "y": 16
+        "y": 7
       },
       "hiddenSeries": false,
       "id": 6,
@@ -364,17 +198,17 @@
         "current": false,
         "max": false,
         "min": false,
+        "rightSide": false,
         "show": true,
+        "sideWidth": 200,
         "total": false,
         "values": false
       },
       "lines": true,
       "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "dataLinks": []
-      },
+      "nullPointMode": "null as zero",
       "percentage": false,
+      "pluginVersion": "7.1.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -384,7 +218,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "transport_order_count",
+          "expr": "rate(microservice_summaries_sum{namespace=~\"$namespace\",name=~\"$name\"}[$interval])/rate(microservice_summaries_count{namespace=~\"$namespace\",name=~\"$name\"}[$interval])",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -394,7 +228,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "transport_order_count",
+      "title": "Durations",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -410,7 +244,8 @@
       },
       "yaxes": [
         {
-          "format": "short",
+          "$$hashKey": "object:462",
+          "format": "s",
           "label": null,
           "logBase": 1,
           "max": null,
@@ -418,6 +253,7 @@
           "show": true
         },
         {
+          "$$hashKey": "object:463",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -433,11 +269,238 @@
     }
   ],
   "refresh": false,
-  "schemaVersion": 25,
+  "schemaVersion": 26,
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "allValue": null,
+        "current": {
+          "selected": true,
+          "tags": [],
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": "Prometheus-test",
+        "definition": "label_values(name)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "name",
+        "multi": true,
+        "name": "name",
+        "options": [
+          {
+            "selected": true,
+            "text": "All",
+            "value": "$__all"
+          },
+          {
+            "selected": false,
+            "text": "TestCommand",
+            "value": "TestCommand"
+          },
+          {
+            "selected": false,
+            "text": "TestEvent",
+            "value": "TestEvent"
+          }
+        ],
+        "query": "label_values(name)",
+        "refresh": 0,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": true,
+          "tags": [],
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": "Prometheus-test",
+        "definition": "label_values(namespace)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "namespace",
+        "multi": true,
+        "name": "namespace",
+        "options": [
+          {
+            "selected": true,
+            "text": "All",
+            "value": "$__all"
+          },
+          {
+            "selected": false,
+            "text": "WebApplication1",
+            "value": "WebApplication1"
+          },
+          {
+            "selected": false,
+            "text": "WebApplication1.Commands",
+            "value": "WebApplication1.Commands"
+          }
+        ],
+        "query": "label_values(namespace)",
+        "refresh": 0,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": true,
+          "tags": [],
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": "Prometheus-test",
+        "definition": "label_values(metric_type)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "metrictype",
+        "multi": true,
+        "name": "metrictype",
+        "options": [
+          {
+            "selected": true,
+            "text": "All",
+            "value": "$__all"
+          },
+          {
+            "selected": false,
+            "text": "CommandHandlerDuration",
+            "value": "CommandHandlerDuration"
+          },
+          {
+            "selected": false,
+            "text": "EventHandlerDuration",
+            "value": "EventHandlerDuration"
+          }
+        ],
+        "query": "label_values(metric_type)",
+        "refresh": 0,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "auto": false,
+        "auto_count": 30,
+        "auto_min": "10s",
+        "current": {
+          "selected": false,
+          "text": "1m",
+          "value": "1m"
+        },
+        "hide": 0,
+        "label": "interval",
+        "name": "interval",
+        "options": [
+          {
+            "selected": false,
+            "text": "15s",
+            "value": "15s"
+          },
+          {
+            "selected": false,
+            "text": "30s",
+            "value": "30s"
+          },
+          {
+            "selected": true,
+            "text": "1m",
+            "value": "1m"
+          },
+          {
+            "selected": false,
+            "text": "5m",
+            "value": "5m"
+          },
+          {
+            "selected": false,
+            "text": "10m",
+            "value": "10m"
+          },
+          {
+            "selected": false,
+            "text": "30m",
+            "value": "30m"
+          },
+          {
+            "selected": false,
+            "text": "1h",
+            "value": "1h"
+          },
+          {
+            "selected": false,
+            "text": "6h",
+            "value": "6h"
+          },
+          {
+            "selected": false,
+            "text": "12h",
+            "value": "12h"
+          },
+          {
+            "selected": false,
+            "text": "1d",
+            "value": "1d"
+          },
+          {
+            "selected": false,
+            "text": "7d",
+            "value": "7d"
+          },
+          {
+            "selected": false,
+            "text": "14d",
+            "value": "14d"
+          },
+          {
+            "selected": false,
+            "text": "30d",
+            "value": "30d"
+          }
+        ],
+        "query": "15s,30s,1m,5m,10m,30m,1h,6h,12h,1d,7d,14d,30d",
+        "queryValue": "",
+        "refresh": 2,
+        "skipUrlSync": false,
+        "type": "interval"
+      }
+    ]
   },
   "time": {
     "from": "now-30m",
@@ -457,7 +520,7 @@
     ]
   },
   "timezone": "",
-  "title": "Test dashboard",
+  "title": "Microservice dashboard",
   "uid": "1MmtQqGMk",
-  "version": 8
+  "version": 1
 }

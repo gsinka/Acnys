@@ -1,5 +1,6 @@
 ﻿using Acnys.Core.Exceptions;
 using Acnys.Core.Request.Infrastructure.Exceptions;
+using Acnys.Core.Services;
 using Acnys.Core.ValueObjects;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
@@ -12,7 +13,7 @@ using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Acnys.Core.AspNet
+namespace Acnys.Core.AspNet.Middlewares
 {
     public class ErrorHandlingMiddleware
     {

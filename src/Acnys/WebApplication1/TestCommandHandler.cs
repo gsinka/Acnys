@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,7 +26,6 @@ namespace WebApplication1
         public async Task Handle(TestCommand command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
             var testEvent = new TestEvent(command.Data);
-            
             var args = new Dictionary<string, object>()
             {
                 { "test", "test" }, 
