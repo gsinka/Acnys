@@ -23,7 +23,7 @@ namespace Acnys.Core.AspNet.Eventing
             {
                 Log.Verbose("Registering eventing metrics");
                 containerBuilder.AddMetricsService();
-                containerBuilder.AddEventCountMetricsBehaviour();
+                //containerBuilder.AddEventCountMetricsBehaviour();
                 containerBuilder.AddEventDurationMetricsBehaviour();
             });
 
