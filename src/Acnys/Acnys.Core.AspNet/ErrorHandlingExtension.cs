@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Acnys.Core.AspNet.Middlewares;
+using Microsoft.AspNetCore.Builder;
 
 namespace Acnys.Core.AspNet
 {
@@ -6,7 +7,8 @@ namespace Acnys.Core.AspNet
     {
         public static IApplicationBuilder AddErrorHandling(this IApplicationBuilder app)
         {
-            return app.UseMiddleware<ErrorHandlingMiddleware>();
+            app.UseMiddleware<ErrorHandlingMiddleware>();
+            return app.UseMiddleware<ErrorMetricsMiddleware>();
         }
     }
 }
