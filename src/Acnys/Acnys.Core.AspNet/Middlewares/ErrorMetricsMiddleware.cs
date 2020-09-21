@@ -27,10 +27,7 @@ namespace Acnys.Core.AspNet.Middlewares
             catch (Exception e)
             {
                 // type = var x = e.GetType().Name;
-                var s = new StackTrace(e, true);
-                var frame = s.GetFrame(0);
-                var file = frame.GetFileName().Split('\\').Last();
-                _metricsService.AddException(file, frame.GetFileLineNumber().ToString(), e.GetType().FullName);
+                _metricsService.AddException(e);
                 throw;
             }
 
