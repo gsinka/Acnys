@@ -1,6 +1,9 @@
 ﻿using Prometheus;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Metadata;
 
 /*
  Not using quantiles: https://www.robustperception.io/how-does-a-prometheus-summary-work
@@ -36,7 +39,7 @@ namespace Acnys.Core.Services
         {
             get
             {
-                if (_exceptionCounter == null) _exceptionCounter = Metrics.CreateCounter("microservice_exceptions", "Auto-generated exception counter metrics", new CounterConfiguration() { LabelNames = new[] { "file", "line", "exception" } });
+                if (_exceptionCounter == null) _exceptionCounter = Metrics.CreateCounter("microservice_exceptions", "Auto-generated exception counter metrics", new CounterConfiguration() { LabelNames = new[] { "file", "line", "exception_namespace", "exception_name" } });
                 return _exceptionCounter;
             }
         }
@@ -59,13 +62,18 @@ namespace Acnys.Core.Services
                 type).
                 Inc(increment);
         }
-        public void AddException(string file, string line, string exception)
+        public void AddException(Exception e)
         {
+            var s = new StackTrace(e, true);
+            var frame = s.GetFrame(0);
+            var file = frame.GetFileName().Split('\\').Last();
+
             ExceptionCounter.
                 WithLabels(
                 file,
-                line,
-                exception).
+                frame.GetFileLineNumber().ToString(),
+                e.GetType().Namespace,
+                e.GetType().Name).
                 Inc();
         }
     }
