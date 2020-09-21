@@ -29,3 +29,32 @@ services:
       - ./env/prometheus/dashboard.json:/etc/dashboards/develop/dashboard.json
     # volumes:
     #   - grafana_data:/var/lib/grafana
+  jaeger:
+    image: jaegertracing/all-in-one:1.9
+    container_name: jaeger
+    ports:
+      - 6831:6831/udp # endpoint
+      - 16686:16686 # frontend
+
+  acnys-test-seq:
+    image: datalust/seq:latest
+    restart: always
+    container_name: acnys-test-seq
+    environment:
+    - ACCEPT_EULA=Y
+    ports:
+    - 5341:80
+
+  acnys-test-rabbitmq:
+    image: acnys-test-rabbitmq
+    container_name: acnys-test-rabbitmq
+    restart: always
+    build: env/RabbitMQ    
+    ports:
+      - 15672:15672
+      - 5672:5672
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping", "-q"]
+      interval: 5s
+      timeout: 2s
+      retries: 15

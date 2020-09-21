@@ -1,12 +1,17 @@
 using Acnys.Core.Abstractions;
 using Acnys.Core.AspNet;
 using Acnys.Core.AspNet.Eventing;
+using Acnys.Core.AspNet.Extensions;
 using Acnys.Core.AspNet.RabbitMQ;
 using Acnys.Core.AspNet.Request;
 using Acnys.Core.Eventing.Infrastructure;
 using Acnys.Core.Eventing.Infrastructure.Extensions;
 using Acnys.Core.Services;
 using Autofac;
+using Jaeger;
+using Jaeger.Samplers;
+using Jaeger.Senders;
+using Jaeger.Senders.Thrift;
 using DotBadge;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -14,6 +19,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using OpenTracing;
+using OpenTracing.Util;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
@@ -44,7 +52,7 @@ namespace WebApplication1
                                     "[{Timestamp:HH:mm:ss+fff}{EventType:x8} {Level:u3}][{App}] {Message:lj} <-- [{SourceContext}]{NewLine}{Exception}",
                                     theme: AnsiConsoleTheme.Code)
                                 .WriteTo.Seq(context.Configuration["Seq:Url"])
-                                .MinimumLevel.Debug()
+                                .MinimumLevel.Verbose()
                                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                                 .Enrich.FromLogContext()
                                 .Enrich.WithProperty("Application", "TEST");
@@ -72,6 +80,7 @@ namespace WebApplication1
 
                         .AddHttpRequestHandler()
                         .AddEventing()
+                        .AddTracing()
 
                         .AddSingleSignOn((context, options) => context.Configuration.Bind("SingleSignOn", options))
 
@@ -107,9 +116,9 @@ namespace WebApplication1
                             services.AddTransient<TestMiddleware>();
                             services.AddControllers(options => { options.UseRequestBinder(); }).AddApplicationPart(Assembly.GetEntryAssembly()).AddControllersAsServices();
 
-                            services.AddAuthorization(options => 
+                            services.AddAuthorization(options =>
                             {
-                                options.AddPolicy("admin", builder => builder.RequireClaim("user-roles", new [] { "administrator"}));
+                                options.AddPolicy("admin", builder => builder.RequireClaim("user-roles", new[] { "administrator" }));
                             });
                         })
 
@@ -134,7 +143,7 @@ namespace WebApplication1
                             var ssoSettings = new SingleSignOnOptions();
                             context.Configuration.Bind("SingleSignOn", ssoSettings);
 
-                            var openApiSettings = new OpenApiDocumentationOptions() {Path = "/swagger"};
+                            var openApiSettings = new OpenApiDocumentationOptions() { Path = "/swagger" };
 
                             app.AddOpenApiDocumentation(appSettings, ssoSettings, openApiSettings);
 
