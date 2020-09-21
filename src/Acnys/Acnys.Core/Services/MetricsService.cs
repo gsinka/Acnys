@@ -66,7 +66,7 @@ namespace Acnys.Core.Services
         {
             var s = new StackTrace(e, true);
             var frame = s.GetFrame(0);
-            var file = frame.GetFileName().Split('\\').Last();
+            var file = frame.GetFileName()?.Split('\\')?.Last()??"n/a";
 
             ExceptionCounter.
                 WithLabels(
