@@ -11,7 +11,9 @@ namespace Acnys.Core.Request
             target ??= new Dictionary<string, object>();
             
             var correlationId = source.CorrelationId();
+            var traceId = source.TraceId();
             if (correlationId.HasValue) target.UseCorrelationId(correlationId.Value);
+            if (!string.IsNullOrWhiteSpace(traceId)) target.UseTraceId(traceId);
             
             target.UseCausationId(command.RequestId);
 
@@ -21,9 +23,11 @@ namespace Acnys.Core.Request
         public static IDictionary<string, object> CreateCorrelationFromSource(this IDictionary<string, object> source, ICommand command)
         {
             var target = new Dictionary<string, object>();
+            var traceId = source.TraceId();
 
             var correlationId = source.CorrelationId();
             if (correlationId.HasValue) target.UseCorrelationId(correlationId.Value);
+            if (!string.IsNullOrWhiteSpace(traceId)) target.UseTraceId(traceId);
 
             target.UseCausationId(command.RequestId);
 

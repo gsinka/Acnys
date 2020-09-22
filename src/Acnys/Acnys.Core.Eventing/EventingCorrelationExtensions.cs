@@ -12,6 +12,7 @@ namespace Acnys.Core.Eventing
             return new Dictionary<string, object>{
                 { RequestConstants.CorrelationId, source.CorrelationId() },
                 { RequestConstants.CausationId, @event.EventId },
+                { RequestConstants.TraceId, source.TraceId()}
             };
         }
 
@@ -20,6 +21,8 @@ namespace Acnys.Core.Eventing
             target ??= new Dictionary<string, object>();
 
             var correlationId = source.CorrelationId();
+            var traceId = source.TraceId();
+            if (!string.IsNullOrWhiteSpace(traceId)) target.UseTraceId(traceId);
             if (correlationId.HasValue) target.UseCorrelationId(correlationId.Value);
 
             target.UseCausationId(@event.EventId);
@@ -32,6 +35,8 @@ namespace Acnys.Core.Eventing
             var target = new Dictionary<string, object>();
 
             var correlationId = source.CorrelationId();
+            var traceId = source.TraceId();
+            if (!string.IsNullOrWhiteSpace(traceId)) target.UseTraceId(traceId);
             if (correlationId.HasValue) target.UseCorrelationId(correlationId.Value);
 
             target.UseCausationId(@event.EventId);

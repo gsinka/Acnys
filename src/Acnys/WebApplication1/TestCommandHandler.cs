@@ -7,6 +7,7 @@ using Acnys.Core.Eventing.Abstractions;
 using Acnys.Core.Request;
 using Acnys.Core.Request.Abstractions;
 using Jaeger;
+using Microsoft.Extensions.Primitives;
 using OpenTracing;
 using OpenTracing.Propagation;
 using Serilog;
@@ -49,16 +50,18 @@ namespace WebApplication1
             {
                 { "test", "test" },
                 { "int", 1 },
-                { "RoutingKey", "test.level" }
+                { "Routing", "test.level" },
+                //{ "uber-trace-id", (arguments["uber-trace-id"].ToString())}
             }.EnrichWithCorrelation(command, arguments);
-
+            //arguments.Add("uber-trace-id", new StringValues(traceExtendedHeaders["uber-trace-id"]));
             var testEvent2 = new TestEvent(command.Data);
 
             var args2 = new Dictionary<string, object>()
             {
                 { "test", "test2" },
                 { "int", 2 },
-                { "RoutingKey", "test.level" }
+                { "RoutingKey", "test.level" },
+                //{ "uber-trace-id", (arguments["uber-trace-id"].ToString())}
             }.EnrichWithCorrelation(command, arguments);
 
             await _eventPublisher.Publish(testEvent, args, cancellationToken);

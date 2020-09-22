@@ -6,5 +6,6 @@
         public const string CausationId = "causation-id";
         public const string RequestId = "request-id";
         public const string DomainType = "domain-type";
+        public const string TraceId = "uber-trace-id";
     }
 }
