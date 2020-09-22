@@ -1,8 +1,10 @@
 using System;
+using Acnys.Core.Attributes;
 using Acnys.Core.Request;
 
 namespace WebApplication1.Commands
 {
+    [HumanReadableInformation("Test command","Test command's deteailed description")]
     public class TestCommand : Command
     {
         public string Data { get; }

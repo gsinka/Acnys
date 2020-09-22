@@ -17,9 +17,9 @@ namespace Acnys.Core.AspNet.Extensions
     public static class TracingExtensions
     {
 
-        public static IHostBuilder AddTracing(this IHostBuilder hostBuilder)
+        public static IHostBuilder AddTracing(this IHostBuilder hostBuilder, bool addOpenTracing = false)
         {
-            
+
             return hostBuilder.ConfigureContainer<ContainerBuilder>((context, containerBuilder) =>
             {
                 containerBuilder.AddEventTracingBehaviour();
@@ -42,7 +42,7 @@ namespace Acnys.Core.AspNet.Extensions
 
                     var tracer = new Tracer.Builder(Assembly.GetEntryAssembly().GetName().Name)
                         .WithLoggerFactory(loggerFactory)
-                        
+
                         .WithSampler(new ConstSampler(true))
                         .Build();
 
@@ -54,8 +54,11 @@ namespace Acnys.Core.AspNet.Extensions
                     return tracer;
                 });
 
-                // Useless default http tracing
-                //services.AddOpenTracing();
+                if (addOpenTracing)
+                {
+                    // Useless default http tracing
+                    services.AddOpenTracing();
+                }
 
             });
         }

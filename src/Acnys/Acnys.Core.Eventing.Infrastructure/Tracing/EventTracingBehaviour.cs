@@ -25,6 +25,7 @@ namespace Acnys.Core.Eventing.Infrastructure.Tracing
         }
         public async Task Handle(TEvent command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
+            arguments ??= new Dictionary<string, object>();
             var headerExtractor = new TextMapExtractAdapter(arguments.ToDictionary(e => e.Key, v => v.Value.ToString()));
             var previousSpan = _tracer.Extract(BuiltinFormats.HttpHeaders, headerExtractor);
             ISpanBuilder spanbuilder;
