@@ -15,7 +15,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "iteration": 1600671301875,
+  "iteration": 1600776091995,
   "links": [],
   "panels": [
     {
@@ -49,7 +49,7 @@
         "min": false,
         "rightSide": true,
         "show": true,
-        "sideWidth": 200,
+        "sideWidth": null,
         "total": false,
         "values": false
       },
@@ -67,9 +67,9 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(microservice_summaries_count{namespace=~\"$namespace\",name=~\"$name\",metric_type=~\"$metrictype\"}[$interval])",
+          "expr": "rate(microservice_handler_durations_count{handler_namespace=~\"$handler_namespace\",handler_name=~\"$handler_name\",trigger_namespace=~\"$trigger_namespace\",trigger_name=~\"$trigger_name\",handler_type=~\"$handler_type\"}[$interval])",
           "interval": "",
-          "legendFormat": "{{name}}",
+          "legendFormat": "{{handler_name}}({{trigger_name}})",
           "refId": "A"
         }
       ],
@@ -206,7 +206,7 @@
         "min": false,
         "rightSide": true,
         "show": true,
-        "sideWidth": 200,
+        "sideWidth": null,
         "total": false,
         "values": false
       },
@@ -224,9 +224,9 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(microservice_summaries_sum{namespace=~\"$namespace\",name=~\"$name\",metric_type=~\"$metrictype\"}[$interval])/rate(microservice_summaries_count{namespace=~\"$namespace\",name=~\"$name\",metric_type=~\"$metrictype\"}[$interval])",
+          "expr": "rate(microservice_handler_durations_sum{handler_namespace=~\"$handler_namespace\",handler_name=~\"$handler_name\",trigger_namespace=~\"$trigger_namespace\",trigger_name=~\"$trigger_name\",handler_type=~\"$handler_type\"}[$interval])/rate(microservice_handler_durations_count{handler_namespace=~\"$handler_namespace\",handler_name=~\"$handler_name\",trigger_namespace=~\"$trigger_namespace\",trigger_name=~\"$trigger_name\",handler_type=~\"$handler_type\"}[$interval])",
           "interval": "",
-          "legendFormat": "{{name}}",
+          "legendFormat": "{{handler_name}}({{trigger_name}})",
           "refId": "A"
         }
       ],
@@ -283,7 +283,8 @@
       {
         "allValue": null,
         "current": {
-          "selected": false,
+          "selected": true,
+          "tags": [],
           "text": [
             "All"
           ],
@@ -292,12 +293,12 @@
           ]
         },
         "datasource": "Prometheus-test",
-        "definition": "label_values(name)",
+        "definition": "label_values(handler_namespace)",
         "hide": 0,
         "includeAll": true,
-        "label": "name",
+        "label": "Handler-namespace",
         "multi": true,
-        "name": "name",
+        "name": "handler_namespace",
         "options": [
           {
             "selected": true,
@@ -306,16 +307,11 @@
           },
           {
             "selected": false,
-            "text": "TestCommand",
-            "value": "TestCommand"
-          },
-          {
-            "selected": false,
-            "text": "TestEvent",
-            "value": "TestEvent"
+            "text": "WebApplication1",
+            "value": "WebApplication1"
           }
         ],
-        "query": "label_values(name)",
+        "query": "label_values(handler_namespace)",
         "refresh": 0,
         "regex": "",
         "skipUrlSync": false,
@@ -339,12 +335,59 @@
           ]
         },
         "datasource": "Prometheus-test",
-        "definition": "label_values(namespace)",
+        "definition": "label_values(handler_name)",
         "hide": 0,
         "includeAll": true,
-        "label": "namespace",
+        "label": "Handler-name",
         "multi": true,
-        "name": "namespace",
+        "name": "handler_name",
+        "options": [
+          {
+            "selected": true,
+            "text": "All",
+            "value": "$__all"
+          },
+          {
+            "selected": false,
+            "text": "TestCommandHandler",
+            "value": "TestCommandHandler"
+          },
+          {
+            "selected": false,
+            "text": "TestEventHandler",
+            "value": "TestEventHandler"
+          }
+        ],
+        "query": "label_values(handler_name)",
+        "refresh": 0,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": true,
+          "tags": [],
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": "Prometheus-test",
+        "definition": "label_values(trigger_namespace)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Trigger-namespace",
+        "multi": true,
+        "name": "trigger_namespace",
         "options": [
           {
             "selected": true,
@@ -362,7 +405,7 @@
             "value": "WebApplication1.Commands"
           }
         ],
-        "query": "label_values(namespace)",
+        "query": "label_values(trigger_namespace)",
         "refresh": 0,
         "regex": "",
         "skipUrlSync": false,
@@ -386,12 +429,12 @@
           ]
         },
         "datasource": "Prometheus-test",
-        "definition": "label_values(metric_type)",
+        "definition": "label_values(trigger_name)",
         "hide": 0,
         "includeAll": true,
-        "label": "metrictype",
+        "label": "trigger_name",
         "multi": true,
-        "name": "metrictype",
+        "name": "trigger_name",
         "options": [
           {
             "selected": true,
@@ -400,16 +443,63 @@
           },
           {
             "selected": false,
-            "text": "CommandHandlerDuration",
-            "value": "CommandHandlerDuration"
+            "text": "TestCommand",
+            "value": "TestCommand"
           },
           {
             "selected": false,
-            "text": "EventHandlerDuration",
-            "value": "EventHandlerDuration"
+            "text": "TestEvent",
+            "value": "TestEvent"
           }
         ],
-        "query": "label_values(metric_type)",
+        "query": "label_values(trigger_name)",
+        "refresh": 0,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": true,
+          "tags": [],
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": "Prometheus-test",
+        "definition": "label_values(handler_type)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Duration type",
+        "multi": true,
+        "name": "handler_type",
+        "options": [
+          {
+            "selected": true,
+            "text": "All",
+            "value": "$__all"
+          },
+          {
+            "selected": false,
+            "text": "Command Handler",
+            "value": "Command Handler"
+          },
+          {
+            "selected": false,
+            "text": "Event Handler",
+            "value": "Event Handler"
+          }
+        ],
+        "query": "label_values(handler_type)",
         "refresh": 0,
         "regex": "",
         "skipUrlSync": false,
