@@ -1,20 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using Acnys.Core.Attributes;
 using Acnys.Core.Eventing.Abstractions;
 using Acnys.Core.Request;
 using Acnys.Core.Request.Abstractions;
-using Jaeger;
-using Microsoft.Extensions.Primitives;
 using OpenTracing;
-using OpenTracing.Propagation;
 using Serilog;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using WebApplication1.Commands;
 
 namespace WebApplication1
 {
+    [HumanReadableInformation("Test command' handler", "Test command handler's deteailed description")]
     public class TestCommandHandler : IHandleCommand<TestCommand>
     {
         private readonly IPublishEvent _eventPublisher;

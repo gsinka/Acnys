@@ -14,12 +14,12 @@ namespace Acnys.Core.Services
     public class MetricsService
     {
         private Summary _summary;
-        private Summary Summary
+        private Summary HandlerDurations
         {
             get
             {
                 if (_summary == null)
-                    _summary = Metrics.CreateSummary("microservice_summaries", "Auto-generated summary metrics", new SummaryConfiguration() { LabelNames = new[] { "namespace", "name", "metric_type" } });
+                    _summary = Metrics.CreateSummary("microservice_handler_durations", "Auto-generated summary for handler durations in second", new SummaryConfiguration() { LabelNames = new[] { "handler_namespace", "handler_name","trigger_namespace", "trigger_name", "handler_type" } });
                 return _summary;
             }
         }
@@ -43,12 +43,14 @@ namespace Acnys.Core.Services
                 return _exceptionCounter;
             }
         }
-        public void ObserveInSummary<T>(double val, string type = "")
+        public void PutObservationInSecond(string handlerNamespace, string handlerName, string triggerNamespace,string triggerName, double val, string type = "")
         {
-            Summary.
+            HandlerDurations.
                 WithLabels(
-                typeof(T).Namespace,
-                typeof(T).Name,
+                handlerNamespace,
+                handlerName,
+                triggerNamespace,
+                triggerName,
                 type).
                 Observe(val);
         }

@@ -20,8 +20,14 @@ namespace Acnys.Core.Request.Infrastructure.Extensions
         }
         public static ContainerBuilder AddCommandDurationMetricsBehaviour(this ContainerBuilder builder)
         {
-            builder.RegisterGeneric(typeof(CommandSummaryMetricBehaviour<>));
-            builder.RegisterGenericDecorator(typeof(CommandSummaryMetricBehaviour<>), typeof(IHandleCommand<>));
+            builder.RegisterGeneric(typeof(CommandDurationMetricBehaviour<>));
+            builder.RegisterGenericDecorator(typeof(CommandDurationMetricBehaviour<>), typeof(IHandleCommand<>));
+            return builder;
+        }
+        public static ContainerBuilder AddQueryDurationMetrics(this ContainerBuilder builder)
+        {
+            builder.RegisterGeneric(typeof(RequestDurationMetricBehaviour<,>));
+            builder.RegisterGenericDecorator(typeof(RequestDurationMetricBehaviour<,>), typeof(IHandleQuery<,>));
             return builder;
         }
     }

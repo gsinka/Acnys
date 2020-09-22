@@ -51,6 +51,7 @@ namespace Acnys.Core.AspNet.Request
                 containerBuilder.AddMetricsService();
                 //containerBuilder.AddCommandCountMetricsBehaviour();
                 containerBuilder.AddCommandDurationMetricsBehaviour();
+                containerBuilder.AddQueryDurationMetrics();       
             });
         }
 

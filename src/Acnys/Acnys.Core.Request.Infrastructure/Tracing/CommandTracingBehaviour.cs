@@ -1,9 +1,11 @@
 ﻿using Acnys.Core.Request.Abstractions;
+using Autofac.Features.Decorators;
 using Microsoft.Extensions.Primitives;
 using OpenTracing;
 using OpenTracing.Propagation;
 using OpenTracing.Tag;
 using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -16,19 +18,24 @@ namespace Acnys.Core.Request.Infrastructure.Tracing
         private readonly ILogger _log;
         private readonly IHandleCommand<TCommand> _nextCommand;
         private readonly ITracer _tracer;
+        private readonly IDecoratorContext _decoratorContext;
 
-        public CommandTracingBehaviour(ILogger log, IHandleCommand<TCommand> nextCommand, ITracer tracer)
+        public CommandTracingBehaviour(ILogger log, IHandleCommand<TCommand> nextCommand, ITracer tracer, IDecoratorContext decoratorContext)
         {
             _log = log;
             _nextCommand = nextCommand;
             _tracer = tracer;
+            _decoratorContext = decoratorContext;
         }
         public async Task Handle(TCommand command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
+            arguments ??= new Dictionary<string, object>();
+            var test = _decoratorContext.ImplementationType;
             var headerExtractor = new TextMapExtractAdapter(arguments.ToDictionary(e => e.Key, v => v.Value.ToString()));
             var previousSpan = _tracer.Extract(BuiltinFormats.HttpHeaders, headerExtractor);
             ISpanBuilder spanbuilder;
             if (previousSpan != null)
+                //command.GetType().GetCustomAttributes(false).OfType<Attribute>().First(a=>a.)
                 spanbuilder = _tracer.BuildSpan(typeof(TCommand).FullName).AddReference(References.ChildOf, previousSpan);
             else
             {

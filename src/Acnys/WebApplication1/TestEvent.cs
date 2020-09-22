@@ -3,6 +3,7 @@ using Acnys.Core.Eventing;
 
 namespace WebApplication1
 {
+    //[HumanReadableInformation("Test Event", "Test event's deteailed description")]
     public class TestEvent : Event
     {
         public string Data { get; }
