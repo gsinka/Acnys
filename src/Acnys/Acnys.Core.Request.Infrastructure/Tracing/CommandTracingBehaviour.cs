@@ -1,8 +1,11 @@
 ﻿using Acnys.Core.Request.Abstractions;
-using Acnys.Core.Services;
+using Microsoft.Extensions.Primitives;
 using OpenTracing;
+using OpenTracing.Propagation;
+using OpenTracing.Tag;
 using Serilog;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,13 +25,26 @@ namespace Acnys.Core.Request.Infrastructure.Tracing
         }
         public async Task Handle(TCommand command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
-            var spanbuilder = _tracer.BuildSpan(typeof(TCommand).Name);
+            var headerExtractor = new TextMapExtractAdapter(arguments.ToDictionary(e => e.Key, v => v.Value.ToString()));
+            var previousSpan = _tracer.Extract(BuiltinFormats.HttpHeaders, headerExtractor);
+            ISpanBuilder spanbuilder;
+            if (previousSpan != null)
+                spanbuilder = _tracer.BuildSpan(typeof(TCommand).FullName).AddReference(References.ChildOf, previousSpan);
+            else
+            {
+                spanbuilder = _tracer.BuildSpan(typeof(TCommand).FullName);
+            }
+            arguments.Remove("uber-trace-id");
+            var traceExtendedHeaders = arguments.ToDictionary(e => e.Key, v => v.Value.ToString());
+            var headerInjector = new TextMapInjectAdapter(traceExtendedHeaders);
             using var span = spanbuilder.StartActive(true);
+            _tracer.Inject(span.Span.Context, BuiltinFormats.HttpHeaders, headerInjector);
+            arguments.Add("uber-trace-id", new StringValues(traceExtendedHeaders["uber-trace-id"].ToString()));
             foreach (var arg in arguments)
             {
-                span.Span.SetBaggageItem(arg.Key, arg.Value.ToString());
-                span.Span.SetTag(new OpenTracing.Tag.StringTag(arg.Key), arg.Value.ToString());
+                span.Span.SetTag(new StringTag(arg.Key), arg.Value.ToString());
             }
+            //var ea = new OpenTracing.Propagation.TextMapExtractAdapter();
             Log.Verbose("Command span started");
             await _nextCommand.Handle(command, arguments, cancellationToken);
             Log.Verbose("Command span ended");
