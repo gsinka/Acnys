@@ -98,6 +98,7 @@ namespace Acnys.Core.AspNet.Extensions
 
                     var tracer = new Tracer.Builder(Assembly.GetEntryAssembly().GetName().Name)
                         .WithLoggerFactory(loggerFactory)
+                        
                         .WithSampler(new ConstSampler(true))
                         .Build();
 
