@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OpenTracing;
 using OpenTracing.Util;
+using System;
 using System.Reflection;
 
 namespace Acnys.Core.AspNet.Extensions
@@ -17,7 +18,7 @@ namespace Acnys.Core.AspNet.Extensions
     public static class TracingExtensions
     {
 
-        public static IHostBuilder AddTracing(this IHostBuilder hostBuilder, bool addOpenTracing = false)
+        public static IHostBuilder AddTracing(this IHostBuilder hostBuilder, Configuration.SenderConfiguration config=null , bool addOpenTracing = false)
         {
 
             return hostBuilder.ConfigureContainer<ContainerBuilder>((context, containerBuilder) =>
@@ -33,16 +34,18 @@ namespace Acnys.Core.AspNet.Extensions
 
                     Configuration.SenderConfiguration.DefaultSenderResolver = new SenderResolver(loggerFactory)
                         .RegisterSenderFactory<ThriftSenderFactory>();
-                    var udpSender = new Configuration.SenderConfiguration(loggerFactory)
+                    if(config == null)
+                    {
+                        config = new Configuration.SenderConfiguration(loggerFactory)
                         .WithAgentHost("localhost")
-                        .WithAgentPort(6831)
-                        .GetSender();
+                        .WithAgentPort(6831);
+                    }
+                    var udpSender = config.GetSender();
 
                     //var config = Configuration.FromEnv(loggerFactory);
 
                     var tracer = new Tracer.Builder(Assembly.GetEntryAssembly().GetName().Name)
                         .WithLoggerFactory(loggerFactory)
-
                         .WithSampler(new ConstSampler(true))
                         .Build();
 
