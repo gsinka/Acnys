@@ -11,7 +11,7 @@ using WebApplication1.Commands;
 
 namespace WebApplication1
 {
-    [HumanReadableInformation("Test command' handler", "Test command handler's deteailed description")]
+    [HumanReadableInformation("Test command's handler", "Test command handler's deteailed description")]
     public class TestCommandHandler : IHandleCommand<TestCommand>
     {
         private readonly IPublishEvent _eventPublisher;
