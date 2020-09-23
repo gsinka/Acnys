@@ -51,7 +51,7 @@ namespace Acnys.Core.Eventing.Tests
 
             var svc = _container.Resolve<EventAwaiterService>();
             var testEvent = new TestEvent();
-            var stoppingTokenSource = new CancellationTokenSource(1);
+            var stoppingTokenSource = new CancellationTokenSource(10);
             var awaiter = svc.GetEventAwaiter<TestEvent>((evnt, args) => correlationId == args.CorrelationId(), stoppingTokenSource.Token);
             await Assert.ThrowsAsync<TaskCanceledException>(async () => await awaiter);
             
