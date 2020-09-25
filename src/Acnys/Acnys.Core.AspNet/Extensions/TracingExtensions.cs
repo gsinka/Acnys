@@ -2,6 +2,7 @@
 using Acnys.Core.Request.Infrastructure.Extensions;
 using Autofac;
 using Jaeger;
+using Jaeger.Reporters;
 using Jaeger.Samplers;
 using Jaeger.Senders;
 using Jaeger.Senders.Thrift;
@@ -27,21 +28,26 @@ namespace Acnys.Core.AspNet.Extensions
                  services.AddSingleton<ITracer>(serviceProvider =>
                  {
                      var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+                     var log = serviceProvider.GetRequiredService<Serilog.ILogger>();
 
                      Configuration.SenderConfiguration.DefaultSenderResolver = new SenderResolver(loggerFactory)
                          .RegisterSenderFactory<ThriftSenderFactory>();
 
-                     var udpSender = new Configuration.SenderConfiguration(loggerFactory)
-                         .WithAgentHost(context.Configuration.GetValue<string>("Tracing:Host") ?? "localhost")
-                         .WithAgentPort(context.Configuration.GetValue<int?>("Tracing:Port") ?? 6831)
-                         .GetSender();
+                     var endpoint = context.Configuration.GetValue<string>("Tracing:Host") ?? "localhost";
+                     var port = context.Configuration.GetValue<int?>("Tracing:Port") ?? 6831;
+                     log.Debug($"Tracing added with endpoint: {endpoint}");
 
-                     //var config = Configuration.FromEnv(loggerFactory);
+                     var reporter = new RemoteReporter.Builder()
+                      .WithLoggerFactory(loggerFactory)
+                      .WithSender(new UdpSender(endpoint, port, 0))
+                      .Build();
 
                      var tracer = new Tracer.Builder(Assembly.GetEntryAssembly().GetName().Name)
-                          .WithLoggerFactory(loggerFactory)
-                          .WithSampler(new ConstSampler(true))
-                          .Build();
+                      .WithLoggerFactory(loggerFactory)
+                      .WithSampler(new ConstSampler(true))
+                      .WithReporter(reporter)
+                      .Build();
+
 
                      if (!GlobalTracer.IsRegistered())
                      {
@@ -63,6 +69,7 @@ namespace Acnys.Core.AspNet.Extensions
             {
                 containerBuilder.AddEventTracingBehaviour();
                 containerBuilder.AddCommandTracingBehaviour();
+                containerBuilder.AddRequestTracingBehaviour();
             }).
             ConfigureServices(configuration);
         }

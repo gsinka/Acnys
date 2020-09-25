@@ -1,4 +1,3 @@
-using Acnys.Core.Abstractions;
 using Acnys.Core.AspNet;
 using Acnys.Core.AspNet.Eventing;
 using Acnys.Core.AspNet.Extensions;
@@ -12,7 +11,6 @@ using Jaeger.Reporters;
 using Jaeger.Samplers;
 using Jaeger.Senders;
 using Jaeger.Senders.Thrift;
-using DotBadge;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -28,9 +26,8 @@ using Serilog.Sinks.SystemConsole.Themes;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Threading.Tasks;
 
-namespace WebApplication1
+namespace WebApplication2
 {
     public class Program
     {
@@ -56,14 +53,6 @@ namespace WebApplication1
                                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                                 .Enrich.FromLogContext()
                                 .Enrich.WithProperty("Application", "TEST");
-                        })
-
-                        .AddBadge((registry, services) =>
-                        {
-                            registry.RegistrateVersionBadge();
-                            registry.RegistrateReadinessBadge();
-                            registry.RegistrateLivenessBadge();
-                            registry.RegistrateBadge("test", "Random", () => Task.FromResult(new Random().Next(0, 10).ToString()), (status) => int.Parse(status) <= 5 ? ColorScheme.Blue : ColorScheme.Yellow);
                         })
 
                         .AddHealthChecks((context, builder) => builder
@@ -105,6 +94,7 @@ namespace WebApplication1
                                  .WithReporter(reporter)
                                  .Build();
 
+
                                 if (!GlobalTracer.IsRegistered())
                                 {
                                     GlobalTracer.Register(tracer);
@@ -121,13 +111,12 @@ namespace WebApplication1
 
                         .AddRequestSender(request => "http")
                         .AddHttpRequestSender(context => "http://localhost:5000/api", "http")
-
                         .AddRabbit((context, factory) =>
                         {
                             factory.Uri = new Uri(context.Configuration["Rabbit:Uri"]);
                             factory.AutomaticRecoveryEnabled = true;
 
-                        }, "test", "test", consumerCount: 5, consumerTag: "test-tag")
+                        }, "test", "test2", consumerCount: 5, consumerTag: "test-tag")
 
                         .ConfigureContainer<ContainerBuilder>((context, builder) =>
                         {
@@ -139,14 +128,16 @@ namespace WebApplication1
 
                             builder.RegisterEventRecorderService(10000);
 
-                            builder.RegisterType<EventRecorder>().AsImplementedInterfaces().SingleInstance();
-                            builder.Register((ctx => new EventRecorder(ctx.Resolve<ILogger>(), ctx.Resolve<IClock>(), 100))).AsImplementedInterfaces().SingleInstance();
+                            //builder.RegisterType<EventRecorder>().AsImplementedInterfaces().SingleInstance();
+                            //builder.Register((ctx => new EventRecorder(ctx.Resolve<ILogger>(), ctx.Resolve<IClock>(), 100))).AsImplementedInterfaces().SingleInstance();
                         })
 
-                        .ConfigureServices((context, services) => {
+                        .ConfigureServices((context, services) =>
+                        {
 
-                            services.AddTransient<TestMiddleware>();
                             services.AddControllers(options => { options.UseRequestBinder(); }).AddApplicationPart(Assembly.GetEntryAssembly()).AddControllersAsServices();
+
+                            //services.AddTransient<TestMiddleware>();
 
                             services.AddAuthorization(options =>
                             {
@@ -186,7 +177,6 @@ namespace WebApplication1
                             {
                                 endpoints.MapControllers();
                                 endpoints.MapHttpRequestHandler("api");
-                                endpoints.MapBadge();
                             });
                         }));
                 });
