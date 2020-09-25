@@ -12,5 +12,11 @@ namespace Acnys.Core.Request.Infrastructure.Extensions
             builder.RegisterGenericDecorator(typeof(CommandTracingBehaviour<>), typeof(IHandleCommand<>));
             return builder;
         }
+        public static ContainerBuilder AddRequestTracingBehaviour(this ContainerBuilder builder)
+        {
+            builder.RegisterGeneric(typeof(RequestTracingBehaviour<,>));
+            builder.RegisterGenericDecorator(typeof(RequestTracingBehaviour<,>), typeof(IHandleCommand<>));
+            return builder;
+        }
     }
 }

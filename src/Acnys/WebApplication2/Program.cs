@@ -27,7 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace WebApplication1
+namespace WebApplication2
 {
     public class Program
     {
@@ -94,6 +94,7 @@ namespace WebApplication1
                                  .WithReporter(reporter)
                                  .Build();
 
+
                                 if (!GlobalTracer.IsRegistered())
                                 {
                                     GlobalTracer.Register(tracer);
@@ -115,7 +116,7 @@ namespace WebApplication1
                             factory.Uri = new Uri(context.Configuration["Rabbit:Uri"]);
                             factory.AutomaticRecoveryEnabled = true;
 
-                        }, "test", "test", consumerCount: 5, consumerTag: "test-tag")
+                        }, "test", "test2", consumerCount: 5, consumerTag: "test-tag")
 
                         .ConfigureContainer<ContainerBuilder>((context, builder) =>
                         {
@@ -135,7 +136,7 @@ namespace WebApplication1
                         {
 
                             services.AddControllers(options => { options.UseRequestBinder(); }).AddApplicationPart(Assembly.GetEntryAssembly()).AddControllersAsServices();
-                            
+
                             //services.AddTransient<TestMiddleware>();
 
                             services.AddAuthorization(options =>

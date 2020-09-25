@@ -27,7 +27,7 @@ namespace Acnys.Core.Extensions
                 arguments = new Dictionary<string, object>();
             }
             var operationName = $"{handlerName}({triggerName})";
-            if (triggerInfo != null && handlerInfo != null)
+            if (handlerInfo != null)
             {
                 operationName = $"{handlerInfo.Name}";
             }
