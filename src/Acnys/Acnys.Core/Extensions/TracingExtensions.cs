@@ -44,11 +44,11 @@ namespace Acnys.Core.Extensions
             {
                 spanbuilder = tracer.BuildSpan(operationName);
             }
-
             arguments.Remove("uber-trace-id");
             var traceExtendedHeaders = arguments.ToDictionary(e => e.Key, v => v.Value.ToString());
             var headerInjector = new TextMapInjectAdapter(traceExtendedHeaders);
             var span = spanbuilder.Start();
+            tracer.ScopeManager.Activate(span,true);
             tracer.Inject(span.Context, BuiltinFormats.HttpHeaders, headerInjector);
             arguments.Add("uber-trace-id", new StringValues(traceExtendedHeaders["uber-trace-id"]).First());
 
