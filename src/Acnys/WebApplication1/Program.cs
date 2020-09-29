@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using Acnys.Core.Abstractions;
 using Acnys.Core.AspNet;
 using Acnys.Core.AspNet.Eventing;
@@ -10,9 +7,9 @@ using Acnys.Core.Eventing.Infrastructure;
 using Acnys.Core.Eventing.Infrastructure.Extensions;
 using Acnys.Core.Services;
 using Autofac;
+using DotBadge;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -20,6 +17,10 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace WebApplication1
 {
@@ -49,8 +50,17 @@ namespace WebApplication1
                                 .Enrich.WithProperty("Application", "TEST");
                         })
 
+                        .AddBadge((registry, services) =>
+                        {
+                            registry.RegistrateVersionBadge();
+                            registry.RegistrateReadinessBadge();
+                            registry.RegistrateLivenessBadge();
+                            registry.RegistrateBadge("test", "Random", () => Task.FromResult(new Random().Next(0, 10).ToString()), (status) => int.Parse(status) <= 5 ? ColorScheme.Blue : ColorScheme.Yellow);
+                        })
+
                         .AddHealthChecks((context, builder) => builder
-                            .AddCheck("Self", () => HealthCheckResult.Healthy(), new List<string> {"Liveness"})
+                            .AddCheck("Self", () => HealthCheckResult.Healthy(), new List<string> { "Liveness" })
+                            .AddCheck("Self-Ready", () => HealthCheckResult.Unhealthy(), new List<string> { "Readiness" })
                         )
                         .AddHttpMetrics()
                         .AddOpenApiDocumentation(
@@ -69,13 +79,13 @@ namespace WebApplication1
 
                         .AddRequestSender(request => "http")
                         .AddHttpRequestSender(context => "http://localhost:5000/api", "http")
-                        
+
                         .AddRabbit((context, factory) =>
                         {
                             factory.Uri = new Uri(context.Configuration["Rabbit:Uri"]);
                             factory.AutomaticRecoveryEnabled = true;
 
-                        }, "test", "test", consumerCount:5, consumerTag: "test-tag")
+                        }, "test", "test", consumerCount: 5, consumerTag: "test-tag")
 
                         .ConfigureContainer<ContainerBuilder>((context, builder) =>
                         {
@@ -87,13 +97,13 @@ namespace WebApplication1
 
                             builder.RegisterEventRecorderService(10000);
 
-                            //builder.RegisterType<EventRecorder>().AsImplementedInterfaces().SingleInstance();
-                            //builder.Register((ctx => new EventRecorder(ctx.Resolve<ILogger>(), ctx.Resolve<IClock>(), 100))).AsImplementedInterfaces().SingleInstance();
+                            builder.RegisterType<EventRecorder>().AsImplementedInterfaces().SingleInstance();
+                            builder.Register((ctx => new EventRecorder(ctx.Resolve<ILogger>(), ctx.Resolve<IClock>(), 100))).AsImplementedInterfaces().SingleInstance();
                         })
 
                         .ConfigureServices((context, services) => {
 
-                            //services.AddTransient<TestMiddleware>();
+                            services.AddTransient<TestMiddleware>();
                             services.AddControllers(options => { options.UseRequestBinder(); }).AddApplicationPart(Assembly.GetEntryAssembly()).AddControllersAsServices();
 
                             services.AddAuthorization(options => 
@@ -134,6 +144,7 @@ namespace WebApplication1
                             {
                                 endpoints.MapControllers();
                                 endpoints.MapHttpRequestHandler("api");
+                                endpoints.MapBadge();
                             });
                         }));
                 });
