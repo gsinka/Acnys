@@ -6,6 +6,7 @@ using Acnys.Core.AspNet.Request;
 using Acnys.Core.Eventing.Infrastructure.Extensions;
 using Acnys.Core.Services;
 using Autofac;
+using DotBadge;
 using Jaeger;
 using Jaeger.Reporters;
 using Jaeger.Samplers;
@@ -26,6 +27,7 @@ using Serilog.Sinks.SystemConsole.Themes;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace WebApplication1
 {
@@ -53,6 +55,14 @@ namespace WebApplication1
                                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                                 .Enrich.FromLogContext()
                                 .Enrich.WithProperty("Application", "TEST");
+                        })
+
+                        .AddBadge((registry, services) =>
+                        {
+                            registry.RegistrateVersionBadge();
+                            registry.RegistrateReadinessBadge();
+                            registry.RegistrateLivenessBadge();
+                            registry.RegistrateBadge("test", "Random", () => Task.FromResult(new Random().Next(0, 10).ToString()), (status) => int.Parse(status) <= 5 ? ColorScheme.Blue : ColorScheme.Yellow);
                         })
 
                         .AddHealthChecks((context, builder) => builder
@@ -110,6 +120,7 @@ namespace WebApplication1
 
                         .AddRequestSender(request => "http")
                         .AddHttpRequestSender(context => "http://localhost:5000/api", "http")
+
                         .AddRabbit((context, factory) =>
                         {
                             factory.Uri = new Uri(context.Configuration["Rabbit:Uri"]);
@@ -131,7 +142,7 @@ namespace WebApplication1
                             //builder.Register((ctx => new EventRecorder(ctx.Resolve<ILogger>(), ctx.Resolve<IClock>(), 100))).AsImplementedInterfaces().SingleInstance();
                         })
 
-                        .ConfigureServices((context, services) =>
+                        .ConfigureServices((context, services) => 
                         {
 
                             services.AddControllers(options => { options.UseRequestBinder(); }).AddApplicationPart(Assembly.GetEntryAssembly()).AddControllersAsServices();
@@ -176,6 +187,7 @@ namespace WebApplication1
                             {
                                 endpoints.MapControllers();
                                 endpoints.MapHttpRequestHandler("api");
+                                endpoints.MapBadge();
                             });
                         }));
                 });
