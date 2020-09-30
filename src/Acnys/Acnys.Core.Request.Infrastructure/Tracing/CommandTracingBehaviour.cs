@@ -30,6 +30,11 @@ namespace Acnys.Core.Request.Infrastructure.Tracing
         }
         public async Task Handle(TCommand command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
+            if (command.GetType().GetCustomAttributes(false).OfType<ExcludeFromTracingAttribute>().Any() || _decoratorContext.ImplementationType.GetCustomAttributes(false).OfType<ExcludeFromTracingAttribute>().Any())
+            {
+                await _nextCommand.Handle(command, arguments, cancellationToken);
+                return;
+            }
             var triggerInfo = command.GetType().GetCustomAttributes(false).OfType<HumanReadableInformationAttribute>().FirstOrDefault();
             var handlerInfo = _decoratorContext.ImplementationType.GetCustomAttributes(false).OfType<HumanReadableInformationAttribute>().FirstOrDefault();
 
