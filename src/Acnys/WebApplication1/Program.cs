@@ -29,6 +29,8 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using ILogger = Serilog.ILogger;
+using Acnys.Core.Eventing.Infrastructure;
 
 namespace WebApplication1
 {
