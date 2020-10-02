@@ -1,6 +1,5 @@
 using Acnys.Core.AspNet;
 using Acnys.Core.AspNet.Eventing;
-using Acnys.Core.AspNet.Extensions;
 using Acnys.Core.AspNet.RabbitMQ;
 using Acnys.Core.AspNet.Request;
 using Acnys.Core.Eventing.Infrastructure.Extensions;
