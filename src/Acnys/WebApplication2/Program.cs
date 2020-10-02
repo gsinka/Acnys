@@ -2,6 +2,7 @@ using Acnys.Core.AspNet;
 using Acnys.Core.AspNet.Eventing;
 using Acnys.Core.AspNet.RabbitMQ;
 using Acnys.Core.AspNet.Request;
+using Acnys.Core.AspNet.Tracing;
 using Acnys.Core.Eventing.Infrastructure.Extensions;
 using Acnys.Core.Services;
 using Autofac;
@@ -68,40 +69,7 @@ namespace WebApplication2
 
                         .AddHttpRequestHandler()
                         .AddEventing()
-                        .AddTracing((context, services) =>
-                        {
-                            services.AddSingleton<ITracer>(serviceProvider =>
-                            {
-                                var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-                                var log = serviceProvider.GetRequiredService<Serilog.ILogger>();
-
-                                Configuration.SenderConfiguration.DefaultSenderResolver = new SenderResolver(loggerFactory)
-                                    .RegisterSenderFactory<ThriftSenderFactory>();
-
-                                var endpoint = context.Configuration.GetValue<string>("Tracing:Host") ?? "localhost";
-                                var port = context.Configuration.GetValue<int?>("Tracing:Port") ?? 6831;
-                                log.Information($"Tracing added with endpoint: {endpoint}");
-
-                                var reporter = new RemoteReporter.Builder()
-                                 .WithLoggerFactory(loggerFactory)
-                                 .WithSender(new UdpSender(endpoint, port, 0))
-                                 .Build();
-
-                                var tracer = new Tracer.Builder(Assembly.GetEntryAssembly().GetName().Name)
-                                 .WithLoggerFactory(loggerFactory)
-                                 .WithSampler(new ConstSampler(true))
-                                 .WithReporter(reporter)
-                                 .Build();
-
-
-                                if (!GlobalTracer.IsRegistered())
-                                {
-                                    GlobalTracer.Register(tracer);
-                                }
-
-                                return tracer;
-                            });
-                        })
+                        .AddTracing((configuration) => configuration["Tracing:Host"], (configuration) => { var port = configuration["Tracing:Port"]; return string.IsNullOrWhiteSpace(port) ? 0 : Int32.Parse(port); })
 
                         .AddSingleSignOn((context, options) => context.Configuration.Bind("SingleSignOn", options))
 
