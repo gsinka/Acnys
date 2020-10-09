@@ -49,9 +49,10 @@ namespace Acnys.Core.RabbitMQ
             arguments.EnrichLogContextWithCorrelation();
 
             var (contextRoutingKey, mandatory, props, body) = _publishContext(@event, arguments);
+
             _log.Debug("Publishing event '{eventType}' to exchange '{exchangeName}' with routing key '{routingKey}'", typeof(T).Name, _exchange, routingKey ?? contextRoutingKey);
             _log.Verbose("Event data: {@event}", @event);
-            _log.Verbose("Mandatory: '{mandatory}', event arguments: {@eventProps}", routingKey ?? contextRoutingKey, mandatory, props);
+            _log.Verbose("Mandatory: '{mandatory}', event arguments: {@eventProps}", mandatory, props);
 
             _model.BasicPublish(_exchange, routingKey ?? contextRoutingKey, mandatory, props, body);
             return Task.CompletedTask;
