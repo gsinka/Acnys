@@ -35,8 +35,10 @@ namespace Acnys.Core.Eventing.Infrastructure
 
             try
             {
-                var handlers = (IEnumerable<dynamic>)_scope.Resolve(typeof(IEnumerable<>).MakeGenericType(handlerType));
-                var allHandlers = _scope.Resolve<IEnumerable<IHandleEvent>>();
+                using var scope = _scope.BeginLifetimeScope();
+                
+                var handlers = (IEnumerable<dynamic>)scope.Resolve(typeof(IEnumerable<>).MakeGenericType(handlerType));
+                var allHandlers = scope.Resolve<IEnumerable<IHandleEvent>>();
 
                 foreach (var handler in handlers.Union(allHandlers))
                 {
