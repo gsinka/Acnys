@@ -36,7 +36,6 @@ namespace Acnys.Core.Eventing.Infrastructure
             try
             {
                 using var scope = _scope.BeginLifetimeScope();
-                
                 var handlers = (IEnumerable<dynamic>)scope.Resolve(typeof(IEnumerable<>).MakeGenericType(handlerType));
                 var allHandlers = scope.Resolve<IEnumerable<IHandleEvent>>();
 
