@@ -7,7 +7,10 @@ namespace Acnys.Core.AspNet
     {
         public static IApplicationBuilder AddErrorHandling(this IApplicationBuilder app)
         {
-            app.UseMiddleware<ErrorHandlingMiddleware>();
+            return app.UseMiddleware<ErrorHandlingMiddleware>();
+        }
+        public static IApplicationBuilder AddErrorMetricsMiddleware( this IApplicationBuilder app)
+        {
             return app.UseMiddleware<ErrorMetricsMiddleware>();
         }
     }

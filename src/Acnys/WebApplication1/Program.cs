@@ -130,7 +130,7 @@ namespace WebApplication1
                             app.UseAuthentication();
                             app.UseAuthorization();
                             app.UseHttpMetrics();
-
+                            app.AddErrorMetricsMiddleware();
                             var appSettings = new ApplicationOptions();
                             context.Configuration.Bind("Application", appSettings);
 
