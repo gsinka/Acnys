@@ -47,7 +47,7 @@ namespace WebApplication1
             }.EnrichWithCorrelation(command, arguments);
 
             await _eventPublisher.Publish(testEvent, args, cancellationToken);
-            await _eventPublisher.Publish(testEvent2, args2, cancellationToken);
+            await _eventPublisher.Publish(testEvent2, arguments, cancellationToken);
         }
     }
 }

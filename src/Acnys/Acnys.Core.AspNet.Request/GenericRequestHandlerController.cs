@@ -51,10 +51,10 @@ namespace Acnys.Core.AspNet.Request
             Type requestType = request.GetType();
 
             _log.Debug("Generic request identified as {requestType}", requestType.FullName);
-
+            
             var arguments =
-                Request.Headers.Keys.ToDictionary<string, string, object>(key => key, key => Request.Headers[key]);
-
+                Request.Headers.ToDictionary(a => a.Key, a => (object)string.Join(";",a.Value));
+            //Request.Headers.Keys.ToDictionary<string, string, object>(key => key, key => Request.Headers[key]);
             _log.Verbose("Arguments parsed from request header: {@arguments}", arguments);
 
             if (request is ICommand)

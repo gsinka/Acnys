@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
+using Prometheus;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
@@ -72,40 +73,7 @@ namespace WebApplication1
                         .AddHttpRequestHandler()
                         .AddEventing()
                         .AddTracing((configuration) => configuration["Tracing:Host"], (configuration) => { var port = configuration["Tracing:Port"]; return string.IsNullOrWhiteSpace(port) ? 0 : Int32.Parse(port); })
-                        //.AddTracing((context, services) =>
-                        //{
-                        //    services.AddSingleton<ITracer>(serviceProvider =>
-                        //    {
-                        //        var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-                        //        var log = serviceProvider.GetRequiredService<Serilog.ILogger>();
-
-                        //        Configuration.SenderConfiguration.DefaultSenderResolver = new SenderResolver(loggerFactory)
-                        //            .RegisterSenderFactory<ThriftSenderFactory>();
-
-                        //        var endpoint = context.Configuration.GetValue<string>("Tracing:Host") ?? "localhost";
-                        //        var port = context.Configuration.GetValue<int?>("Tracing:Port") ?? 6831;
-                        //        log.Information($"Tracing added with endpoint: {endpoint}");
-
-                        //        var reporter = new RemoteReporter.Builder()
-                        //         .WithLoggerFactory(loggerFactory)
-                        //         .WithSender(new UdpSender(endpoint, port, 0))
-                        //         .Build();
-
-                        //        var tracer = new Tracer.Builder(Assembly.GetEntryAssembly().GetName().Name)
-                        //         .WithLoggerFactory(loggerFactory)
-                        //         .WithSampler(new ConstSampler(true))
-                        //         .WithReporter(reporter)
-                        //         .Build();
-
-                        //        if (!GlobalTracer.IsRegistered())
-                        //        {
-                        //            GlobalTracer.Register(tracer);
-                        //        }
-
-                        //        return tracer;
-                        //    });
-                        //})
-
+                        
                         .AddSingleSignOn((context, options) => context.Configuration.Bind("SingleSignOn", options))
 
                         .RegisterRequestHandlersFromAssemblyOf<TestEventHandler>()
@@ -159,9 +127,9 @@ namespace WebApplication1
 
                             app.AddErrorHandling();
                             app.UseRouting();
-
                             app.UseAuthentication();
                             app.UseAuthorization();
+                            app.UseHttpMetrics();
 
                             var appSettings = new ApplicationOptions();
                             context.Configuration.Bind("Application", appSettings);
