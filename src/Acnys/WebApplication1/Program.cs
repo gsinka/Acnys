@@ -21,6 +21,8 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using Acnys.Core.Correlation;
+using Acnys.Core.Request.Infrastructure.Extensions;
 
 namespace WebApplication1
 {
@@ -98,6 +100,8 @@ namespace WebApplication1
                             builder.RegisterType<TestMiddleware>().AsImplementedInterfaces().AsSelf().InstancePerLifetimeScope();
 
                             builder.RegisterEventRecorderService(10000);
+
+                            builder.AddCorrelation();
 
                             //builder.RegisterType<EventRecorder>().AsImplementedInterfaces().SingleInstance();
                             //builder.Register((ctx => new EventRecorder(ctx.Resolve<ILogger>(), ctx.Resolve<IClock>(), 100))).AsImplementedInterfaces().SingleInstance();

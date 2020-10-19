@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Acnys.Core.Correlation;
 using Acnys.Core.Extensions;
 using Acnys.Core.Request.Abstractions;
 using Acnys.Core.Request.Infrastructure.Extensions;

@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using Acnys.Core.Extensions;
 using Acnys.Core.Request.Abstractions;
 
-namespace Acnys.Core.Request
+namespace Acnys.Core.Correlation
 {
     public static class RequestCorrelationExtensions
     {

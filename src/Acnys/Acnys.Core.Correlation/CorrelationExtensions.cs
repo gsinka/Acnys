@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using Acnys.Core.Request.Abstractions;
 using Acnys.Core.ValueObjects;
-using Microsoft.Extensions.Primitives;
+using Autofac;
 using Serilog.Context;
 
-namespace Acnys.Core.Extensions
+namespace Acnys.Core.Correlation
 {
     public static class CorrelationExtensions
     {
@@ -21,6 +22,7 @@ namespace Acnys.Core.Extensions
                         ? parsedGuid
                         : (Guid?)null;
         }
+
         public static string TraceId(this IDictionary<string, object> arguments)
         {
             if (arguments == null || !arguments.ContainsKey(RequestConstants.TraceId)) return null;
@@ -47,19 +49,36 @@ namespace Acnys.Core.Extensions
         public static IDictionary<string, object> UseCorrelationId(this IDictionary<string, object> arguments, Guid? correlationId)
         {
             if (!correlationId.HasValue) return arguments;
-            arguments.Add(RequestConstants.CorrelationId, correlationId);
+            if (!arguments.ContainsKey(RequestConstants.CorrelationId))
+            {
+                arguments.Add(RequestConstants.CorrelationId, correlationId);
+            }
+            else
+            {
+                arguments[RequestConstants.CorrelationId] = correlationId;
+            }
+
             return arguments;
         }
+
         public static IDictionary<string, object> UseTraceId(this IDictionary<string, object> arguments, string traceId)
         {
             if (string.IsNullOrWhiteSpace(traceId)) return arguments;
             arguments.Add(RequestConstants.TraceId, traceId);
             return arguments;
         }
+
         public static IDictionary<string, object> UseCausationId(this IDictionary<string, object> arguments, Guid? causationId)
         {
             if (!causationId.HasValue) return arguments;
-            arguments.Add(RequestConstants.CausationId, causationId);
+            if (!arguments.ContainsKey(RequestConstants.CausationId))
+            {
+                arguments.Add(RequestConstants.CausationId, causationId);
+            }
+            else
+            {
+                arguments[RequestConstants.CausationId] = causationId;
+            }
             return arguments;
         }
 

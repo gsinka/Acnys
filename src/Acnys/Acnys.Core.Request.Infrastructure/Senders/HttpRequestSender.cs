@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Acnys.Core.Correlation;
 using Acnys.Core.Extensions;
 using Acnys.Core.Request.Abstractions;
 using Acnys.Core.ValueObjects;

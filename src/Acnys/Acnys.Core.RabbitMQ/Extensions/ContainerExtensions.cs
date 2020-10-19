@@ -60,7 +60,7 @@ namespace Acnys.Core.RabbitMQ.Extensions
                     exchange,
                     RabbitEventPublisher.DefaultContextBuilder
                     )
-            ).AsImplementedInterfaces().SingleInstance();
+            ).AsImplementedInterfaces().InstancePerLifetimeScope();
 
             return builder;
         }

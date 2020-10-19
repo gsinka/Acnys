@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Acnys.Core.Correlation;
 using Acnys.Core.Eventing.Abstractions;
 using Acnys.Core.Extensions;
 using Acnys.Core.ValueObjects;

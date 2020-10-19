@@ -5,6 +5,7 @@ using Serilog;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Acnys.Core.Correlation;
 
 namespace Acnys.Core.Eventing.Infrastructure.Publishers
 {

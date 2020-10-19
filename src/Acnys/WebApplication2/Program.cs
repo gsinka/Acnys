@@ -6,26 +6,19 @@ using Acnys.Core.AspNet.Tracing;
 using Acnys.Core.Eventing.Infrastructure.Extensions;
 using Acnys.Core.Services;
 using Autofac;
-using Jaeger;
-using Jaeger.Reporters;
-using Jaeger.Samplers;
-using Jaeger.Senders;
-using Jaeger.Senders.Thrift;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using OpenTracing;
-using OpenTracing.Util;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Acnys.Core.Correlation;
 
 namespace WebApplication2
 {
@@ -94,6 +87,8 @@ namespace WebApplication2
                             builder.RegisterType<TestMiddleware>().AsImplementedInterfaces().AsSelf().InstancePerLifetimeScope();
 
                             builder.RegisterEventRecorderService(10000);
+
+                            builder.AddCorrelation();
 
                             //builder.RegisterType<EventRecorder>().AsImplementedInterfaces().SingleInstance();
                             //builder.Register((ctx => new EventRecorder(ctx.Resolve<ILogger>(), ctx.Resolve<IClock>(), 100))).AsImplementedInterfaces().SingleInstance();

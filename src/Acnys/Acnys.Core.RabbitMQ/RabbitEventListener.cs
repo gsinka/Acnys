@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Acnys.Core.Correlation;
 using Acnys.Core.Eventing.Abstractions;
 using Acnys.Core.Extensions;
 using Acnys.Core.ValueObjects;
@@ -86,6 +87,7 @@ namespace Acnys.Core.RabbitMQ
         private void OnReceived(object sender, BasicDeliverEventArgs e)
         {
             using var scope = _scope.BeginLifetimeScope();
+
             var consumer = sender as EventingBasicConsumer;
 
             _log.Debug("New lifetime scope created for event dispatcher ({scopeId})", scope.GetHashCode());

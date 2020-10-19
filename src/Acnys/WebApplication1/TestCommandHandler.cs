@@ -1,12 +1,12 @@
 using Acnys.Core.Attributes;
 using Acnys.Core.Eventing.Abstractions;
-using Acnys.Core.Request;
 using Acnys.Core.Request.Abstractions;
 using OpenTracing;
 using Serilog;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Acnys.Core.Correlation;
 using WebApplication1.Commands;
 
 namespace WebApplication1
@@ -18,13 +18,15 @@ namespace WebApplication1
         private readonly ILogger _log;
         private readonly UserContext _context;
         private readonly ITracer _tracer;
+        private readonly CorrelationContext _correlationContext;
 
-        public TestCommandHandler(IPublishEvent eventPublisher, ILogger log, UserContext context, ITracer tracer)
+        public TestCommandHandler(IPublishEvent eventPublisher, ILogger log, UserContext context, ITracer tracer, CorrelationContext correlationContext)
         {
             _eventPublisher = eventPublisher;
             _log = log;
             _context = context;
             _tracer = tracer;
+            _correlationContext = correlationContext;
         }
 
         public async Task Handle(TestCommand command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
@@ -36,7 +38,9 @@ namespace WebApplication1
                 { "test", "test" },
                 { "int", 1 },
                 { "Routing", "test.level" },
-            }.EnrichWithCorrelation(command, arguments);
+            }
+                    //.EnrichWithCorrelation(command, arguments)
+                ;
             var testEvent2 = new TestEvent(command.Data);
 
             var args2 = new Dictionary<string, object>()
@@ -44,10 +48,12 @@ namespace WebApplication1
                 { "test", "test2" },
                 { "int", 2 },
                 { "RoutingKey", "test.level" },
-            }.EnrichWithCorrelation(command, arguments);
+            }
+                //.EnrichWithCorrelation(command, arguments)
+                ;
 
             await _eventPublisher.Publish(testEvent, args, cancellationToken);
-            await _eventPublisher.Publish(testEvent2, arguments, cancellationToken);
+            await _eventPublisher.Publish(testEvent2, args2, cancellationToken);
         }
     }
 }

@@ -47,7 +47,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Acnys.Core.AspNet.RabbitMQ"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Acnys.Core.Tests", "Acnys.Core.Tests\Acnys.Core.Tests.csproj", "{CC136432-1D95-44DC-80B0-54C4EBFE737A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication2", "WebApplication2\WebApplication2.csproj", "{AE3A1120-CF1B-4F71-BE05-536BCA0A71AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplication2", "WebApplication2\WebApplication2.csproj", "{AE3A1120-CF1B-4F71-BE05-536BCA0A71AE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Acnys.Core.Correlation", "Acnys.Core.Correlation\Acnys.Core.Correlation.csproj", "{297DC0DB-37AF-4329-9DA2-F5A79DD7603D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -127,6 +129,10 @@ Global
 		{AE3A1120-CF1B-4F71-BE05-536BCA0A71AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE3A1120-CF1B-4F71-BE05-536BCA0A71AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE3A1120-CF1B-4F71-BE05-536BCA0A71AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{297DC0DB-37AF-4329-9DA2-F5A79DD7603D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{297DC0DB-37AF-4329-9DA2-F5A79DD7603D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{297DC0DB-37AF-4329-9DA2-F5A79DD7603D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{297DC0DB-37AF-4329-9DA2-F5A79DD7603D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -148,6 +154,7 @@ Global
 		{6F0D1A04-79A9-4268-9FD3-E2ADAA1E2588} = {930262B8-522B-4321-9773-76BC112FCFFF}
 		{FB0F2861-7DC6-4EFD-AB66-BDD06534B1D4} = {930262B8-522B-4321-9773-76BC112FCFFF}
 		{CC136432-1D95-44DC-80B0-54C4EBFE737A} = {C131F949-85D8-4355-98E9-196EE451F849}
+		{297DC0DB-37AF-4329-9DA2-F5A79DD7603D} = {C131F949-85D8-4355-98E9-196EE451F849}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A69C0856-DF72-460A-BEEB-2F5709E6DE5D}

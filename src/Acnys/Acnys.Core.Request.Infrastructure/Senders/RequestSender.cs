@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Acnys.Core.Correlation;
 using Acnys.Core.Extensions;
 using Acnys.Core.Request.Abstractions;
 using Autofac.Features.Indexed;

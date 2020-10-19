@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Acnys.Core.Correlation;
 using Acnys.Core.Eventing.Abstractions;
 using Acnys.Core.Extensions;
 using Acnys.Core.Request.Abstractions;
