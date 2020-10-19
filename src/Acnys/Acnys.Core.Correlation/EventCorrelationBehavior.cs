@@ -23,10 +23,7 @@ namespace Acnys.Core.Correlation
 
         public async Task Dispatch<T>(T @event, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : IEvent
         {
-            _correlationContext.CorrelationId = arguments?.CorrelationId() ?? Guid.NewGuid();
-            _correlationContext.CausationId = @event.EventId;
-            _log.Debug("Correlation context {contextId} updated: {@context}", _correlationContext.GetHashCode(), _correlationContext);
-
+            _correlationContext.Update(_log, @event, arguments);
             await _next.Dispatch(@event, arguments, cancellationToken);
         }
     }

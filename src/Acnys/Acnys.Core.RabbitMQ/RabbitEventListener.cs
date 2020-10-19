@@ -155,8 +155,9 @@ namespace Acnys.Core.RabbitMQ
 
             var eventArgs = (args.BasicProperties?.Headers ?? new Dictionary<string, object>())
                 .Where( pair => pair.Key != RequestConstants.CausationId &&
-                        pair.Key != RequestConstants.TraceId && 
-                        pair.Key != nameof(args.RoutingKey))
+                                pair.Key != RequestConstants.CausationPath &&
+                                pair.Key != RequestConstants.TraceId && 
+                                pair.Key != nameof(args.RoutingKey))
                 .ToDictionary(pair => pair.Key, pair => pair.Value);
 
             if (args.BasicProperties.IsCorrelationIdPresent())
@@ -171,7 +172,13 @@ namespace Acnys.Core.RabbitMQ
                 if (Guid.TryParse(causationId.ToString(), out var result)) eventArgs.UseCausationId(result);
             }
 
-            if(args.BasicProperties?.Headers?.ContainsKey(RequestConstants.TraceId) ?? false)
+            if (args.BasicProperties?.Headers?.ContainsKey(RequestConstants.CausationPath) ?? false)
+            {
+                var causationPath = Encoding.UTF8.GetString((byte[])args.BasicProperties.Headers[RequestConstants.CausationPath]);
+                eventArgs.Add(RequestConstants.CausationPath, causationPath);
+            }
+
+            if (args.BasicProperties?.Headers?.ContainsKey(RequestConstants.TraceId) ?? false)
             {
                 var traceId = Encoding.UTF8.GetString((byte[])args.BasicProperties.Headers[RequestConstants.TraceId]);
                 eventArgs.Add(RequestConstants.TraceId, traceId);

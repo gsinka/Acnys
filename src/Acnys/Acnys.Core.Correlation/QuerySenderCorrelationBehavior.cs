@@ -21,12 +21,9 @@ namespace Acnys.Core.Correlation
 
         public async Task<T> Send<T>(IQuery<T> query, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
-            arguments.UseCorrelationId(_correlationContext.CorrelationId);
-            arguments.UseCausationId(_correlationContext.CausationId);
-            _log.Debug("Updating arguments from Correlation context {contextId}: {@context}", _correlationContext.GetHashCode(), _correlationContext);
-
+            arguments.UpdateWithCorrelationContext(_log, _correlationContext);
+            arguments.UpdateCausationPath(query);
             return  await _next.Send(query, arguments, cancellationToken);
-
         }
     }
 }

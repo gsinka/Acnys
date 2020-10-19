@@ -21,19 +21,15 @@ namespace Acnys.Core.Correlation
 
         public async Task Publish<T>(T @event, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : IEvent
         {
-            arguments.UseCorrelationId(_correlationContext.CorrelationId);
-            arguments.UseCausationId(_correlationContext.CausationId);
-            _log.Debug("Updating arguments from Correlation context {contextId}: {@context}", _correlationContext.GetHashCode(), _correlationContext);
-
+            arguments.UpdateWithCorrelationContext(_log, _correlationContext);
+            arguments.UpdateCausationPath(@event);
             await _next.Publish(@event, arguments, cancellationToken);
         }
 
         public async Task Publish<T>(T @event, string routingKey, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : IEvent
         {
-            arguments.UseCorrelationId(_correlationContext.CorrelationId);
-            arguments.UseCausationId(_correlationContext.CausationId);
-            _log.Debug("Updating arguments from Correlation context {contextId}: {@context}", _correlationContext.GetHashCode(), _correlationContext);
-
+            arguments.UpdateWithCorrelationContext(_log, _correlationContext);
+            arguments.UpdateCausationPath(@event);
             await _next.Publish(@event, routingKey, arguments, cancellationToken);
         }
     }

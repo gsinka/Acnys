@@ -25,7 +25,7 @@ namespace WebApplication1
 
         public async Task Handle(AnotherTestCommand command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            
         }
     }
 }

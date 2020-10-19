@@ -22,9 +22,8 @@ namespace Acnys.Core.Correlation
 
         public async Task Send<T>(T command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : ICommand
         {
-            arguments.UseCorrelationId(_correlationContext.CorrelationId);
-            arguments.UseCausationId(_correlationContext.CausationId);
-            _log.Debug("Updating arguments from Correlation context {contextId}: {@context}", _correlationContext.GetHashCode(), _correlationContext);
+            arguments.UpdateWithCorrelationContext(_log, _correlationContext);
+            arguments.UpdateCausationPath(command);
 
             await _next.Send(command, arguments, cancellationToken);
         }

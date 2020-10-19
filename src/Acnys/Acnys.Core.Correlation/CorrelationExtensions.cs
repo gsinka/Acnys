@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Acnys.Core.Eventing.Abstractions;
 using Acnys.Core.Request.Abstractions;
 using Acnys.Core.ValueObjects;
 using Autofac;
+using Serilog;
 using Serilog.Context;
 
 namespace Acnys.Core.Correlation
@@ -89,6 +92,65 @@ namespace Acnys.Core.Correlation
 
             var causationId = args?.CausationId();
             if (causationId != null) LogContext.PushProperty(RequestConstants.CausationId, causationId);
+        }
+
+        public static IDictionary<string, object> UpdateWithCorrelationContext(this IDictionary<string, object> arguments, ILogger log, CorrelationContext correlationContext)
+        {
+            arguments.UseCorrelationId(correlationContext.CorrelationId);
+            arguments.UseCausationId(correlationContext.CausationId);
+            log.Debug("Updating arguments from Correlation context {contextId}: {@context}", correlationContext.GetHashCode(), correlationContext);
+
+            return arguments;
+        }
+
+        public static IDictionary<string, object> UpdateCausationPath(this IDictionary<string, object> arguments, IRequest request)
+        {
+            if (!arguments.ContainsKey(RequestConstants.CausationPath))
+            {
+                arguments.Add(RequestConstants.CausationPath, $"{request.GetType().FullName} ({request.RequestId})");
+            }
+            else
+            {
+                arguments[RequestConstants.CausationPath] = $"{arguments[RequestConstants.CausationPath]} -> {request.GetType().FullName} ({request.RequestId})";
+            }
+
+            return arguments;
+        }
+
+        public static IDictionary<string, object> UpdateCausationPath(this IDictionary<string, object> arguments, IEvent evnt)
+        {
+            if (!arguments.ContainsKey(RequestConstants.CausationPath))
+            {
+                arguments.Add(RequestConstants.CausationPath, $"{evnt.GetType().FullName} ({evnt.EventId})");
+            }
+            else
+            {
+                arguments[RequestConstants.CausationPath] = $"{arguments[RequestConstants.CausationPath]} -> {evnt.GetType().FullName} ({evnt.EventId})";
+            }
+
+            return arguments;
+        }
+
+        public static CorrelationContext Update(this CorrelationContext correlationContext, ILogger log, IEvent evnt, IDictionary<string, object> arguments)
+        {
+            correlationContext.CorrelationId = arguments?.CorrelationId() ?? Guid.NewGuid();
+            correlationContext.CausationId = evnt.EventId;
+            //if (arguments != null && arguments.ContainsKey(RequestConstants.CausationPath)) correlationContext.CausationPath = arguments[RequestConstants.CausationPath] as string;
+
+            log.Debug("Correlation context {contextId} updated: {@context}", correlationContext.GetHashCode(), correlationContext);
+
+            return correlationContext;
+        }
+
+        public static CorrelationContext Update(this CorrelationContext correlationContext, ILogger log, IRequest request, IDictionary<string, object> arguments)
+        {
+            correlationContext.CorrelationId = arguments?.CorrelationId() ?? Guid.NewGuid();
+            correlationContext.CausationId = request.RequestId;
+            //if (arguments != null && arguments.ContainsKey(RequestConstants.CausationPath)) correlationContext.CausationPath = arguments[RequestConstants.CausationPath] as string;
+
+            log.Debug("Correlation context {contextId} updated: {@context}", correlationContext.GetHashCode(), correlationContext);
+
+            return correlationContext;
         }
     }
 }
