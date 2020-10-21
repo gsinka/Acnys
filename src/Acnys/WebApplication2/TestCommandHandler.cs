@@ -1,12 +1,11 @@
-using Acnys.Core.Attributes;
 using Acnys.Core.Eventing.Abstractions;
-using Acnys.Core.Request;
 using Acnys.Core.Request.Abstractions;
 using OpenTracing;
 using Serilog;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Acnys.Core.Tracing.Attributes;
 using WebApplication2.Commands;
 
 namespace WebApplication2

@@ -1,106 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Acnys.Core.Correlation;
-using Acnys.Core.Extensions;
 using Acnys.Core.Request.Abstractions;
-using Acnys.Core.ValueObjects;
-using Newtonsoft.Json;
 using Serilog;
 
 namespace Acnys.Core.Request.Infrastructure.Senders
 {
-    public class HttpRequestSender : ISendRequest
-    {
-        private readonly ILogger _log;
-        private readonly HttpClientHandler _httpHandler;
-        private readonly Uri _uri;
-        
-        public HttpRequestSender(ILogger log, HttpClientHandler httpHandler, string uri)
-        {
-            _log = log;
-            _httpHandler = httpHandler;
-            _uri = new Uri(uri);
-        }
+    //public class HttpRequestSender : ISendRequest
+    //{
+    //    private readonly ISendCommand _commandSender;
+    //    private readonly ISendQuery _querySender;
 
-        private readonly Func<Type, string> _typeNameBuilder = type => $"{type.FullName}, {type.Assembly.GetName().Name}";
+    //    public HttpRequestSender(ISendCommand commandSender, ISendQuery querySender)
+    //    {
+    //        _commandSender = commandSender;
+    //        _querySender = querySender;
+    //    }
 
-        public async Task Send<T>(T command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : ICommand
-        {
-            arguments.EnrichLogContextWithCorrelation();
+    //    private readonly Func<Type, string> _typeNameBuilder = type => $"{type.FullName}, {type.Assembly.GetName().Name}";
 
-            _log.Debug("Sending command to HTTP endpoint {uri}", _uri.ToString());
+    //    public async Task Send<T>(T command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default) where T : ICommand
+    //    {
+    //        await _commandSender.Send(command, arguments, cancellationToken);
+    //    }
 
-            _log.Verbose("Command data: {@command}", command);
-            _log.Verbose("Command arguments: {@arguments}", arguments);
-
-            using var httpClient = new HttpClient(_httpHandler, false)
-            {
-                Timeout = TimeSpan.FromSeconds(30),
-            };
-
-            var commandJson = JsonConvert.SerializeObject(command);
-            
-            httpClient.DefaultRequestHeaders.Add(RequestConstants.DomainType, _typeNameBuilder(command.GetType()));
-            httpClient.DefaultRequestHeaders.Add(RequestConstants.RequestId, command.RequestId.ToString());
-
-            if (arguments != null)
-                foreach (var argument in arguments)
-                {
-                    httpClient.DefaultRequestHeaders.Add(argument.Key, argument.Value.ToString());
-                }
-
-            var result = await httpClient.PostAsync(
-                _uri,
-                new StringContent(commandJson, Encoding.UTF8, "application/json"),
-                cancellationToken);
-
-            if (!result.IsSuccessStatusCode)
-            {
-                _log.Error("Sending command to HTTP endpoint failed. Reason: {reason}, Response: {response}", result.ReasonPhrase, result.Content.ReadAsStringAsync());
-                throw new Exceptions.HttpRequestException(result.StatusCode, await result.Content.ReadAsByteArrayAsync());
-            }
-        }
-
-        public async Task<T> Send<T>(IQuery<T> query, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
-        {
-            _log.Debug("Sending query to HTTP endpoint {uri}", _uri.ToString());
-
-            _log.Verbose("Query data: {@query}", query);
-            _log.Verbose("Query arguments: {@query}", arguments);
-
-            using var httpClient = new HttpClient(_httpHandler, false)
-            {
-                Timeout = TimeSpan.FromMinutes(5),
-            };
-
-            var queryJson = JsonConvert.SerializeObject(query);
-
-            httpClient.DefaultRequestHeaders.Add(RequestConstants.DomainType, _typeNameBuilder(query.GetType()));
-            httpClient.DefaultRequestHeaders.Add(RequestConstants.RequestId, query.RequestId.ToString());
-
-            if (arguments != null)
-                foreach (var argument in arguments)
-                {
-                    httpClient.DefaultRequestHeaders.Add(argument.Key, argument.Value.ToString());
-                }
-
-            var result = await httpClient.PostAsync(
-                _uri, 
-                new StringContent(queryJson, Encoding.UTF8, "application/json"), 
-                cancellationToken);
-            
-            if (!result.IsSuccessStatusCode)
-            {
-                _log.Error("Sending command to HTTP endpoint failed. Reason: {reason}, Response: {response}", result.ReasonPhrase, await result.Content.ReadAsStringAsync());
-                throw new Exceptions.HttpRequestException(result.StatusCode, await result.Content.ReadAsByteArrayAsync());
-            }
-
-            var responseContent = await result.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<T>(responseContent);
-        }
-    }
+    //    public async Task<T> Send<T>(IQuery<T> query, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
+    //    {
+    //        return await _querySender.Send(query, arguments, cancellationToken);
+    //    }
+    //}
 }

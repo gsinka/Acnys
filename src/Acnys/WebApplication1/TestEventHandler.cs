@@ -10,15 +10,17 @@ namespace WebApplication1
     public class TestEventHandler : IHandleEvent<TestEvent>
     {
         private readonly ISendRequest _requestSender;
+        private readonly ISendCommand _commandSender;
 
-        public TestEventHandler(ISendRequest requestSender)
+        public TestEventHandler(ISendRequest requestSender, ISendCommand commandSender)
         {
             _requestSender = requestSender;
+            _commandSender = commandSender;
         }
 
         public async Task Handle(TestEvent @event, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
         {
-            await _requestSender.Send(new AnotherTestCommand(""), null, cancellationToken);
+            await _requestSender.Send(new AnotherTestCommand(""), new Dictionary<string, object>(), cancellationToken);
         }
     }
 }

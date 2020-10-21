@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading;
 using Acnys.Core.Correlation;
 using Acnys.Core.Eventing.Abstractions;
-using Acnys.Core.Extensions;
 using Acnys.Core.ValueObjects;
 using Autofac;
 using Newtonsoft.Json;

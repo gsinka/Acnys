@@ -1,9 +1,7 @@
 ﻿using Prometheus;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection.Metadata;
 
 /*
  Not using quantiles: https://www.robustperception.io/how-does-a-prometheus-summary-work

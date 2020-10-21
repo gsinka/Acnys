@@ -1,19 +1,13 @@
 using Acnys.Core.AspNet;
 using Acnys.Core.AspNet.Eventing;
-using Acnys.Core.AspNet.RabbitMQ;
 using Acnys.Core.AspNet.Request;
-using Acnys.Core.AspNet.Tracing;
-using Acnys.Core.Eventing.Infrastructure.Extensions;
 using Acnys.Core.Services;
 using Autofac;
 using DotBadge;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
-using Prometheus;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
@@ -21,8 +15,13 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using Acnys.Core.AspNet.RabbitMQ;
+using Acnys.Core.AspNet.Tracing;
 using Acnys.Core.Correlation;
-using Acnys.Core.Request.Infrastructure.Extensions;
+using Acnys.Core.Eventing.Infrastructure.Extensions;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Prometheus;
 
 namespace WebApplication1
 {

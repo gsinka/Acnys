@@ -6,7 +6,6 @@ using Acnys.Core.Correlation;
 using Acnys.Core.Eventing.Abstractions;
 using Acnys.Core.Eventing.Infrastructure.Extensions;
 using Acnys.Core.Eventing.Infrastructure;
-using Acnys.Core.Extensions;
 using Autofac;
 using Serilog;
 using Xunit;

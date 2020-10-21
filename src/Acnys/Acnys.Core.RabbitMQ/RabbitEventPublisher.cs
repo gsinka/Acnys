@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Correlation;
 using Acnys.Core.Eventing.Abstractions;
-using Acnys.Core.Extensions;
 using Acnys.Core.ValueObjects;
 using Newtonsoft.Json;
 using RabbitMQ.Client;

@@ -13,9 +13,11 @@
     <ProjectReference Include="..\Acnys.Core.AspNet.Eventing\Acnys.Core.AspNet.Eventing.csproj" />
     <ProjectReference Include="..\Acnys.Core.AspNet.RabbitMQ\Acnys.Core.AspNet.RabbitMQ.csproj" />
     <ProjectReference Include="..\Acnys.Core.AspNet.Request\Acnys.Core.AspNet.Request.csproj" />
+    <ProjectReference Include="..\Acnys.Core.AspNet.Tracing\Acnys.Core.AspNet.Tracing.csproj" />
     <ProjectReference Include="..\Acnys.Core.AspNet\Acnys.Core.AspNet.csproj" />
     <ProjectReference Include="..\Acnys.Core.Eventing\Acnys.Core.Eventing.csproj" />
     <ProjectReference Include="..\Acnys.Core.Request\Acnys.Core.Request.csproj" />
+    <ProjectReference Include="..\Acnys.Core.Tracing\Acnys.Core.Tracing.csproj" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.1" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="4.0.0" />
   </ItemGroup>

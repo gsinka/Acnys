@@ -1,9 +1,4 @@
-﻿using System.Collections.Generic;
-using Acnys.Core.Eventing.Abstractions;
-using Acnys.Core.Extensions;
-using Acnys.Core.ValueObjects;
-
-namespace Acnys.Core.Eventing
+﻿namespace Acnys.Core.Eventing
 {
     public static class EventingCorrelationExtensions
     {

@@ -1,4 +1,3 @@
-using Acnys.Core.Attributes;
 using Acnys.Core.Eventing.Abstractions;
 using Acnys.Core.Request.Abstractions;
 using OpenTracing;
@@ -7,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Acnys.Core.Correlation;
+using Acnys.Core.Tracing.Attributes;
 using WebApplication1.Commands;
 
 namespace WebApplication1
@@ -53,7 +53,7 @@ namespace WebApplication1
                 ;
 
             await _eventPublisher.Publish(testEvent, args, cancellationToken);
-            await _eventPublisher.Publish(testEvent2, args2, cancellationToken);
+            //await _eventPublisher.Publish(testEvent2, args2, cancellationToken);
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Acnys.Core.Eventing.Abstractions;
-using Acnys.Core.Extensions;
 using Autofac;
 using Serilog;
 using System.Collections.Generic;

@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-
-namespace Acnys.Core.ValueObjects
+﻿namespace Acnys.Core.ValueObjects
 {
     public class RequestConstants
     {

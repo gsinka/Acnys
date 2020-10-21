@@ -4,10 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Acnys.Core.Correlation;
 using Acnys.Core.Eventing.Abstractions;
-using Acnys.Core.Extensions;
 using Acnys.Core.Request.Abstractions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using WebApplication1.Commands;
 
 namespace WebApplication1.Controllers

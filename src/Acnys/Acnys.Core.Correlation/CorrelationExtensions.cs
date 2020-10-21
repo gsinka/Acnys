@@ -26,15 +26,6 @@ namespace Acnys.Core.Correlation
                         : (Guid?)null;
         }
 
-        public static string TraceId(this IDictionary<string, object> arguments)
-        {
-            if (arguments == null || !arguments.ContainsKey(RequestConstants.TraceId)) return null;
-
-            var value = arguments[RequestConstants.TraceId];
-            
-            return value.ToString();
-        }
-
         public static Guid? CausationId(this IDictionary<string, object> arguments)
         {
             if (arguments == null || !arguments.ContainsKey(RequestConstants.CausationId)) return null;
@@ -61,13 +52,6 @@ namespace Acnys.Core.Correlation
                 arguments[RequestConstants.CorrelationId] = correlationId;
             }
 
-            return arguments;
-        }
-
-        public static IDictionary<string, object> UseTraceId(this IDictionary<string, object> arguments, string traceId)
-        {
-            if (string.IsNullOrWhiteSpace(traceId)) return arguments;
-            arguments.Add(RequestConstants.TraceId, traceId);
             return arguments;
         }
 

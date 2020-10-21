@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Acnys.Core.Correlation;
-using Acnys.Core.Extensions;
 using Xunit;
 
 namespace Acnys.Core.Tests

@@ -21,7 +21,8 @@ namespace Acnys.Core.Request.Infrastructure.Extensions
         {
             builder.Register(context => new RequestSender(
                 context.Resolve<ILogger>().ForContext<RequestSender>(),
-                context.Resolve<IIndex<object, ISendRequest>>(),
+                context.Resolve<IIndex<object, ISendCommand>>(),
+                context.Resolve<IIndex<object, ISendQuery>>(),
                 keySelector
             )).AsImplementedInterfaces().InstancePerLifetimeScope();
 
@@ -42,7 +43,10 @@ namespace Acnys.Core.Request.Infrastructure.Extensions
             }
             else
             {
-                builder.RegisterType<LoopbackRequestSender>().Keyed<ISendRequest>(senderKey).InstancePerLifetimeScope();
+                builder.RegisterType<LoopbackRequestSender>()
+                    .Keyed<ISendCommand>(senderKey)
+                    .Keyed<ISendQuery>(senderKey)
+                    .InstancePerLifetimeScope();
             }
 
             return builder;
@@ -62,19 +66,29 @@ namespace Acnys.Core.Request.Infrastructure.Extensions
             {
                 builder.RegisterType<HttpClientHandler>().AsSelf().SingleInstance();
                 builder.Register(context =>
-                        new HttpRequestSender(context.Resolve<ILogger>().ForContext<HttpRequestSender>(),
+                        new HttpCommandSender(context.Resolve<ILogger>().ForContext<HttpCommandSender>(),
                             context.Resolve<HttpClientHandler>(),
                             uri))
-                    .As<ISendRequest>().InstancePerLifetimeScope();
+                    .AsImplementedInterfaces().InstancePerLifetimeScope();
+                builder.Register(context =>
+                        new HttpQuerySender(context.Resolve<ILogger>().ForContext<HttpQuerySender>(),
+                            context.Resolve<HttpClientHandler>(),
+                            uri))
+                    .AsImplementedInterfaces().InstancePerLifetimeScope();
             }
             else
             {
                 builder.RegisterType<HttpClientHandler>().Keyed<HttpClientHandler>(senderKey).AsSelf().SingleInstance();
                 builder.Register(context =>
-                        new HttpRequestSender(context.Resolve<ILogger>().ForContext<HttpRequestSender>(),
+                        new HttpCommandSender(context.Resolve<ILogger>().ForContext<HttpCommandSender>(),
                             context.ResolveKeyed<HttpClientHandler>(senderKey),
                             uri))
-                    .Keyed<ISendRequest>(senderKey).InstancePerLifetimeScope();
+                    .Keyed<ISendCommand>(senderKey).InstancePerLifetimeScope();
+                builder.Register(context =>
+                        new HttpQuerySender(context.Resolve<ILogger>().ForContext<HttpQuerySender>(),
+                            context.ResolveKeyed<HttpClientHandler>(senderKey),
+                            uri))
+                    .Keyed<ISendQuery>(senderKey).InstancePerLifetimeScope();
             }
 
             return builder;
