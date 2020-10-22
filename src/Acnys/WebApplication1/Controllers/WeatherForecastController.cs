@@ -48,23 +48,25 @@ namespace WebApplication1.Controllers
             //_eventPublisher.Publish(new TestEvent("test"));
             await _sender.Send(new TestCommand("data"), arguments: new Dictionary<string, object>{ { "source", "weather forecast"} }.UseCorrelationId(correlationId));
             
-            await Task.Delay(50);
+            //await Task.Delay(50);
 
-            var testEventAwaiter = _eventRecorder
-                .WaitFor<TestEvent>(
-                    (evnt, args) => evnt.Data == "data" && args.CorrelationId() == correlationId, 
-                    TimeSpan.FromSeconds(5));
+            //var testEventAwaiter = _eventRecorder
+            //    .WaitFor<TestEvent>(
+            //        (evnt, args) => evnt.Data == "data" && args.CorrelationId() == correlationId, 
+            //        TimeSpan.FromSeconds(5));
 
-            var testEvent = await testEventAwaiter;
+            //var testEvent = await testEventAwaiter;
 
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = $"{testEvent?.Data} / {Summaries[rng.Next(Summaries.Length)]}"
-            })
-            .ToArray();
+            //var rng = new Random();
+            //return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            //{
+            //    Date = DateTime.Now.AddDays(index),
+            //    TemperatureC = rng.Next(-20, 55),
+            //    Summary = $"{testEvent?.Data} / {Summaries[rng.Next(Summaries.Length)]}"
+            //})
+            //.ToArray();
+
+            return Enumerable.Empty<WeatherForecast>();
         }
 
         [HttpGet("query")]

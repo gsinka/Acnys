@@ -12,10 +12,9 @@ namespace WebApplication1
         private readonly ISendRequest _requestSender;
         private readonly ISendCommand _commandSender;
 
-        public TestEventHandler(ISendRequest requestSender, ISendCommand commandSender)
+        public TestEventHandler(ISendRequest requestSender)
         {
             _requestSender = requestSender;
-            _commandSender = commandSender;
         }
 
         public async Task Handle(TestEvent @event, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)

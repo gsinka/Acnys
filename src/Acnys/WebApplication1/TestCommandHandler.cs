@@ -53,7 +53,7 @@ namespace WebApplication1
                 ;
 
             await _eventPublisher.Publish(testEvent, args, cancellationToken);
-            //await _eventPublisher.Publish(testEvent2, args2, cancellationToken);
+            await _eventPublisher.Publish(testEvent2, args2, cancellationToken);
         }
     }
 }
