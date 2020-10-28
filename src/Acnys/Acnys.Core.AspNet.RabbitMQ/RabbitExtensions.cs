@@ -14,9 +14,17 @@ namespace Acnys.Core.AspNet.RabbitMQ
         {
             return hostBuilder.ConfigureContainer<ContainerBuilder>((context, builder) =>
                 {
+
                     builder.AddRabbitConnection(factory => connectionBuilder(context, factory));
-                    builder.AddRabbitEventPublisher(exchange);
-                    builder.AddRabbitEventListener(queue, requeueOnNack, consumerCount, consumerTag);
+                    builder.AddRabbitChannel();
+
+                    builder.AddRabbitConnection(factory => connectionBuilder(context, factory), "listener");
+                    builder.AddRabbitEventListener(queue, requeueOnNack, consumerCount, consumerTag, "listener");
+
+                    builder.AddRabbitConnection(factory => connectionBuilder(context, factory), "publisher");
+                    builder.AddRabbitChannel("publisher");
+                    builder.AddRabbitEventPublisher(exchange, "publisher");
+                    
                     builder.RegisterType<RabbitService>().AsImplementedInterfaces().SingleInstance();
 
                     if (autoStartListener) builder.AutoStartRabbitEventListeners();
@@ -33,9 +41,17 @@ namespace Acnys.Core.AspNet.RabbitMQ
             return hostBuilder.ConfigureContainer<ContainerBuilder>((context, builder) =>
                     {
                         var (exchange, queue, autoStartListener, consumerTag, consumerCount) = properties(context);
+
                         builder.AddRabbitConnection(factory => connectionBuilder(context, factory));
-                        builder.AddRabbitEventPublisher(exchange);
-                        builder.AddRabbitEventListener(queue, consumerCount: consumerCount, consumerTag: consumerTag);
+                        builder.AddRabbitChannel();
+
+                        builder.AddRabbitConnection(factory => connectionBuilder(context, factory), "listener");
+                        builder.AddRabbitEventListener(queue, consumerTag : consumerTag, consumerCount: consumerCount, connectionKey: "listener");
+
+                        builder.AddRabbitConnection(factory => connectionBuilder(context, factory), "publisher");
+                        builder.AddRabbitChannel("publisher");
+                        builder.AddRabbitEventPublisher(exchange, "publisher");
+
                         builder.RegisterType<RabbitService>().AsImplementedInterfaces().SingleInstance();
 
                         if (autoStartListener) builder.AutoStartRabbitEventListeners();
@@ -52,9 +68,21 @@ namespace Acnys.Core.AspNet.RabbitMQ
             return hostBuilder.ConfigureContainer<ContainerBuilder>((context, builder) =>
                     {
                         var (exchange, queue, requeueOnNack, autoStartListener, consumerTag, consumerCount) = properties(context);
+
+                        //builder.AddRabbitConnection(factory => connectionBuilder(context, factory));
+                        //builder.AddRabbitEventPublisher(exchange);
+                        //builder.AddRabbitEventListener(queue, requeueOnNack, consumerCount, consumerTag);
+
                         builder.AddRabbitConnection(factory => connectionBuilder(context, factory));
-                        builder.AddRabbitEventPublisher(exchange);
-                        builder.AddRabbitEventListener(queue, requeueOnNack, consumerCount, consumerTag);
+                        builder.AddRabbitChannel();
+
+                        builder.AddRabbitConnection(factory => connectionBuilder(context, factory), "listener");
+                        builder.AddRabbitEventListener(queue, requeueOnNack: requeueOnNack, consumerTag: consumerTag, consumerCount: consumerCount, connectionKey: "listener");
+
+                        builder.AddRabbitConnection(factory => connectionBuilder(context, factory), "publisher");
+                        builder.AddRabbitChannel("publisher");
+                        builder.AddRabbitEventPublisher(exchange, "publisher");
+
                         builder.RegisterType<RabbitService>().AsImplementedInterfaces().SingleInstance();
 
                         if (autoStartListener) builder.AutoStartRabbitEventListeners();

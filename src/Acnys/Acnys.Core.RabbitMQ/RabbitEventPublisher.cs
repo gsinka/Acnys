@@ -34,11 +34,12 @@ namespace Acnys.Core.RabbitMQ
         /// <param name="publishContext">Publish context builder function for building routing key, mandatory flag and properties</param>
         public RabbitEventPublisher(
             ILogger log,
-            IConnection connection, 
+            //IConnection connection,
+            IModel model,
             string exchange, 
             Func<IEvent, IDictionary<string, object>, (string routingKey, bool mandatory, IBasicProperties properties, byte[] body)> publishContext)
         {
-            _model = connection.CreateModel();
+            _model = model;
             _log = log;
             _exchange = exchange;
             _publishContext = publishContext;
