@@ -14,7 +14,6 @@ namespace Acnys.Core.AspNet.RabbitMQ
         {
             return hostBuilder.ConfigureContainer<ContainerBuilder>((context, builder) =>
                 {
-
                     builder.AddRabbitConnection(factory => connectionBuilder(context, factory));
                     builder.AddRabbitChannel();
 

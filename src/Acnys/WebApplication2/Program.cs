@@ -75,6 +75,8 @@ namespace WebApplication2
                         {
                             factory.Uri = new Uri(context.Configuration["Rabbit:Uri"]);
                             factory.AutomaticRecoveryEnabled = true;
+                            factory.NetworkRecoveryInterval = new TimeSpan(0, 0, 1);
+                            factory.TopologyRecoveryEnabled = true;
 
                         }, "test", "test2", consumerCount: 5, consumerTag: "test-tag")
 
