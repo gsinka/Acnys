@@ -7,7 +7,7 @@ using Serilog;
 
 namespace Acnys.Core.Request.Infrastructure.Senders
 {
-    public class LoopbackRequestSender : ISendCommand, ISendQuery
+    public class LoopbackRequestSender : ISendCommand, ISendQuery, ISendRequest
     {
         private readonly ILogger _log;
         private readonly ILifetimeScope _scope;
