@@ -19,14 +19,16 @@ namespace WebApplication1
         private readonly UserContext _context;
         private readonly ITracer _tracer;
         private readonly CorrelationContext _correlationContext;
+        private readonly ISendCommand _sendCommand;
 
-        public TestCommandHandler(IPublishEvent eventPublisher, ILogger log, UserContext context, ITracer tracer, CorrelationContext correlationContext)
+        public TestCommandHandler(IPublishEvent eventPublisher, ILogger log, UserContext context, ITracer tracer, CorrelationContext correlationContext, ISendCommand sendCommand)
         {
             _eventPublisher = eventPublisher;
             _log = log;
             _context = context;
             _tracer = tracer;
             _correlationContext = correlationContext;
+            _sendCommand = sendCommand;
         }
 
         public async Task Handle(TestCommand command, IDictionary<string, object> arguments = null, CancellationToken cancellationToken = default)
