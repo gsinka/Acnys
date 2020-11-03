@@ -1,0 +1,98 @@
+version: '2.1'
+
+services:
+
+  rabbitmq:
+    image: rabbitmq
+    container_name: rabbitmq
+    restart: always
+    build: env/RabbitMQ    
+    ports:
+      - 15672:15672
+      - 5672:5672
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping", "-q"]
+      interval: 5s
+      timeout: 2s
+      retries: 15
+
+  postgres:
+    image: postgres
+    restart: always
+    container_name: postgres
+    build: env/PostgreSQL
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_PASSWORD=postgres
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "100m"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 2s
+      retries: 15
+      
+  pgadmin:
+    image: pgadmin
+    container_name: pgadmin
+    restart: always
+    build:
+      context: ./env/pgadmin    
+    environment:
+    - PGADMIN_DEFAULT_EMAIL=admin
+    - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:      
+    - 8080:80
+    
+  seq:
+    image: datalust/seq:latest
+    restart: always
+    container_name: seq
+    environment:
+    - ACCEPT_EULA=Y
+    ports:
+    - 5341:80
+    
+  prometheus:
+    image: prom/prometheus:0.18.0
+    container_name: prometheus
+    volumes:
+      - ./env/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '-config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - '9090:9090'
+      
+  prometheus-pushgateway:
+    image: prom/pushgateway
+    container_name: prometheus-pushgateway
+    ports:
+      - '9091:9091'
+      
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./env/prometheus/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+      - ./env/prometheus/dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml
+      - ./env/prometheus/dashboard.json:/etc/dashboards/develop/dashboard.json
+    # volumes:
+    #   - grafana_data:/var/lib/grafana
+  
+  jaeger:
+    image: jaegertracing/all-in-one:1.9
+    container_name: jaeger
+    ports:
+      - 6831:6831/udp # endpoint
+      - 16686:16686 # frontend

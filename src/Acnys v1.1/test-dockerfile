@@ -1,0 +1,22 @@
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
+WORKDIR /src
+EXPOSE 80
+# PROXY
+
+ENV http_proxy=http://ep.threatpulse.net:80
+ENV https_proxy=http://ep.threatpulse.net:80
+ENV no_proxy=.conti.de,kxg-sms,kxg-smc,kxg
+ENV MSBUILDSINGLELOADCONTEXT=1
+
+# certificate fix
+COPY jfrog_base64.cert /usr/local/share/ca-certificates/jfrog_base64.crt
+COPY cloud_base64.cert /usr/local/share/ca-certificates/cloud_base64.crt
+RUN update-ca-certificates
+
+COPY nuget.config ./nuget.config
+
+COPY . .
+
+RUN dotnet restore "src/Acnys v1.1/Acnys.RabbitMQ.Tests/Acnys.RabbitMQ.Tests.csproj"
+
+ENTRYPOINT ["dotnet", "test", "src/Acnys v1.1/Acnys.RabbitMQ.Tests/Acnys.RabbitMQ.Tests.csproj", "-l:trx;LogFileName=/var/testresults/result.xml", "--blame"]
