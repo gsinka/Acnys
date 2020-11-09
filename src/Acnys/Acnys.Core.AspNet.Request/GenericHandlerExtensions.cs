@@ -17,7 +17,7 @@ namespace Acnys.Core.AspNet.Request
             });
         }
        
-        public static IHostBuilder MapHttpRequestHandler(this IEndpointRouteBuilder app, string path = null)
+        public static IEndpointConventionBuilder MapHttpRequestHandler(this IEndpointRouteBuilder app, string path = null)
         {
             Log.Verbose("Mapping HTTP request handler service on path {path}", path);
 
