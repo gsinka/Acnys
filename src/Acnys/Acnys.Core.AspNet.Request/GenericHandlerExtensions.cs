@@ -17,12 +17,12 @@ namespace Acnys.Core.AspNet.Request
             });
         }
        
-        public static void MapHttpRequestHandler(this IEndpointRouteBuilder app, string path = null)
+        public static IHostBuilder MapHttpRequestHandler(this IEndpointRouteBuilder app, string path = null)
         {
             Log.Verbose("Mapping HTTP request handler service on path {path}", path);
 
             path ??= "";
-            app.MapControllerRoute("generic", $"{((path ?? "").EndsWith("/") ? path : path + "/")}{{controller=GenericRequestHandler}}/{{action=post}}");
+            return app.MapControllerRoute("generic", $"{((path ?? "").EndsWith("/") ? path : path + "/")}{{controller=GenericRequestHandler}}/{{action=post}}");
         }
     }
 }
