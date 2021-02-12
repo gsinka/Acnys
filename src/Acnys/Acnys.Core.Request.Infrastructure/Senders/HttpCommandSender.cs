@@ -36,10 +36,7 @@ namespace Acnys.Core.Request.Infrastructure.Senders
             _log.Verbose("Command data: {@command}", command);
             _log.Verbose("Command arguments: {@arguments}", arguments);
 
-            using var httpClient = new HttpClient(_httpHandler, false)
-            {
-                Timeout = TimeSpan.FromSeconds(30),
-            };
+            using var httpClient = new HttpClient(_httpHandler, false);
 
             var commandJson = JsonConvert.SerializeObject(command);
 
