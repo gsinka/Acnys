@@ -2,30 +2,27 @@ name: Continous Integration
 
 on:
   push:
-    branches: 
+    branches:
       - develop
       - release/*
     tags-ignore:
-      - '*'
-      
+      - "*"
+
 jobs:
-  
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+      - run: |
+          git fetch origin +refs/heads/*:refs/remotes/origin/* --unshallow --tags -f
 
-    - uses: actions/checkout@v2
-    - run: |
-        git fetch origin +refs/heads/*:refs/remotes/origin/* --unshallow --tags
-    
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.100
 
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 3.1.100
-    
-    - name: Build
-      run: dotnet build ./src/Acnys/Acnys.sln --configuration Release
-    
-    - name: Test
-      run: dotnet test ./src/Acnys/Acnys.sln
+      - name: Build
+        run: dotnet build ./src/Acnys/Acnys.sln --configuration Release
+
+      - name: Test
+        run: dotnet test ./src/Acnys/Acnys.sln
