@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Acnys.Core.Eventing.Abstractions;
+using Acnys.Core.Exceptions;
 using Acnys.Core.Extensions;
 using Acnys.Core.Request.Abstractions;
 using Microsoft.AspNetCore.Mvc;
@@ -41,6 +42,12 @@ namespace WebApplication1.Controllers
 
         }
 
+        [HttpGet("GenerateBusinessException")]
+        public async Task GenerateBusinessException()
+        {
+            var correlationId = Guid.NewGuid();
+            throw new BusinessException(1234, "Test Business exception");
+        }
         [HttpGet]
         public async Task<IEnumerable<WeatherForecast>> Get()
         {

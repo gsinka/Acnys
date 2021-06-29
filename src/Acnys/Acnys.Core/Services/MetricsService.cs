@@ -1,4 +1,5 @@
-﻿using Prometheus;
+﻿using Acnys.Core.Exceptions;
+using Prometheus;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,7 +20,7 @@ namespace Acnys.Core.Services
             get
             {
                 if (_summary == null)
-                    _summary = Metrics.CreateSummary("microservice_handler_durations", "Auto-generated summary for handler durations in second", new SummaryConfiguration() { LabelNames = new[] { "handler_namespace", "handler_name","trigger_namespace", "trigger_name", "handler_type" } });
+                    _summary = Metrics.CreateSummary("microservice_handler_durations", "Auto-generated summary for handler durations in second", new SummaryConfiguration() { LabelNames = new[] { "handler_namespace", "handler_name", "trigger_namespace", "trigger_name", "handler_type" } });
                 return _summary;
             }
         }
@@ -39,11 +40,19 @@ namespace Acnys.Core.Services
         {
             get
             {
-                if (_exceptionCounter == null) _exceptionCounter = Metrics.CreateCounter("microservice_exceptions", "Auto-generated exception counter metrics", new CounterConfiguration() { LabelNames = new[] { "file", "line", "exception_namespace", "exception_name" } });
+                if (_exceptionCounter == null) _exceptionCounter = Metrics.CreateCounter("microservice_exceptions", "Auto-generated exception counter metrics", new CounterConfiguration()
+                {
+                    LabelNames = new[] {
+                    "file",
+                    "line",
+                    "exception_namespace",
+                    "exception_name",
+                    "business_code"}
+                });
                 return _exceptionCounter;
             }
         }
-        public void PutObservationInSecond(string handlerNamespace, string handlerName, string triggerNamespace,string triggerName, double val, string type = "")
+        public void PutObservationInSecond(string handlerNamespace, string handlerName, string triggerNamespace, string triggerName, double val, string type = "")
         {
             HandlerDurations.
                 WithLabels(
@@ -68,14 +77,16 @@ namespace Acnys.Core.Services
         {
             var s = new StackTrace(e, true);
             var frame = s.GetFrame(0);
-            var file = frame.GetFileName()?.Split('\\')?.Last()??"n/a";
+            var file = frame.GetFileName()?.Split('\\')?.Last() ?? "n/a";
+            var businessExceptionCode = e is BusinessException businessException ? businessException.ErrorCode.ToString() : "n/a";
 
             ExceptionCounter.
                 WithLabels(
                 file,
                 frame.GetFileLineNumber().ToString(),
                 e.GetType().Namespace,
-                e.GetType().Name).
+                e.GetType().Name,
+                businessExceptionCode).
                 Inc();
         }
     }
