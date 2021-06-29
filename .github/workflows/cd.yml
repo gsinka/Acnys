@@ -17,18 +17,22 @@ jobs:
         with:
           dotnet-version: 3.1.100
 
+      - name: Get version
+        run: echo "app_version=`git describe --tags`" >> $GITHUB_ENV
+      - name: Get release status
+        run: echo "app_release=`(git describe --tags --exact-match>/dev/null 2>&1 && echo true) || echo false`" >> $GITHUB_ENV
+      - name: Status
+        run: echo "Release=$app_release, version=$app_version"
+
       - name: Build
-        shell: bash
-        run: |
-          tag=$(git describe --tags --abbrev=0)
-          dotnet build ./src/Acnys/Acnys.sln --configuration Release -p:Version=$tag
+        run: dotnet build ./src/Acnys/Acnys.sln --configuration Release -p:Version=$app_version
 
       - name: Test
         run: dotnet test ./src/Acnys/Acnys.sln
 
       - name: Pack
         run: |
-          dotnet pack ./src/Acnys/Acnys.sln --configuration Release -p:Version=$tag --output ./packages --include-symbols --include-source
+          dotnet pack ./src/Acnys/Acnys.sln --configuration Release -p:Version=$app_version --output ./packages --include-symbols --include-source
 
       - name: publish
         run: dotnet nuget push ./packages/**/*.nupkg --skip-duplicate true --no-symbols true --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.nuget_api_key }}
